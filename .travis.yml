@@ -7,8 +7,10 @@ python:
 cache: pip
 
 install:
+  - pip install -e .[develop]
   - pip install sphinx
 
 script:
-  true
+  - python setup.py test
+  
 deploy:
