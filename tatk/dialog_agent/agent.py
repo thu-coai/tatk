@@ -5,8 +5,13 @@ class BaseAgent:
     """
     Base dialog agent class.
     """
-
     def __init__(self):
+        pass
+
+    def response(self, input, sess):
+        pass
+
+    def init_session(self):
         pass
 
 
@@ -21,9 +26,6 @@ class PipelineAgent(BaseAgent):
         self.policy = policy
         self.nlg_model = nlg_model
 
-    def response(self, input, sess):
-        pass
-
 
 class End2EndAgent(BaseAgent):
     """
@@ -31,6 +33,3 @@ class End2EndAgent(BaseAgent):
     """
     def __init__(self):
         super().__init__()
-
-    def response(self, input, sess):
-        pass
