@@ -12,7 +12,7 @@ class Session:
         Args:
             sys_agent (Dialog_System): An instance of dialog systenm agent.
             simulator (User_Simulator): An instance of user simulator.
-            kb_query: database query function
+            kb_query (Knowledge Base Query): An instance of database query.
         """
         self.sys_agent = sys_agent
         self.simulator = simulator
