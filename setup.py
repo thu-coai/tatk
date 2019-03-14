@@ -53,7 +53,7 @@ setup(
 		]
 	},
 	include_package_data=True,
-	url='https://github.com/thu-coai/contk',
+	url='https://github.com/thu-coai/tatk',
 	author='thu-coai',
 	author_email='thu-coai-developer@googlegroups.com',
 	python_requires='>=3.5',
