@@ -36,9 +36,10 @@ class User_Policy(Policy):
 class Sys_Policy(Policy):
     """Base class for system policy model."""
 
-    def __init__(self):
+    def __init__(self, is_train=False):
         """ Constructor for Sys_Policy class. """
         super().__init__()
+        self.is_train = is_train
         pass
 
     def predict(self, state, sess=None):
