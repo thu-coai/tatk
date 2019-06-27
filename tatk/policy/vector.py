@@ -18,7 +18,7 @@ class Vector():
         
     def action_vectorize(action):
         """
-        vectorize a action
+        vectorize an action
         Args:
             action (tuple): Dialog act
         Returns:
@@ -38,7 +38,7 @@ class Vector():
         
     def action_devectorize(action_vec):
         """
-        recover a action
+        recover an action
         Args:
             action_vec (np.array): Dialog act vector
         Returns:
