@@ -200,7 +200,7 @@ class Value(nn.Module):
 
         return value
 
-Transition = namedtuple('Transition', ('state', 'action', 'mask', 'next_state'))
+Transition = namedtuple('Transition', ('state', 'action', 'reward', 'next_state', 'mask'))
 
 class Memory(object):
 

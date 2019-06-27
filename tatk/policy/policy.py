@@ -31,6 +31,12 @@ class User_Policy(Policy):
             reward (float): Reward given by the user.
         """
         pass
+    
+    def init_session(self):
+        """
+        Restore after one session
+        """
+        pass
 
 
 class Sys_Policy(Policy):
