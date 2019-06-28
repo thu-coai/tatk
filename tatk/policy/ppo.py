@@ -2,11 +2,11 @@
 import torch
 import numpy as np
 import logging
-from tasktk.policy.policy import Sys_Policy
+from tasktk.policy.policy import Policy
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-class PPO(Sys_Policy):
+class PPO(Policy):
     
     def __init__(self, is_train=False):
         self.is_train = is_train
