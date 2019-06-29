@@ -2,7 +2,7 @@
 import torch
 import numpy as np
 import logging
-from tasktk.policy.policy import Policy
+from tatk.policy.policy import Policy
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

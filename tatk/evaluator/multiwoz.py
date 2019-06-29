@@ -4,8 +4,8 @@ import re
 import numpy as np
 from copy import deepcopy
 
-from convlab.evaluator.evaluator import Evaluator
-from convlab.modules.util.multiwoz.dbquery import dbs
+from tatk.evaluator.evaluator import Evaluator
+from tatk.util.multiwoz.dbquery import dbs
 
 requestable = \
 {'attraction': ['post', 'phone', 'addr', 'fee', 'area', 'type'],
