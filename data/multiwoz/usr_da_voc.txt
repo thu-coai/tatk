@@ -9,8 +9,6 @@ Attraction-Request-Phone-?
 Attraction-Request-Post-?
 Attraction-Request-Type-?
 Hospital-Inform-Department-1
-Hospital-Inform-Phone-1
-Hospital-Inform-Post-1
 Hospital-Inform-none-none
 Hospital-Request-Addr-?
 Hospital-Request-Phone-?
@@ -36,9 +34,7 @@ Hotel-Request-Price-?
 Hotel-Request-Ref-?
 Hotel-Request-Stars-?
 Hotel-Request-Type-?
-Police-Inform-Addr-1
 Police-Inform-Name-1
-Police-Inform-Phone-1
 Police-Inform-none-none
 Police-Request-Addr-?
 Police-Request-Phone-?
@@ -64,7 +60,6 @@ Taxi-Inform-Dest-1
 Taxi-Inform-Leave-1
 Taxi-Inform-none-none
 Taxi-Request-Car-?
-Taxi-Request-Phone-?
 Train-Inform-Arrive-1
 Train-Inform-Day-1
 Train-Inform-Depart-1
