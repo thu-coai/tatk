@@ -6,7 +6,12 @@ class Vector():
     def __init__(self):
         pass
     
-    def state_vectorize(state):
+    def generate_dict(self):
+        """
+        init the dict for mapping state/action into vector
+        """
+    
+    def state_vectorize(self, state):
         """
         vectorize a state
         Args:
@@ -16,27 +21,7 @@ class Vector():
         """
         raise NotImplementedError
         
-    def action_vectorize(action):
-        """
-        vectorize an action
-        Args:
-            action (tuple): Dialog act
-        Returns:
-            action_vec (np.array): Dialog act vector
-        """
-        raise NotImplementedError
-        
-    def state_devectorize(state_vec):
-        """
-        recover a state
-        Args:
-            state_vec (np.array): Dialog state vector
-        Returns:
-            state (tuple): Dialog state
-        """
-        raise NotImplementedError
-        
-    def action_devectorize(action_vec):
+    def action_devectorize(self, action_vec):
         """
         recover an action
         Args:
