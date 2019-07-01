@@ -1,10 +1,11 @@
 from copy import deepcopy
+from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA
 
 def delexicalize_da(meta, requestable):
     meta = deepcopy(meta)
     for k, v in meta.items():
         domain, intent = k.split('-')
-        if intent.lower() in requestable:
+        if intent in requestable:
             for pair in v:
                 pair.insert(1, '?')
         else:
@@ -44,24 +45,25 @@ def lexicalize_da(meta, entities, state, requestable):
     
     for k, v in meta.items():
         domain, intent = k.split('-')
-        if intent.lower() in requestable:
+        if intent in requestable:
             for pair in v:
-                v[1] = '?'
+                pair[1] = '?'
         elif intent.lower() in ['nooffer', 'nobook']:
             for pair in v:
-                if v[0] in state[domain]['semi']:
-                    v[1] = state[domain]['semi'][v[0]]
+                if pair[0] in state[domain.lower()]['semi']:
+                    pair[1] = state[domain.lower()]['semi'][pair[0]]
                 else:
-                    v[1] = 'none'
+                    pair[1] = 'none'
         else:
             for pair in v:
-                if v[1] == 'none':
+                if pair[1] == 'none':
                     continue
-                elif v[0].lower() == 'choice':
-                    v[1] = str(len(entities[domain]))
+                elif pair[0].lower() == 'choice':
+                    pair[1] = str(len(entities[domain]))
                 else:
-                    n = int(v[1]) - 1
-                    if len(entities[domain]) > n and v[0] in entities[domain][n]:
-                        v[1] = entities[domain][n][v[0]]
+                    n = int(pair[1]) - 1
+                    if len(entities[domain]) > n and REF_SYS_DA[domain][pair[0]] in entities[domain][n]:
+                        pair[1] = entities[domain][n][REF_SYS_DA[domain][pair[0]]]
                     else:
-                        v[1] = 'none'    
+                        pair[1] = 'none'    
+    return meta

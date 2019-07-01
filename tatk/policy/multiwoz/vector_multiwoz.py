@@ -3,7 +3,8 @@ import os
 import json
 import numpy as np
 from tatk.policy.vector import Vector
-from tatk.util.lexicalize import delexicalize_da, flat_da, deflat_da, lexicalize_da
+from tatk.util.multiwoz.lexicalize import delexicalize_da, flat_da, deflat_da, lexicalize_da
+from tatk.util.multiwoz.multiwoz_slot_trans import REF_USR_DA
 from tatk.util.multiwoz.dbquery import query
 
 mapping = {'restaurant': {'addr': 'address', 'area': 'area', 'food': 'food', 'name': 'name', 'phone': 'phone', 'post': 'postcode', 'price': 'pricerange'},
@@ -13,6 +14,8 @@ mapping = {'restaurant': {'addr': 'address', 'area': 'area', 'food': 'food', 'na
            'taxi': {'car': 'car type', 'phone': 'phone'},
            'hospital': {'post': 'postcode', 'phone': 'phone', 'addr': 'address', 'department': 'department'},
            'police': {'post': 'postcode', 'phone': 'phone', 'addr': 'address'}}
+
+
 
 class MultiWozVector(Vector):
     
@@ -66,10 +69,10 @@ class MultiWozVector(Vector):
         pointer_vector = np.zeros(6 * len(self.db_domains))
         for domain in self.db_domains:
             constraint = []
-            for k, v in turn[domain]['semi'].items():
-                if k in mapping[domain]:
-                    constraint.append((mapping[domain][k], v))
-            entities = query(domain, constraint)
+            for k, v in turn[domain.lower()]['semi'].items():
+                if k in mapping[domain.lower()]:
+                    constraint.append((mapping[domain.lower()][k], v))
+            entities = query(domain.lower(), constraint)
             pointer_vector = self.one_hot_vector(len(entities), domain, pointer_vector)
     
         return pointer_vector
@@ -116,7 +119,7 @@ class MultiWozVector(Vector):
         Returns:
             state_vec (np.array): Dialog state vector
         """
-        self.state = state
+        self.state = state['belief_state']
         
         opp_action = delexicalize_da(state['action'], self.requestable)
         opp_action = flat_da(opp_action)
@@ -132,8 +135,8 @@ class MultiWozVector(Vector):
             
         inform = np.zeros(self.inform_dim)
         for domain in self.belief_domains:
-            for slot, value in state['belief_state'][domain]['semi'].items():
-                dom_slot, p = domain+'-'+slot+'-', 1
+            for slot, value in state['belief_state'][domain.lower()]['semi'].items():
+                dom_slot, p = domain+'-'+REF_USR_DA[domain][slot]+'-', 1
                 key = dom_slot + str(p)
                 while inform[self.inform2vec[key]]:
                     p += 1
@@ -145,7 +148,7 @@ class MultiWozVector(Vector):
 
         book = np.zeros(len(self.db_domains))
         for i, domain in enumerate(self.db_domains):
-            if state['belief_state'][domain]['book']['booked']:
+            if state['belief_state'][domain.lower()]['book']['booked']:
                 book[i] = 1.
     
         degree = self.pointer(state['belief_state'])
@@ -164,18 +167,19 @@ class MultiWozVector(Vector):
             action (tuple): Dialog act
         """
         act_array = []
-        for idx in action_vec:
-            act_array.append(self.vec2act[idx])
+        for i, idx in enumerate(action_vec):
+            if idx == 1:
+                act_array.append(self.vec2act[i])
         action = deflat_da(act_array)
         entities = {}
         for domint in action:
             domain, intent = domint.split('-')
             if domain not in entities:
                 constraint = []
-                for k, v in self.state[domain]['semi'].items():
-                    if k in mapping[domain]:
-                        constraint.append((mapping[domain][k], v))
-                entities[domain] = query(domain, constraint)
+                for k, v in self.state[domain.lower()]['semi'].items():
+                    if k in mapping[domain.lower()]:
+                        constraint.append((mapping[domain.lower()][k], v))
+                entities[domain] = query(domain.lower(), constraint)
         action = lexicalize_da(action, entities, self.state, self.requestable)
         return action
         
