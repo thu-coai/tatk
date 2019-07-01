@@ -4,17 +4,15 @@ import json
 import os
 import random
 
-from nltk.stem.porter import PorterStemmer
-
-stemmer = PorterStemmer()
 
 # loading databases
 domains = ['restaurant', 'hotel', 'attraction', 'train', 'hospital', 'taxi', 'police']
 dbs = {}
 for domain in domains:
-    dbs[domain] = json.load(open(os.path.join(os.path.dirname(os.path.dirname(
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))), 
-        'data/multiwoz/db/{}_db.json'.format(domain))))
+    with open(os.path.join(os.path.dirname(
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))), 
+            'data/multiwoz/db/{}_db.json'.format(domain))) as f:
+        dbs[domain] = json.load(f)
 
 def query(domain, constraints, ignore_open=True):
     """Returns the list of entities for a given domain
@@ -36,8 +34,8 @@ def query(domain, constraints, ignore_open=True):
                 pass
             else:
                 try:
-                    record_keys = [key.lower() for key in record]
-                    if key.lower() not in record_keys and stemmer.stem(key) not in record_keys:
+                    record_keys = [k.lower() for k in record]
+                    if key.lower() not in record_keys:
                         continue
                     if key == 'leaveAt':
                         val1 = int(val.split(':')[0]) * 100 + int(val.split(':')[1])

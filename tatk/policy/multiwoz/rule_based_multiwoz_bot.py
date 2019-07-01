@@ -618,5 +618,3 @@ def test_run():
     system_act = policy.predict(fake_state())
     print(json.dumps(system_act, indent=4))
 
-if __name__ == '__main__':
-    test_run()
