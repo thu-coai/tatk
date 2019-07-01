@@ -135,7 +135,7 @@ class GoalGenerator:
 
     def __init__(self,
                  goal_model_path=os.path.join(
-                     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))),
+                     os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
                      'data/multiwoz/goal/goal_model.pkl'),
                  corpus_path=None,
                  boldify=False):
@@ -639,7 +639,9 @@ class GoalGenerator:
 
 
 if __name__ == "__main__":
-    goal_generator = GoalGenerator(corpus_path='data/multiwoz/annotated_user_da_with_span_full.json')
+    goal_generator = GoalGenerator(corpus_path=os.path.join(os.path.dirname(
+                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+                'data/multiwoz/annotated_user_da_with_span_full.json'))
     while True:
         user_goal = goal_generator.get_user_goal()
         print(user_goal)

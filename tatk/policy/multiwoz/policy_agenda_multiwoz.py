@@ -41,9 +41,10 @@ class UserPolicyAgendaMultiWoz(Policy):
     """ The rule-based user policy model by agenda. Derived from the UserPolicy class """
 
     # load stand value
-    stand_value_dict = json.load(open(os.path.join(os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))),
-                'data/value_set.json')))
+    with open(os.path.join(os.path.dirname(
+                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+                'data/multiwoz/value_set.json')) as f:
+        stand_value_dict = json.load(f)
 
     def __init__(self, max_goal_num=100, seed=2019):
         """
@@ -52,7 +53,9 @@ class UserPolicyAgendaMultiWoz(Policy):
         self.max_turn = 40
         self.max_initiative = 4
 
-        self.goal_generator = GoalGenerator(corpus_path='data/multiwoz/annotated_user_da_with_span_full.json')
+        self.goal_generator = GoalGenerator(corpus_path=os.path.join(os.path.dirname(
+                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+                'data/multiwoz/annotated_user_da_with_span_full.json'))
 
         self.__turn = 0
         self.goal = None
@@ -829,7 +832,7 @@ def test_with_system():
     user_simulator = UserPolicyAgendaMultiWoz()
     user_simulator.init_session()
     state = fake_state()
-    system_agent = RuleBasedMultiwozBot(None, None, None)
+    system_agent = RuleBasedMultiwozBot()
     sys_action = system_agent.predict(state)
     action, session_over, reward = user_simulator.predict(None, sys_action)
     print("Sys:")
@@ -837,7 +840,3 @@ def test_with_system():
     print("User:")
     print(json.dumps(action, indent=4))
 
-
-if __name__ == '__main__':
-    test()
-    # test_with_system()
