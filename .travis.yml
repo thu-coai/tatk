@@ -10,7 +10,22 @@ install:
   - pip install -e .[develop]
   - pip install sphinx
 
-script:
-  - python setup.py test
+script: true
+  # - python setup.py test
   
 deploy:
+  - provider: pages
+    skip-cleanup: true
+    github-token: $DEPLOY_KEY
+    keep-history: true
+    repo: thu-coai/tatk_docs
+    target-branch: master
+    local-dir: ./docs/build
+    on:
+      branch: master
+  - provider: script
+    skip-cleanup: true
+    script: coveralls
+    on:
+      all_branches: true
+      condition: true
