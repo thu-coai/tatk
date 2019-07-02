@@ -12,7 +12,7 @@ install:
 
 script:
   # - python setup.py test
-  - cd docs && make html && mv ./build/html ./build/docs && rm -r ./build/doctrees && cd ..
+  - cd docs && make html && mv ./build/html ./build/docs && rm -r ./build/doctrees && mv LICENSE.txt ./build && mv README.md ./build && cd ..
   
 deploy:
   - provider: pages
