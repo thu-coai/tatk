@@ -32,12 +32,15 @@ class PipelineAgent(Agent):
         If agent A is (nlu, tracker, policy), then the agent B should be like (tracker, policy, nlg) to ensure API
         matching.
     The valid module combinations are as follows:
+           =====   =====    ======  ===     ==      ===
             NLU     DST     Policy  NLG     In      Out
-             +       +         +     +      nl      nl
-             -       +         +     +      da      nl
-             -       +         +     -      da      da
-             +       +         +     -      nl      da
-             -       -         +     -      da      da
+           =====   =====    ======  ===     ==      ===
+            \+      \+        \+    \+      nl      nl
+             o      \+        \+    \+      da      nl
+             o      \+        \+     o      da      da
+            \+      \+        \+     o      nl      da
+             o       o        \+     o      da      da
+           =====   =====    ======  ===     ==      ===
     """
     def __init__(self, nlu_model, tracker, policy, nlg_model):
         """The constructor of PipelineAgent class.
