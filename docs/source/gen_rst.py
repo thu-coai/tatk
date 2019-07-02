@@ -17,12 +17,12 @@ def process(text):
     return result
 
 
-def generate_rst(file):
-    with open(file, 'r', encoding='utf-8') as f:
+def generate_rst(file_):
+    with open(file_, 'r', encoding='utf-8') as f:
         text = f.readlines()
 
     text = process(text)
-    with open(file, 'w', encoding='utf-8') as f:
+    with open(file_, 'w', encoding='utf-8') as f:
         for line in text:
             f.write(line)
 
@@ -30,9 +30,9 @@ def main(**kwargs):
     project = kwargs.get('project')
     if not project:
         return
-    for file in os.listdir('.'):
-        if os.path.isfile(file) and file.startswith(project) and file.endswith('.rst'):
-            generate_rst(file)
+    for file_ in os.listdir('.'):
+        if os.path.isfile(file_) and file_.startswith(project) and file_.endswith('.rst'):
+            generate_rst(file_)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(__doc__)
