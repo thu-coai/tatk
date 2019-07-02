@@ -1,1 +1,1 @@
-from .nlg import NLG
+from tatk.nlg.nlg import NLG
