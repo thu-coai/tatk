@@ -1,1 +1,1 @@
-from .nlu import NLU
+from tatk.nlu.nlu import NLU
