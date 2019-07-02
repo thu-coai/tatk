@@ -1,15 +1,13 @@
-"""Natural Language Understanding Interface"""
+"""Natural language understanding interface."""
+from abc import ABCMeta, abstractmethod
 
+class NLU(metaclass=ABCMeta):
+    """NLU module interface."""
 
-class NLU:
-    """Base class for NLU model."""
-    def __init__(self):
-        """ Constructor for NLU class. """
-        pass
-
-    def parse(self, utterance, sess=None):
+    @abstractmethod
+    def predict(self, utterance):
         """
-        Predict the dialog act of a natural language utterance and apply error model.
+        Predict the dialog act of a natural language utterance.
         Args:
             utterance (str): A natural language utterance.
         Returns:

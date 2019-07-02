@@ -1,20 +1,21 @@
 """Dialog State Tracker Interface"""
+from abc import ABCMeta, abstractmethod
 
-
-class Tracker:
+class Tracker(metaclass=ABCMeta):
     """Base class for dialog state tracker models."""
-    def __init__(self):
-        pass
 
-    def update(self, user_act=None, sess=None):
-        """
-        Update dialog state.
+    @abstractmethod
+    def update(self, dialog_act):
+        """ Update the internal dialog state variable.
+
         Args:
-            sess (Session Object):
+            dialog_act (str or dict): The type is str when Tracker is word-level (such as NBT), and dict when it is
+                    DA-level.
         Returns:
             new_state (tuple): Updated dialog state, with the same form of previous state.
         """
         pass
 
-    def init_session(self):
+    @abstractmethod
+    def init(self):
         pass
