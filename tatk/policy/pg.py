@@ -3,13 +3,15 @@ import torch
 import numpy as np
 import logging
 from tatk.policy.policy import Policy
+from tatk.policy.rlmodule import MultiDiscretePolicy
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class PG(Policy):
     
-    def __init__(self, is_train=False):
+    def __init__(self, cfg, is_train=False):
         self.is_train = is_train
+        self.policy = MultiDiscretePolicy(cfg).to(device=DEVICE)
         
     def predict(self, state, sess=None):
         """
