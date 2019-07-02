@@ -1,28 +1,22 @@
 """Policy Interface"""
+from abc import ABCMeta, abstractmethod
 
-
-class Policy():
+class Policy(metaclass=ABCMeta):
     """Base class for policy model."""
-
-    def __init__(self, is_train=False):
-        """ Constructor for Policy class. """
-        super().__init__()
-        self.is_train = is_train
-        pass
-
-    def predict(self, state, sess=None):
-        """
-        Predict an system action given state.
+	
+    @abstractmethod
+    def predict(self, state):
+        """Predict the next agent action given dialog state.
         Args:
-            state (dict): Dialog state. Please refer to util/state.py
+            state (tuple or dict): when the DST and Policy module are separated, the type of state is tuple.
+                    else when they are aggregated together, the type of state is dict (dialog act).
         Returns:
-            action : System act, with the form of (act_type, {slot_name_1: value_1, slot_name_2, value_2, ...})
+            action (dict): The next dialog action.
         """
         pass
 
+    @abstractmethod
     def init_session(self):
-        """
-        Restore after one session
-        """
+        """Init the class variables for a new session."""
         pass
 
