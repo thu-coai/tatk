@@ -1,6 +1,4 @@
-from .agent import BaseAgent, PipelineAgent, End2EndAgent
-from .system import Dialog_System
-from .user import User_Simulator
-from .session import Session
+from tatk.dialog_agent.agent import Agent, PipelineAgent
+from tatk.dialog_agent.session import Session, BiSession
 
-__all__ = ['BaseAgent', 'PipelineAgent', 'End2EndAgent', 'Dialog_System', 'User_Simulator', 'Session']
+__all__ = ['Agent', 'PipelineAgent','Session', 'BiSession']

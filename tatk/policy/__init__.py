@@ -1,1 +1,1 @@
-from .policy import Policy, User_Policy, Sys_Policy
+from tatk.policy.policy import Policy
