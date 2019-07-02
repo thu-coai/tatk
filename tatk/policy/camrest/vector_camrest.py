@@ -103,7 +103,7 @@ class CamrestVector(Vector):
             key = slot + '-' + str(p)
             while inform[self.inform2vec[key]]:
                 p += 1
-                key = slot + str(p)
+                key = slot + '-' + str(p)
                 if key not in self.inform2vec:
                     break
             else:
@@ -130,9 +130,7 @@ class CamrestVector(Vector):
                 act_array.append(self.vec2act[i])
         action = deflat_da(act_array)
         constraint = self.state.items()
-        print(constraint)
         entities = query(constraint)
-        print(entities)
         action = lexicalize_da(action, entities, self.state, self.requestable)
         return action
         
