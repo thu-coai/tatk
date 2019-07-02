@@ -17,5 +17,5 @@ class Tracker(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def init(self):
+    def init_session(self):
         pass

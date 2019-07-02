@@ -2,7 +2,8 @@
 from abc import ABCMeta, abstractmethod
 
 class Policy(metaclass=ABCMeta):
-
+    """Base class for policy model."""
+	
     @abstractmethod
     def predict(self, state):
         """Predict the next agent action given dialog state.
@@ -15,6 +16,7 @@ class Policy(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def init(self):
+    def init_session(self):
         """Init the class variables for a new session."""
         pass
+

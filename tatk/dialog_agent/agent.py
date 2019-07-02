@@ -18,7 +18,7 @@ class Agent(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def init(self):
+    def init_session(self):
         """Reset the class variables to prepare for a new session."""
         pass
 
@@ -80,9 +80,9 @@ class PipelineAgent(Agent):
 
         return model_response
 
-    def init(self):
+    def init_session(self):
         """Init the attributes of DST and Policy module."""
         if self.tracker is not None:
-            self.tracker.init()
+            self.tracker.init_session()
         if self.policy is not None:
-            self.policy.init()
+            self.policy.init_session()

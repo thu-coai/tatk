@@ -8,3 +8,9 @@ __pycache__
 
 # vscode
 .vscode
+
+# data
+data/**/*.json
+
+# test script
+*_test.py
