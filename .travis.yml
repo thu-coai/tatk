@@ -10,8 +10,9 @@ install:
   - pip install -e .[develop]
   - pip install sphinx
 
-script: true
+script:
   # - python setup.py test
+  - cd docs && make html && mv ./build/html ./build/docs && rm -r ./build/doctrees && cd ..
   
 deploy:
   - provider: pages
