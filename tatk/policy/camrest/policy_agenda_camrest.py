@@ -393,16 +393,12 @@ def test():
     user_simulator.init_session()
 
     test_turn(user_simulator, {'inform': [['none', 'none']]})
+    test_turn(user_simulator, {'inform': [['pricerange', 'expensive']]})
     test_turn(user_simulator, {'request': [['food', '?'], ['area', '?']]})
     test_turn(user_simulator, {'request': [['area', '?']]})
     test_turn(user_simulator, {})
     test_turn(user_simulator, {"inform": [['phone', '123456789']]})
     test_turn(user_simulator, {"inform": [['address', '987654321']]})
-#    test_turn(user_simulator, {"Hotel-Request": [["Addr", "?"]], "Hotel-Inform": [["Internet", "yes"]]})
-#    test_turn(user_simulator, {"Hotel-Request": [["Type", "?"], ["Parking", "?"]]})
-#    test_turn(user_simulator, {"Hotel-Nooffer": [["Stars", "3"]], "Hotel-Request": [["Parking", "?"]]})
-#    test_turn(user_simulator, {"Hotel-Select": [["Area", "aa"], ["Area", "bb"], ["Area", "cc"], ['Choice', 3]]})
-#    test_turn(user_simulator, {"Hotel-Offerbooked": [["Ref", "12345"]]})
 
 def test_turn(user_simulator, sys_action):
     print('input:', sys_action)
