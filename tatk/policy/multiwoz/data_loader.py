@@ -1,5 +1,6 @@
 import os
 import json
+import pickle
 import zipfile
 import torch
 import torch.utils.data as data
@@ -51,14 +52,14 @@ class PolicyDataLoaderMultiWoz():
         
         os.makedirs(processed_dir)
         for part in ['train', 'val', 'test']:
-            with open(os.path.join(processed_dir, '{}.json'.format(part)), 'w') as f:
-                json.dump(self.data[part], f)
+            with open(os.path.join(processed_dir, '{}.pkl'.format(part)), 'wb') as f:
+                pickle.dump(self.data[part], f)
                      
     def _load_data(self, processed_dir):
         self.data = {}
         for part in ['train', 'val', 'test']:
-            with open(os.path.join(processed_dir, '{}.json'.format(part)), 'r') as f:
-                self.data[part] = json.load(f)
+            with open(os.path.join(processed_dir, '{}.pkl'.format(part)), 'rb') as f:
+                self.data[part] = pickle.load(f)
                 
     def create_dataset(self, part, batchsz):
         print('Start creating {} dataset'.format(part))
