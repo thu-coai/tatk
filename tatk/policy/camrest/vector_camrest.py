@@ -8,7 +8,7 @@ from tatk.util.camrest.dbquery import query
 
 class CamrestVector(Vector):
     
-    def __init__(self, voc_file, voc_opp_file, character='sys'
+    def __init__(self, voc_file, voc_opp_file, character='sys',
                  intent_file=os.path.join(
                  os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
                  'data/camrest/trackable_intent.json')):
@@ -91,14 +91,16 @@ class CamrestVector(Vector):
         opp_action = flat_da(opp_action)
         opp_act_vec = np.zeros(self.da_opp_dim)
         for da in opp_action:
-            opp_act_vec[self.opp2vec[da]] = 1.
+            if da in self.opp2vec:
+                opp_act_vec[self.opp2vec[da]] = 1.
         
         action = state['system_action'] if self.character == 'sys' else state['user_action']
         action = delexicalize_da(action, self.requestable)
         action = flat_da(action)
         last_act_vec = np.zeros(self.da_dim)
         for da in action:
-            last_act_vec[self.act2vec[da]] = 1.
+            if da in self.act2vec:
+                last_act_vec[self.act2vec[da]] = 1.
             
         inform = np.zeros(self.inform_dim)
         for slot, value in state['belief_state'].items():
