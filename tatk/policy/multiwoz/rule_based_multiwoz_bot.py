@@ -506,7 +506,7 @@ def generate_car():
 def fake_state():
     user_action = {'Hotel-Request': [['Name', '?']], 'Train-Inform': [['Day', 'don\'t care']]}
     from tatk.util.multiwoz.state import default_state
-    init_belief_state = default_state()
+    init_belief_state = default_state()['belief_state']
     kb_results = [None, None]
     kb_results[0] = {'name': 'xxx_train', 'day': 'tuesday', 'dest': 'cam', 'phone': '123-3333', 'area': 'south'}
     kb_results[1] = {'name': 'xxx_train', 'day': 'tuesday', 'dest': 'cam', 'phone': '123-3333', 'area': 'north'}

@@ -4,16 +4,16 @@ import pickle
 import zipfile
 import torch
 import torch.utils.data as data
-from tatk.util.multiwoz.state import default_state
-from tatk.policy.multiwoz.vector_multiwoz import MultiWozVector
+from tatk.util.camrest.state import default_state
+from tatk.policy.camrest.vector_camrest import CamrestVector
 
-class PolicyDataLoaderMultiWoz():
+class PolicyDataLoaderCamrest():
     
     def __init__(self):
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        voc_file = os.path.join(root_dir, 'data/multiwoz/sys_da_voc.txt')
-        voc_opp_file = os.path.join(root_dir, 'data/multiwoz/usr_da_voc.txt')
-        self.vector = MultiWozVector(voc_file, voc_opp_file)
+        voc_file = os.path.join(root_dir, 'data/camrest/sys_da_voc.txt')
+        voc_opp_file = os.path.join(root_dir, 'data/camrest/usr_da_voc.txt')
+        self.vector = CamrestVector(voc_file, voc_opp_file)
         
         processed_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'processed_data')
         if os.path.exists(processed_dir):
@@ -26,7 +26,7 @@ class PolicyDataLoaderMultiWoz():
     def _build_data(self, root_dir, processed_dir):
         raw_data = {}
         for part in ['train', 'val', 'test']:
-            archive = zipfile.ZipFile(os.path.join(root_dir, 'data/multiwoz/{}.json.zip'.format(part)), 'r')
+            archive = zipfile.ZipFile(os.path.join(root_dir, 'data/camrest/{}.json.zip'.format(part)), 'r')
             with archive.open('{}.json'.format(part), 'r') as f:
                 raw_data[part] = json.load(f)
         
@@ -35,20 +35,20 @@ class PolicyDataLoaderMultiWoz():
             self.data[part] = []
             
             for key in raw_data[part]:
-                sess = raw_data[part][key]['log']
+                sess = key['dial']
                 state = default_state()
                 action = {}
                 for i, turn in enumerate(sess):
-                    if i % 2 == 0:
-                        state['user_action'] = turn['dialog_act']
-                        if i + 2 == len(sess):
-                            state['terminal'] = True
-                    else:
-                        state['belief_state'] = turn['metadata']
-                        action = turn['dialog_act']
-                        self.data[part].append([self.vector.state_vectorize(state),
-                                 self.vector.action_vectorize(action)])
-                        state['system_action'] = turn['dialog_act']
+                    state['user_action'] = turn['usr']['dialog_act']
+                    if i + 1 == len(sess):
+                        state['terminal'] = True
+                    for da in turn['usr']['slu']:
+                        if da['slots'][0][0] != 'slot':
+                            state['belief_state'][da['slots'][0][0]] = da['slots'][0][1]
+                    action = turn['sys']['dialog_act']
+                    self.data[part].append([self.vector.state_vectorize(state),
+                         self.vector.action_vectorize(action)])
+                    state['system_action'] = turn['sys']['dialog_act']
         
         os.makedirs(processed_dir)
         for part in ['train', 'val', 'test']:

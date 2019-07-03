@@ -19,7 +19,7 @@ mapping = {'restaurant': {'addr': 'address', 'area': 'area', 'food': 'food', 'na
 
 class MultiWozVector(Vector):
     
-    def __init__(self, voc_file, voc_opp_file,
+    def __init__(self, voc_file, voc_opp_file, character='sys',
                  intent_file=os.path.join(
                  os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
                  'data/multiwoz/trackable_intent.json')):
@@ -36,6 +36,7 @@ class MultiWozVector(Vector):
             self.da_voc = f.read().splitlines()
         with open(voc_opp_file) as f:
             self.da_voc_opp = f.read().splitlines()
+        self.character = character
         self.generate_dict()
         
     def generate_dict(self):
@@ -121,17 +122,21 @@ class MultiWozVector(Vector):
         """
         self.state = state['belief_state']
         
-        opp_action = delexicalize_da(state['action'], self.requestable)
+        action = state['user_action'] if self.character == 'sys' else state['system_action']
+        opp_action = delexicalize_da(action, self.requestable)
         opp_action = flat_da(opp_action)
         opp_act_vec = np.zeros(self.da_opp_dim)
         for da in opp_action:
-            opp_act_vec[self.opp2vec[da]] = 1.
+            if da in self.opp2vec:
+                opp_act_vec[self.opp2vec[da]] = 1.
         
-        action = delexicalize_da(state['last_action'], self.requestable)
+        action = state['system_action'] if self.character == 'sys' else state['user_action']
+        action = delexicalize_da(action, self.requestable)
         action = flat_da(action)
         last_act_vec = np.zeros(self.da_dim)
         for da in action:
-            last_act_vec[self.act2vec[da]] = 1.
+            if da in self.act2vec:
+                last_act_vec[self.act2vec[da]] = 1.
             
         inform = np.zeros(self.inform_dim)
         for domain in self.belief_domains:
@@ -182,5 +187,13 @@ class MultiWozVector(Vector):
                 entities[domain] = query(domain.lower(), constraint)
         action = lexicalize_da(action, entities, self.state, self.requestable)
         return action
-        
+
+    def action_vectorize(self, action):
+        action = delexicalize_da(action, self.requestable)
+        action = flat_da(action)
+        act_vec = np.zeros(self.da_dim)
+        for da in action:
+            if da in self.act2vec:
+                act_vec[self.act2vec[da]] = 1.
+        return act_vec
         

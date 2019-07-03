@@ -1,5 +1,6 @@
 def default_state():
-    state = {
+    state = {'user_action':{}, 'system_action':{}, 'belief_state':{}, 'terminal':False}
+    state['belief_state'] = {
         "police": {
             "book": {
                 "booked": []

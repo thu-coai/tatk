@@ -10,7 +10,12 @@ __pycache__
 .vscode
 
 # data
-data/**/*.json
+data/**/train.json
+data/**/val.json
+data/**/test.json
+data/camrest/CamRest676_v2.json
+data/multiwoz/annotated_user_da_with_span_full.json
+**/processed_data/*
 
 # test script
 *_test.py
