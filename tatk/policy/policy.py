@@ -7,6 +7,7 @@ class Policy(metaclass=ABCMeta):
     @abstractmethod
     def predict(self, state):
         """Predict the next agent action given dialog state.
+        
         Args:
             state (tuple or dict): when the DST and Policy module are separated, the type of state is tuple.
                     else when they are aggregated together, the type of state is dict (dialog act).

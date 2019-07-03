@@ -19,6 +19,7 @@ class Session(metaclass=ABCMeta):
     @abstractmethod
     def next_response(self, observation):
         """Generated the next response.
+        
         Args:
             observation (str or dict): The agent observation of next agent.
         Returns:
@@ -78,6 +79,7 @@ class BiSession(Session):
         Conduct a new turn of dialog, which consists of the system response and user response.
         The variable type of responses can be either 1) str or 2) dialog act, depends on the dialog mode settings of the
         two agents which are supposed to be the same.
+        
         Args:
             last_observation: Last agent response.
         Returns:
