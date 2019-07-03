@@ -11,9 +11,11 @@ Welcome to tatk's documentation!
    :caption: Package Reference:
 
    tatk.util
+   tatk.task
    tatk.policy
    tatk.nlu
    tatk.nlg
+   tatk.evaluator
    tatk.e2e
    tatk.dst
    tatk.dialog_agent
