@@ -8,6 +8,7 @@ class NLU(metaclass=ABCMeta):
     def predict(self, utterance):
         """
         Predict the dialog act of a natural language utterance.
+        
         Args:
             utterance (str): A natural language utterance.
         Returns:
