@@ -8,6 +8,7 @@ class NLG(metaclass=ABCMeta):
     def generate(self, action):
         """
         Generate a natural language utterance conditioned on the dialog act.
+        
         Args:
             action (dict): The dialog action produced by dialog policy module, which is in dialog act format.
         Returns:
