@@ -13,24 +13,17 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class MLP(Policy):
     
     def __init__(self, cfg, is_train=False, dataset='multiwoz'):
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         self.is_train = is_train
         self.policy = MultiDiscretePolicy(cfg).to(device=DEVICE)
         
         if dataset == 'multiwoz':
-            voc_file = os.path.join(
-                 os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-                 'data/multiwoz/sys_da_voc.txt')
-            voc_opp_file = os.path.join(
-                 os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-                 'data/multiwoz/usr_da_voc.txt')
+            voc_file = os.path.join(root_dir, 'data/multiwoz/sys_da_voc.txt')
+            voc_opp_file = os.path.join(root_dir, 'data/multiwoz/usr_da_voc.txt')
             self.vector = MultiWozVector(voc_file, voc_opp_file)
         elif dataset == 'camrest':
-            voc_file = os.path.join(
-                 os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-                 'data/camrest/sys_da_voc.txt')
-            voc_opp_file = os.path.join(
-                 os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-                 'data/camrest/usr_da_voc.txt')
+            voc_file = os.path.join(root_dir, 'data/camrest/sys_da_voc.txt')
+            voc_opp_file = os.path.join(root_dir, 'data/camrest/usr_da_voc.txt')
             self.vector = CamrestVector(voc_file, voc_opp_file)
         else:
             raise NotImplementedError('unknown dataset {}'.format(dataset))
