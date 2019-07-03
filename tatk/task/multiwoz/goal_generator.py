@@ -637,13 +637,3 @@ class GoalGenerator:
 
         return message
 
-
-if __name__ == "__main__":
-    goal_generator = GoalGenerator(corpus_path=os.path.join(os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-                'data/multiwoz/annotated_user_da_with_span_full.json'))
-    while True:
-        user_goal = goal_generator.get_user_goal()
-        print(user_goal)
-        # message = goal_generator.build_message(user_goal)
-        # pprint(message)
