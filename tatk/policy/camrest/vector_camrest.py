@@ -138,5 +138,13 @@ class CamrestVector(Vector):
         entities = query(constraint)
         action = lexicalize_da(action, entities, self.state, self.requestable)
         return action
-        
+    
+    def action_vectorize(self, action):
+        action = delexicalize_da(action, self.requestable)
+        action = flat_da(action)
+        act_vec = np.zeros(self.da_dim)
+        for da in action:
+            if da in self.act2vec:
+                act_vec[self.act2vec[da]] = 1.
+        return act_vec
         
