@@ -6,32 +6,8 @@ from copy import deepcopy
 from tatk.policy.policy import Policy
 from tatk.util.camrest.dbquery import query
 
-SELECTABLE_SLOTS = {
-    'Attraction': ['area', 'entrance fee', 'name', 'type'],
-    'Hospital': ['department'],
-    'Hotel': ['area', 'internet', 'name', 'parking', 'pricerange', 'stars', 'type'],
-    'Restaurant': ['area', 'name', 'food', 'pricerange'],
-    'Taxi': [],
-    'Train': [],
-    'Police': [],
-}
-
-INFORMABLE_SLOTS = ["Fee", "Addr", "Area", "Stars", "Internet", "Department", "Choice", "Ref", "Food", "Type", "Price",\
-                    "Stay", "Phone", "Post", "Day", "Name", "Car", "Leave", "Time", "Arrive", "Ticket", None, "Depart",\
-                    "People", "Dest", "Parking", "Open", "Id"]
-
-# Information required to finish booking, according to different domain.
-booking_info = {'Train': ['People'],
-                'Restaurant': ['Time', 'Day', 'People'],
-                'Hotel': ['Stay', 'Day', 'People']}
-
 # Alphabet used to generate Ref number
 alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-
-# Judge if user has confirmed a unique choice, according to different domain
-token = {'Attraction': ['Name', 'Addr', ''],
-         'Hotel': ['Name', ]}
-
 
 class RuleBasedCamrestBot(Policy):
     ''' Rule-based bot. Implemented for Camrest dataset. '''
@@ -231,12 +207,8 @@ def fake_state():
             ]
           ]
         }
-    init_belief_state = {'address': '',
- 'area': 'south',
- 'food': '',
- 'name': '',
- 'phone': '',
- 'pricerange': 'moderate'}
+    from tatk.util.camrest.state import default_state
+    init_belief_state = default_state()
     kb_results = [None, None]
     kb_results[0] = {'name': 'xxx_train', 'day': 'tuesday', 'dest': 'cam', 'phone': '123-3333', 'area': 'south'}
     kb_results[1] = {'name': 'xxx_train', 'day': 'tuesday', 'dest': 'cam', 'phone': '123-3333', 'area': 'north'}

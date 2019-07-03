@@ -11,6 +11,7 @@ inform-name-3
 inform-phone-1
 inform-pricerange-1
 inform-pricerange-2
+nooffer-none-none
 request-address-?
 request-area-?
 request-food-?
