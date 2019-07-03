@@ -70,7 +70,7 @@ class RuleBasedCamrestBot(Policy):
         # print("Sys action: ", DA)
         for intent in DA:
             if not DA[intent]:
-                DA[intent] = ['none', 'none']
+                DA[intent] = [['none', 'none']]
 
         return DA
 
