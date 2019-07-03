@@ -25,7 +25,7 @@ class Rule(Policy):
                 self.vector = MultiWozVector(voc_file, voc_opp_file)
                 self.policy = RuleBasedMultiwozBot()
             elif character == 'usr':
-                self.vector = MultiWozVector(voc_opp_file, voc_file)
+                self.vector = MultiWozVector(voc_opp_file, voc_file, 'usr')
                 self.policy = UserPolicyAgendaMultiWoz()
             else:
                 raise NotImplementedError('unknown character {}'.format(character))
@@ -36,7 +36,7 @@ class Rule(Policy):
                 self.vector = CamrestVector(voc_file, voc_opp_file)
                 self.policy = RuleBasedCamrestBot()
             elif character == 'usr':
-                self.vector = CamrestVector(voc_opp_file, voc_file)
+                self.vector = CamrestVector(voc_opp_file, voc_file, 'usr')
                 self.policy = UserPolicyAgendaCamrest()
             else:
                 raise NotImplementedError('unknown character {}'.format(character))
