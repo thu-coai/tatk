@@ -3,8 +3,8 @@ import torch
 import numpy as np
 import logging
 from tatk.policy.policy import Policy
-from tatk.policy.policy.multiwoz.rule_based_multiwoz_bot import RuleBasedMultiwozBot
-from tatk.policy.policy.multiwoz.policy_agenda_multiwoz import UserPolicyAgendaMultiWoz
+from tatk.policy.multiwoz.rule_based_multiwoz_bot import RuleBasedMultiwozBot
+from tatk.policy.multiwoz.policy_agenda_multiwoz import UserPolicyAgendaMultiWoz
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
