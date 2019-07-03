@@ -14,6 +14,7 @@ class Vector():
     def state_vectorize(self, state):
         """
         vectorize a state
+
         Args:
             state (tuple): Dialog state
         Returns:
@@ -24,6 +25,7 @@ class Vector():
     def action_devectorize(self, action_vec):
         """
         recover an action
+        
         Args:
             action_vec (np.array): Dialog act vector
         Returns:
