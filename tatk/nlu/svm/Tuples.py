@@ -1,13 +1,9 @@
-# Modified by Microsoft Corporation.
-# Licensed under the MIT license.
-
-# deal with tuples and dialog acts
 import math
 import os
 import re
 import json
 
-from convlab.modules.nlu.multiwoz.svm import sutils
+from tatk.nlu.svm import sutils
 
 
 class tuples(object):

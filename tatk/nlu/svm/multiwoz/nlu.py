@@ -1,6 +1,3 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
 import configparser
 import os
 import zipfile
@@ -11,24 +8,19 @@ from tatk.nlu.nlu import NLU
 
 
 class SVMNLU(NLU):
-    def __init__(self,
-                 config_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'multiwoz/config/multiwoz_all.cfg'),
-                 model_file=None):
+    def __init__(self, config_file, model_file):
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
         self.c = Classifier.classifier(self.config)
-        model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.config.get("train", "output"))
+        model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                  self.config.get("train", "output"))
         model_dir = os.path.dirname(model_path)
         if not os.path.exists(model_path):
             if not os.path.exists(model_dir):
                 os.makedirs(model_dir)
-            if not model_file:
-                print('Load from ', os.path.join(model_dir, 'svm_multiwoz.zip'))
-                archive = zipfile.ZipFile(os.path.join(model_dir, 'svm_multiwoz.zip'), 'r')
-            else:
-                print('Load from model_file param')
-                archive_file = cached_path(model_file)
-                archive = zipfile.ZipFile(archive_file, 'r')
+            print('Load from model_file param')
+            archive_file = cached_path(model_file)
+            archive = zipfile.ZipFile(archive_file, 'r')
             archive.extractall(os.path.dirname(model_dir))
             archive.close()
         self.c.load(model_path)
@@ -66,7 +58,8 @@ class SVMNLU(NLU):
         return dialog_act
 
 if __name__ == "__main__":
-    nlu = SVMNLU()
+    nlu = SVMNLU(config_file='config/multiwoz_usr.cfg',
+                 model_file='model/svm_multiwoz_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",
@@ -83,4 +76,4 @@ if __name__ == "__main__":
     ]
     for utt in test_utterances:
         print(utt)
-        print(nlu.parse(utt))
+        print(nlu.predict(utt))

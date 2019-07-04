@@ -1,12 +1,8 @@
-# Modified by Microsoft Corporation.
-# Licensed under the MIT license.
-
-
 import itertools
 import math
 from collections import defaultdict
 
-from convlab.modules.nlu.multiwoz.svm import Tuples
+from tatk.nlu.svm import Tuples
 
 
 class lastSys(object):

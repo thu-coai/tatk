@@ -1,19 +1,6 @@
-# Modified by Microsoft Corporation.
-# Licensed under the MIT license.
-
-# misc useful functions
-
 import imp
 import os
 
-
-def dataset_walker(dataset=None, dataroot=None, labels=None):
-    # we assume that the dataset_walker class in dataroot/../scripts
-    # is the one to use
-    scripts_folder = os.path.join(dataroot, '../..', "scripts")
-    # print(scripts_folder)
-    _dw = imp.load_source('dataset_walker', os.path.join(scripts_folder, "dataset_walker.py"))
-    return _dw.dataset_walker(dataset, dataroot=dataroot, labels=labels)
 
 def import_class(cl):
     d = cl.rfind(".")

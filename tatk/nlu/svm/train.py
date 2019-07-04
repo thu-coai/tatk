@@ -1,14 +1,11 @@
-# Modified by Microsoft Corporation.
-# Licensed under the MIT license.
-
-
 import configparser
 import os
 import pprint
 import sys
 import zipfile
 
-from convlab.modules.nlu.multiwoz.svm import Classifier, sutils
+from tatk.nlu.svm import Classifier
+from tatk.nlu.svm.dataset_walker import dataset_walker
 
 
 def train(config):
@@ -23,9 +20,9 @@ def train(config):
     zip_name = ''.join(os.path.basename(model_path).split('.')[:-1])+'.zip'
     zip_path = os.path.join(model_dir, zip_name)
     print('zip to {}'.format(zip_path))
+    dataListFile = config.get("train", "dataListFile")
     dataroot = config.get("train", "dataroot")
-    dataset = config.get("train", "dataset")
-    dw = sutils.dataset_walker(dataset = dataset, dataroot=dataroot, labels=True)
+    dw = dataset_walker(dataListFile=dataListFile, dataroot=dataroot, labels=True)
     c = Classifier.classifier(config)
     c.cacheFeature(dw)
     c.train(dw)
@@ -37,7 +34,7 @@ def train(config):
 
 def usage():
     print("usage:")
-    print("\t python train.py config/multiwoz_all.cfg")
+    print("\t python train.py multiwoz/config/multiwoz_all.cfg")
 
 
 if __name__ == '__main__':
