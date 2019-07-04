@@ -61,7 +61,7 @@ class nbest(object):
         asr_hyps = [(hyp["score"],hyp["asr-hyp"]) for hyp in log_turn["input"][log_input_key]["asr-hyps"]]
         asr_hyps = [(score, hyp) for score,hyp in asr_hyps if score > -100]
         # do exp of scores and normalise
-        if (len(asr_hyps) == 0):
+        if not asr_hyps:
             return {}
         
         min_score = min([score for score, _hyp in asr_hyps])
@@ -93,7 +93,7 @@ class nbest(object):
         asr_hyps = [(hyp["score"],hyp["asr-hyp"]) for hyp in log_turn["asr-hyps"]]
         asr_hyps = [(score, hyp) for score,hyp in asr_hyps if score > -100]
         # do exp of scores and normalise
-        if (len(asr_hyps) == 0):
+        if not asr_hyps:
             return {}
 
         min_score = min([score for score, _hyp in asr_hyps])
@@ -250,7 +250,7 @@ def get_cnngrams(cnet, max_ngrams, max_length):
                     
                     finished_ngrams.append(new_ngram)
                     
-            if len(this_ngram) != 0 :
+            if this_ngram:
                 new_active_ngrams.append(this_ngram)
                 finished_ngrams.append(this_ngram)
         

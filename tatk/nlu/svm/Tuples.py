@@ -151,16 +151,16 @@ class tuples(object):
                     score += logp
                 else :
                     score += log1_p
-            if (score> self.log_tail_cutoff or len(act) == 0) and makes_valid_act(act) :
+            if (score> self.log_tail_cutoff or not act) and makes_valid_act(act) :
                 acts.append((act,score))
-                if len(act) ==0 :
+                if not act:
                     null_score = score
         acts = sorted(acts,key=lambda x:-x[1])
         
         acts = acts[:10]
         found_null = False
         for act,score in acts:
-            if len(act) == 0:
+            if not act:
                 found_null = True
                 break
         if not found_null :
@@ -247,20 +247,3 @@ def generic_to_specific(tup) :
         value = actual_value(value)
         return (act,slot,value)
     return tup
-    
-if __name__ == '__main__':
-    
-    import configparser, json
-    
-    config = configparser.ConfigParser()
-    config.read("config/multiwoz_all.cfg")
-    t = tuples(config)
-    dist = {('inform', 'food','indian'):0.9,('inform', 'food','indian2'):1.0, ('hello',):0.1}
-    print(dist)
-    nbest = t.distributionToNbest(dist)
-    print(nbest)
-
-    log_file = json.load(open("corpora/data/Mar13_S2A0/voip-318851c80b-20130328_224811/log.json"))
-    log_turn = log_file["turns"][2]
-    print(log_turn["input"]["batch"]["asr-hyps"][0])
-    print([tup for tup in t.activeTuples(log_turn) if tup[0] == "inform"])
