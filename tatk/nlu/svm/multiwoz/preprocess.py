@@ -133,7 +133,6 @@ if __name__ == '__main__':
                     continue
                 elif mode == 'sys' and i % 2 == 0:
                     continue
-                assert type(turn['dialog_act']) == type({})
                 new_das = []
                 for da, svs in turn['dialog_act'].items():
                     for s, v in svs:

@@ -39,8 +39,7 @@ class valueIdentifying(object):
     def tuple_calculate(self, this_tuple, log_turn,log_input_key="batch"):
         if Tuples.is_generic(this_tuple[-1]) :
             return {"<generic_value="+this_tuple[-1].value+">":1}
-        else :
-            return {}
+        return {}
     
 class nbest(object):
     def __init__(self, config):

@@ -60,4 +60,3 @@ if __name__ == '__main__':
         print(batch_data)
         print(intent_logits)
         print(intents)
-
