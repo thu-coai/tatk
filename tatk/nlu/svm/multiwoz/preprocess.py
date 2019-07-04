@@ -1,3 +1,15 @@
+"""
+Preprocess multiwoz data for SVMNLU.
+Usage:
+    python preprocess [mode=all|usr|sys]
+    mode: which side data will be use
+Require:
+    - `../../../../data/multiwoz/[train|val|test].json.zip` data file
+    - `../../../../data/multiwoz/db` database dir
+Output:
+    - `config/ontology_multiwoz_[mode].json` ontology file
+    - `data/[mode]_data/` processed data dir
+"""
 import json
 import os
 import zipfile
@@ -13,15 +25,16 @@ def read_zipped_json(filepath, filename):
 if __name__ == '__main__':
     mode = sys.argv[1]
     assert mode=='all' or mode=='usr' or mode=='sys'
-    data_dir = '../../../../../data/multiwoz'
-    processed_data_dir = 'corpora/{}_data'.format(mode)
+    data_dir = '../../../../data/multiwoz'
+    db_dir = os.path.join(data_dir, 'db')
+
+    processed_data_dir = 'data/{}_data'.format(mode)
     data_key = ['val', 'test', 'train']
     data = {}
     for key in data_key:
         data[key] = read_zipped_json(os.path.join(data_dir,key+'.json.zip'), key+'.json')
         print('load {}, size {}'.format(key, len(data[key])))
 
-    db_dir = '../../../../../data/multiwoz/db'
     db = {
         'attraction': json.load(open(os.path.join(db_dir,'attraction_db.json'))),
         'hotel': json.load(open(os.path.join(db_dir,'hotel_db.json'))),
@@ -166,4 +179,4 @@ if __name__ == '__main__':
         "informable": informable_onto,
         "all_tuples": all_tuples
     }
-    json.dump(ontology_multiwoz, open('corpora/scripts/config/ontology_multiwoz_{}.json'.format(mode), 'w'), indent=4)
+    json.dump(ontology_multiwoz, open('config/ontology_multiwoz_{}.json'.format(mode), 'w'), indent=4)

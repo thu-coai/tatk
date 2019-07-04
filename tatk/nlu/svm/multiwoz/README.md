@@ -1,49 +1,55 @@
-# SVMNLU
+# SVMNLU on multiwoz
 
 SVMNLU build a classifier for each semantic tuple (intent-slot-value) based on n-gram features. It's first proposed by [Mairesse et al. (2009)](http://mairesse.s3.amazonaws.com/research/papers/icassp09-final.pdf). We adapt the implementation from [pydial](https://bitbucket.org/dialoguesystems/pydial/src/master/semi/CNetTrain/).
 
 ## Example usage
 
-Determine which data you want to use: if **data_key**='usr', use user utterances to train; if **data_key**='sys', use system utterances to train; if **data_key**='all', use both user and system utterances to train.
+Determine which data you want to use: if **mode**='usr', use user utterances to train; if **mode**='sys', use system utterances to train; if **mode**='all', use both user and system utterances to train.
 
 #### Preprocess data
 
+On `svm/multiwoz` dir:
+
 ```sh
-$ python preprocess.py [data_key]
+$ python preprocess.py [mode]
 ```
 
-output processed data on `corpora/[data_key]_data` dir.
+output processed data on `data/[mode]_data` dir.
 
 #### Train a model
 
+On `svm` dir:
+
 ```sh
-$ PYTHONPATH=../../../../.. python train.py config/multiwoz_[data_key].cfg
+$ PYTHONPATH=../../.. python train.py multiwoz/config/multiwoz_[mode].cfg
 ```
 
-The model will be saved on `model/svm_multiwoz_[data_key].pickle`. Also, it will be zipped as `model/svm_multiwoz_[data_key].zip`. You can download this from `https://convlab.blob.core.windows.net/models/svm_multiwoz_[data_key].zip` too.
+The model will be saved on `model/svm_multiwoz_[mode].pickle`. Also, it will be zipped as `model/svm_multiwoz_[mode].zip`. 
 
 #### Evaluate
 
-In the parent directory:
+On `svm/multiwoz` dir:
 
 ```sh
-$ PYTHONPATH=../../../.. python evaluate.py SVMNLU [data_key]
+$ PYTHONPATH=../../../.. python evaluate.py [mode]
 ```
 
-The result on `data/multiwoz/test.json.zip`:
+#### Predict
 
-```
-Model SVMNLU on 1000 session 14744 sentences:
-         Precision: 75.44
-         Recall: 43.29
-         F1: 55.01
+In `nlu.py` , the `SVMNLU` class inherits the NLU interface and adapts to multiwoz dataset. Example usage:
+
+```python
+from tatk.nlu.svm.multiwoz.nlu import SVMNLU
+
+model = SVMNLU(config_file=PATH_TO_CONFIG, model_file=PATH_TO_ZIPPED_MODEL)
+dialog_act = model.predict(utterance)
 ```
 
-If you want to perform end-to-end evaluation with trained model, you can set `model_file` param of your ConvLab spec file to `"https://convlab.blob.core.windows.net/models/svm_multiwoz_usr.zip"` (NLU for agent). It will download the trained model and place it under `model` directory automatically.
+You can refer to `evaluate.py` for specific usage.
 
 ## Data
 
-We use the multiwoz data (data/multiwoz/[train|val|test].json.zip).
+We use the multiwoz data (`data/multiwoz/[train|val|test].json.zip`).
 
 ## References
 

@@ -1,6 +1,3 @@
-# Modified by Microsoft Corporation.
-# Licensed under the MIT license.
-
 import json
 import multiprocessing as mp
 import os
@@ -11,8 +8,8 @@ from collections import defaultdict
 import numpy
 from scipy.sparse import lil_matrix
 
-from convlab.modules.nlu.multiwoz.svm import sutils, Tuples
-from convlab.modules.nlu.multiwoz.svm.Features import cnet as cnet_extractor
+from tatk.nlu.svm import sutils, Tuples
+from tatk.nlu.svm.Features import cnet as cnet_extractor
 
 names_to_classes = {}
 
@@ -42,7 +39,7 @@ class classifier(object):
         self.feature_extractors = []
         for feature in self.features:
             self.feature_extractors.append(
-                    sutils.import_class("convlab.modules.nlu.multiwoz.svm.Features." + feature)(config)
+                    sutils.import_class("tatk.nlu.svm.Features." + feature)(config)
                 )
         print(self.feature_extractors)
         self.tuples = Tuples.tuples(config)
