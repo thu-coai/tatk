@@ -7,6 +7,7 @@ from collections import defaultdict
 
 import numpy
 from scipy.sparse import lil_matrix
+from sklearn.linear_model import SGDClassifier
 
 from tatk.nlu.svm import sutils, Tuples
 from tatk.nlu.svm.Features import cnet as cnet_extractor
@@ -172,7 +173,7 @@ class classifier(object):
         
         
     def cacheFeature(self, dw, config=None):
-        if config == None :
+        if config is None:
             config = self.config
         log_input_key = "batch"
         if config.has_option("train","log_input_key") :
@@ -235,7 +236,7 @@ class classifier(object):
             self.classifiers[this_tuple].model = result.get()
             # print(result.get())
 
-        no_models = [this_tuple for this_tuple in self.classifiers if self.classifiers[this_tuple] == None]
+        no_models = [this_tuple for this_tuple in self.classifiers if self.classifiers[this_tuple] is None]
         
         if no_models:
             print("Not able to learn about: %d/%d" % (len(no_models), total_num))
@@ -250,7 +251,7 @@ class classifier(object):
                 print("warning: Did not collect features for ", this_tuple)
                 continue
             n = len(self.X[this_tuple])
-            if self.classifiers[this_tuple] == None :
+            if self.classifiers[this_tuple] is None:
                 results[this_tuple] = numpy.zeros((n,))
                 continue
             baseXs = [self.baseXs[index] for index in self.baseX_pointers[this_tuple]]
@@ -260,7 +261,7 @@ class classifier(object):
         
     
     def decodeToFile(self, dw, output_fname, config=None):
-        if config == None :
+        if config is None:
             config = self.config
         t0 = time.time()
         results = {
@@ -304,7 +305,7 @@ class classifier(object):
 
     
     def decode_sent(self, sentinfo, output_fname, config=None):
-        if config == None :
+        if config is None:
             config = self.config
         t0 = time.time()
         self.X = {}
@@ -343,7 +344,7 @@ class classifier(object):
     def save(self, save_fname):
         classifier_params = {}
         for this_tuple in self.classifiers:
-            if self.classifiers[this_tuple] == None :
+            if self.classifiers[this_tuple] is None:
                 classifier_params[this_tuple] = None
             else :
                 print('saving: ',this_tuple)
@@ -368,7 +369,7 @@ class classifier(object):
         classifier_params = obj["classifier_params"]
         self.classifiers = {}
         for this_tuple in classifier_params:
-            if classifier_params[this_tuple] == None :
+            if classifier_params[this_tuple] is None:
                 self.classifiers[this_tuple] = None
             else :
                 self.classifiers[this_tuple] = names_to_classes[self.type](self.config)
@@ -471,31 +472,6 @@ class SVM():
         self.C = Cs[0]
         print("Warning, not picking C from validation")
         return
-        for i, C in enumerate(Cs) :
-            this_model = svm.sparse.SVC(C=C, kernel='linear')
-            this_model.probability = False
-            this_model.class_weight = 'auto'
-            
-            this_model.fit(X[:dev_index,:],y[:dev_index])
-            pred = this_model.predict(X)
-            train_correct = 0.0
-            dev_correct = 0.0
-            for j, y_j in enumerate(y):
-                if j < dev_index :
-                    train_correct += int(y_j == pred[j])
-                else :
-                    dev_correct += int(y_j == pred[j])
-            train_acc = train_correct/dev_index
-            dev_acc = dev_correct/(n-dev_index)
-            score = (0.1*train_acc + 0.9*dev_acc)
-            print("\tfor C=%.2f;\n\t\t train_acc=%.4f, dev_acc=%.4f, score=%.4f" % (C, train_acc, dev_acc, score))
-            if score > max_score :
-                max_score = score
-                self.C = C
-            if score == 1.0 :
-                break
-        print("Selected C=%.2f"%self.C)
-    
         
     def train(self, X, y):
         # print('train')
@@ -523,7 +499,7 @@ class SVM():
         
 names_to_classes["svm"] = SVM
     
-from sklearn.linear_model import SGDClassifier
+
 class SGD():
     def __init__(self, config):
         pass

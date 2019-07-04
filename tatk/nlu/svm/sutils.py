@@ -38,7 +38,7 @@ def svm_to_libsvm(model, labels=None) :
     
     lines.append("rho "+" ".join(["%.12f" % -c for c in b]))
     
-    if labels == None:
+    if labels is None:
         labels = map(str, range(n_classes))
     lines.append("label " +  " ".join(labels))
             

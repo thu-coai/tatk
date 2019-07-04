@@ -35,7 +35,6 @@ class tuples(object):
         if config.has_option("decode","tail_cutoff") :
             self.tail_cutoff = float(config.get("decode","tail_cutoff"))
         self.log_tail_cutoff = math.log(self.tail_cutoff)
-    
 
     def uactsToTuples(self, uacts):
         out = []
@@ -64,37 +63,6 @@ class tuples(object):
             else:
                 out.append((x[0], slot, genericValue(slot)))
             out.append((x[0], slot, "do n't care"))
-        # all_tuples = []
-        # for x in self.ontology["all_tuples"]:
-        #     if x[0]=='request':
-        #         all_tuples.append(tuple(x))
-        #     else:
-        #         slot = x[1]
-        #         if slot in self.slots_enumerated or slot == "this":
-        #             all_tuples.append(tuple(x))
-        #         else:
-        #             all_tuples.append((x[0],x[1],genericValue(x[1], x[2])))
-        # return all_tuples
-
-        # out = []
-        # for slot in self.slots:
-        #     out.append(("request", slot))
-        # for act in self.nonempty_acts:
-        #     if act == "request" :
-        #         continue
-        #     for slot in self.slots_informable:
-        #         if slot in self.slots_enumerated :
-        #             for value in self.ontology["informable"][slot] :
-        #                 out.append((act,slot,value))
-        #
-        #         else :
-        #             out.append((act,slot, genericValue(slot)))
-        #         out.append((act, slot, "do nt care"))
-        # for slot in self.slots_informable:
-        #     out.append(("inform",slot,"do nt care"))
-        
-        # for act in self.nonfull_acts:
-        #     out.append((act,))
         return list(set(out))
     
     def activeTuples(self, log_turn):
@@ -203,16 +171,11 @@ class tuples(object):
         totalp = sum([p for act,p in acts])
         acts = [{"slu-hyp":[tuple_to_act(a) for a in act],"score":p/totalp} for act,p in acts]
         return acts
-        
+
+
 def tuple_to_act(t) :
     if len(t) == 1 :
         return {"act":t[0],"slots":[]}
-    if len(t) == 2 :
-        assert t[0] == "request"
-        return {"act":"request", "slots":[["slot",t[1]]]}
-    else :
-        return {"act":t[0],"slots":[[t[1],t[2]]]}
-
 
 
 def makes_valid_act(tuples):
@@ -233,6 +196,7 @@ def makes_valid_act(tuples):
     if len(informed_slots) != len(set(informed_slots)) :
         return False
     return True
+
 
 def actual_value(value):
     try:
@@ -276,6 +240,7 @@ class genericValue(object):
 def is_generic(value):
     return not isinstance(value, str)
 
+
 def generic_to_specific(tup) :
     if len(tup) == 3 :
         act,slot,value = tup
@@ -299,5 +264,3 @@ if __name__ == '__main__':
     log_turn = log_file["turns"][2]
     print(log_turn["input"]["batch"]["asr-hyps"][0])
     print([tup for tup in t.activeTuples(log_turn) if tup[0] == "inform"])
-        
-

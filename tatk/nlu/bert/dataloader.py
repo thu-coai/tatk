@@ -31,8 +31,8 @@ class Dataloader:
                     for intent_id in d[-1]:
                         self.intent_weight[intent_id] += 1
         train_size = len(self.data['train'])
-        for intent, id in self.intent2id.items():
-            self.intent_weight[id] = np.log((train_size-self.intent_weight[id])/self.intent_weight[id])
+        for intent, inten_id in self.intent2id.items():
+            self.intent_weight[inten_id] = np.log((train_size-self.intent_weight[inten_id])/self.intent_weight[inten_id])
             # print(intent, self.intent_weight[id], np.exp(self.intent_weight[id]))
         self.intent_weight = torch.tensor(self.intent_weight)
 
@@ -43,8 +43,7 @@ class Dataloader:
         basic_tokens = self.tokenizer.basic_tokenizer.tokenize(' '.join(word_seq))
         accum = ''
         i, j = 0, 0
-        for i in range(len(basic_tokens)):
-            token = basic_tokens[i]
+        for i, token in enumerate(basic_tokens):
             flag = (accum=='')
             if (accum+token).lower()==word_seq[j].lower():
                 accum=''
@@ -150,13 +149,9 @@ class Dataloader:
             batch_intents.append(intents)
         return batch_intents
 
-
-
 if __name__ == '__main__':
     data_dir = "multiwoz_usr_data"
     data = pickle.load(open(os.path.join(data_dir, 'data.pkl'), 'rb'))
     intent_vocab = pickle.load(open(os.path.join(data_dir, 'intent_vocab.pkl'), 'rb'))
     tag_vocab = pickle.load(open(os.path.join(data_dir, 'tag_vocab.pkl'), 'rb'))
     dataloader = Dataloader(data, intent_vocab, tag_vocab)
-
-
