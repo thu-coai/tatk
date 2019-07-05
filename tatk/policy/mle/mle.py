@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import torch
-import numpy as np
-import logging
 import os
+import json
 from tatk.policy.policy import Policy
 from tatk.policy.rlmodule import MultiDiscretePolicy
 from tatk.policy.multiwoz.vector_multiwoz import MultiWozVector
@@ -12,10 +11,12 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class MLP(Policy):
     
-    def __init__(self, cfg, is_train=False, dataset='multiwoz'):
+    def __init__(self, is_train=False, dataset='multiwoz'):
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
         self.is_train = is_train
-        self.policy = MultiDiscretePolicy(cfg).to(device=DEVICE)
+        
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
+            cfg = json.load(f)[dataset]
         
         if dataset == 'multiwoz':
             voc_file = os.path.join(root_dir, 'data/multiwoz/sys_da_voc.txt')
@@ -27,6 +28,8 @@ class MLP(Policy):
             self.vector = CamrestVector(voc_file, voc_opp_file)
         else:
             raise NotImplementedError('unknown dataset {}'.format(dataset))
+               
+        self.policy = MultiDiscretePolicy(self.vector.state_dim, cfg['h_dim'], self.vector.da_dim).to(device=DEVICE)
         
     def predict(self, state, sess=None):
         """
