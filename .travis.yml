@@ -2,12 +2,11 @@ language: python
 
 python:
   - 3.6
-  - 3.5
 
 cache: pip
 
 install:
-  - pip install -e .[develop]
+  - pip install --progress-bar off -e .[develop]
   - pip install sphinx
 
 script:
