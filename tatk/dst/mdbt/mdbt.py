@@ -472,7 +472,7 @@ def test_update():
     print('all time: {:.2f} seconds'.format(time.time() - start_time))
 
 
-def evaluate_model():
+def test_model():
     os.environ["CUDA_VISIBLE_DEVICES"] = '0'
     _config = tf.ConfigProto()
     _config.gpu_options.allow_growth = True
@@ -485,4 +485,4 @@ def evaluate_model():
     mdbt.test(mdbt.sess)
 
 if __name__ == '__main__':
-    evaluate_model()
+    test_model()

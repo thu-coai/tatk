@@ -34,6 +34,11 @@ setup(
 		'tqdm>=4.30',
 		'checksumdir>=1.1',
 		'tensorflow==1.14',
+		'scikit-learn>=0.20.3',
+		'scipy>=1.2.1',
+		'allennlp>=0.8.2',
+		'tensorboard>=1.14.0',
+		'tensorboardX==1.7',
 		'requests'
 	],
 	extras_require={
