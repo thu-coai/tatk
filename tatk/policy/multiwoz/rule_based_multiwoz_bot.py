@@ -376,13 +376,9 @@ class RuleBasedMultiwozBot(Policy):
             if 'Train-Inform' not in DA:
                 DA['Train-Inform'] = []
             for slot in user_action[user_act]:
-                # Train_DA_MAP = {'Duration': "Time", 'Price': 'Ticket', 'TrainID': 'Id'}
-                # slot[0] = Train_DA_MAP.get(slot[0], slot[0])
                 slot_name = REF_SYS_DA['Train'].get(slot[0], slot[0])
-                try:
+                if kb_result and slot_name in kb_result[0]:
                     DA['Train-Inform'].append([slot[0], kb_result[0][slot_name]])
-                except:
-                    pass
             return
         if len(kb_result) == 0:
             if 'Train-NoOffer' not in DA:
@@ -414,7 +410,7 @@ class RuleBasedMultiwozBot(Policy):
                 if 'Booking-Book' not in DA:
                     if domain in self.kb_result and len(self.kb_result[domain]) > 0:
                         DA['Booking-Book'] = [["Ref", self.kb_result[domain][0]['Ref']]]
-        # TODO handle booking between multi turn
+
 
 def check_diff(last_state, state):
     # print(state)
@@ -532,4 +528,3 @@ def test_run():
     policy = RuleBasedMultiwozBot()
     system_act = policy.predict(fake_state())
     print(json.dumps(system_act, indent=4))
-
