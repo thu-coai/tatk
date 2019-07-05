@@ -5,7 +5,7 @@ import zipfile
 import torch
 import torch.utils.data as data
 from tatk.util.camrest.state import default_state
-from tatk.policy.camrest.vector_camrest import CamrestVector
+from tatk.policy.vector.vector_camrest import CamrestVector
 
 class PolicyDataLoaderCamrest():
     

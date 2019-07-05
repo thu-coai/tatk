@@ -4,7 +4,7 @@ import logging
 import torch.nn as nn
 import json
 import pickle
-root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 os.chdir(root_dir)
 import sys
 sys.path.append(os.getcwd())

@@ -5,7 +5,7 @@ import zipfile
 import torch
 import torch.utils.data as data
 from tatk.util.multiwoz.state import default_state
-from tatk.policy.multiwoz.vector_multiwoz import MultiWozVector
+from tatk.policy.vector.vector_multiwoz import MultiWozVector
 
 class PolicyDataLoaderMultiWoz():
     
