@@ -50,13 +50,13 @@ class RuleBasedMultiwozBot(Policy):
         self.last_state = {}
 
     def predict(self, state):
-        """
-        Args:
-            State, please refer to util/state.py
+        """This function will be used to predict agent's dialog act.
+
+        Arguments:
+            State(:class:)
         Output:
             DA(Dialog Act), in the form of {act_type1: [[slot_name_1, value_1], [slot_name_2, value_2], ...], ...}
         """
-        # print('policy received state: {}'.format(state))
 
         if self.recommend_flag != -1:
             self.recommend_flag += 1
@@ -65,75 +65,68 @@ class RuleBasedMultiwozBot(Policy):
 
         DA = {}
 
-        if 'user_action' in state and (len(state['user_action']) > 0):
+        if 'user_action' in state and state['user_action']:
             user_action = state['user_action']
         else:
             user_action = check_diff(self.last_state, state)
 
         # Debug info for check_diff function
-        
+
         last_state_cpy = copy.deepcopy(self.last_state)
         state_cpy = copy.deepcopy(state)
 
-        try:
+        if 'history' in last_state_cpy:
             del last_state_cpy['history']
-        except:
-            pass
 
-        try:
+        if 'history' in state_cpy:
             del state_cpy['history']
-        except:
-            pass
-        '''
-        if last_state_cpy != state_cpy:
-            print("Last state: ", last_state_cpy)
-            print("State: ", state_cpy)
-            print("Predicted action: ", user_action)
-        '''
-
 
         self.last_state = state
 
         for user_act in user_action:
             domain, intent_type = user_act.split('-')
 
-            # Respond to general greetings
-            if domain == 'general':
-                self._update_greeting(user_act, state, DA)
-
-            # Book taxi for user
-            elif domain == 'Taxi':
-                self._book_taxi(user_act, state, DA)
-
-            elif domain == 'Booking':
-                self._update_booking(user_act, state, DA)
-
-            # User's talking about other domain
-            elif domain != "Train":
-                self._update_DA(user_act, user_action, state, DA)
-
-            # Info about train
-            else:
-                self._update_train(user_act, user_action, state, DA)
-
-            # Judge if user want to book
-            self._judge_booking(user_act, user_action, DA)
-
-            if 'Booking-Book' in DA:
-                if random.random() < 0.5:
-                    DA['general-reqmore'] = []
-                user_acts = []
-                for user_act in DA:
-                    if user_act != 'Booking-Book':
-                        user_acts.append(user_act)
-                for user_act in user_acts:
-                    del DA[user_act]
-
-        # print("Sys action: ", DA)
+            self._update_state(domain, user_act, DA)
 
         if DA == {}:
             return {'general-greet': [['none', 'none']]}
+
         return DA
+
+
+    def _update_state(self, domain, user_act, state, DA):
+
+        # Respond to general greetings
+        if domain == 'general':
+            self._update_greeting(user_act, state, DA)
+
+        # Book taxi for user
+        elif domain == 'Taxi':
+            self._book_taxi(user_act, state, DA)
+
+        elif domain == 'Booking':
+            self._update_booking(user_act, state, DA)
+
+        # User's talking about other domain
+        elif domain != "Train":
+            self._update_DA(user_act, user_action, state, DA)
+
+        # Info about train
+        else:
+            self._update_train(user_act, user_action, state, DA)
+
+        # Judge if user want to book
+        self._judge_booking(user_act, user_action, DA)
+
+        if 'Booking-Book' in DA:
+            if random.random() < 0.5:
+                DA['general-reqmore'] = []
+            user_acts = []
+            for user_act in DA:
+                if user_act != 'Booking-Book':
+                    user_acts.append(user_act)
+            for user_act in user_acts:
+                del DA[user_act]
 
     def _update_greeting(self, user_act, state, DA):
         """ General request / inform. """
@@ -195,12 +188,7 @@ class RuleBasedMultiwozBot(Policy):
         kb_result = query(domain.lower(), constraints)
         self.kb_result[domain] = deepcopy(kb_result)
 
-        # print("\tConstraint: " + "{}".format(constraints))
-        # print("\tCandidate Count: " + "{}".format(len(kb_result)))
-        # if len(kb_result) > 0:
-        #     print("Candidate: " + "{}".format(kb_result[0]))
 
-        # print(state['user_action'])
         # Respond to user's request
         if intent_type == 'Request':
             if self.recommend_flag > 1:
