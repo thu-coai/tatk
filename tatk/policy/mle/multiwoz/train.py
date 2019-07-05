@@ -110,7 +110,7 @@ class MLE_Trainer():
         
 if __name__ == '__main__':
     manager = PolicyDataLoaderMultiWoz()
-    with open('config.json', 'r') as f:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
         cfg = json.load(f)
     init_logging_handler(cfg['log_dir'])
     agent = MLE_Trainer(manager, cfg)
