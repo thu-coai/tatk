@@ -16,6 +16,9 @@ data/**/test.json
 data/camrest/CamRest676_v2.json
 data/multiwoz/annotated_user_da_with_span_full.json
 **/processed_data/*
+data/mdbt/data
+data/mdbt/models
+data/mdbt/word-vectors
 
 # test script
 *_test.py
