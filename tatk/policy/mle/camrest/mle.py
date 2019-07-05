@@ -62,7 +62,11 @@ class MLE(Policy):
         pass
     
     def load(self, filename):
+<<<<<<< HEAD
         policy_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_mle.pol.mdl')
+=======
+        policy_mdl = filename + '_mle.pol.mdl'
+>>>>>>> init vhus
         if os.path.exists(policy_mdl):
             self.policy.load_state_dict(torch.load(policy_mdl))
             print('<<dialog policy>> loaded checkpoint from file: {}'.format(policy_mdl))
