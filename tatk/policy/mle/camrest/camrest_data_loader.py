@@ -5,12 +5,12 @@ import zipfile
 import torch
 import torch.utils.data as data
 from tatk.util.camrest.state import default_state
-from tatk.policy.camrest.vector_camrest import CamrestVector
+from tatk.policy.vector.vector_camrest import CamrestVector
 
 class PolicyDataLoaderCamrest():
     
     def __init__(self):
-        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
         voc_file = os.path.join(root_dir, 'data/camrest/sys_da_voc.txt')
         voc_opp_file = os.path.join(root_dir, 'data/camrest/usr_da_voc.txt')
         self.vector = CamrestVector(voc_file, voc_opp_file)
@@ -68,8 +68,8 @@ class PolicyDataLoaderCamrest():
         for item in self.data[part]:
             s.append(torch.Tensor(item[0]))
             a.append(torch.Tensor(item[1]))
-        s = torch.Tensor(s)
-        a = torch.Tensor(a)
+        s = torch.stack(s)
+        a = torch.stack(a)
         dataset = Dataset(s, a)
         dataloader = data.DataLoader(dataset, batchsz, True)
         print('Finish creating {} dataset'.format(part))
