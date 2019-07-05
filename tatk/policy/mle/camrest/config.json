@@ -1,7 +1,7 @@
 {
 	"batchsz": 32,
-	"epoch": 8,
-	"lr": 0.001,
+	"epoch": 16,
+	"lr": 0.01,
 	"save_dir": "save",
 	"log_dir": "log",
 	"print_per_batch": 10,
