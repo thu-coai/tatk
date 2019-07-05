@@ -18,7 +18,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 class MLE_Trainer():
     def __init__(self, manager, cfg):
         self.data_train = manager.create_dataset('train', cfg['batchsz'])
-        self.data_valid = manager.create_dataset('valid', cfg['batchsz'])
+        self.data_valid = manager.create_dataset('val', cfg['batchsz'])
         self.data_test = manager.create_dataset('test', cfg['batchsz'])
         self.save_dir = cfg['save_dir']
         self.print_per_batch = cfg['print_per_batch']

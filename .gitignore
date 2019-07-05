@@ -19,3 +19,9 @@ data/multiwoz/annotated_user_da_with_span_full.json
 
 # test script
 *_test.py
+
+# log
+**/log/**
+
+# save
+**/save/**
