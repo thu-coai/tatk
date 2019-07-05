@@ -15,7 +15,7 @@ sys.path.append(root_dir)
 from tatk.util.train_util import init_logging_handler, to_device
 from tatk.task.multiwoz.goal_generator import GoalGenerator
 from tatk.policy.vhus.multiwoz.usermanager import UserDataManager, batch_iter
-from tatk.policy.vhus.multiwoz.usermodule import VHUS
+from tatk.policy.vhus.usermodule import VHUS
 from tatk.policy.vhus.util import padding_data, kl_gaussian
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

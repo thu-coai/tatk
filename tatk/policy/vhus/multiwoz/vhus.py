@@ -7,7 +7,7 @@ from tatk.policy.policy import Policy
 from tatk.policy.vhus.util import capital, padding
 from tatk.task.multiwoz.goal_generator import GoalGenerator
 from tatk.policy.vhus.multiwoz.usermanager import UserDataManager
-from tatk.policy.vhus.multiwoz.usermodule import VHUS
+from tatk.policy.vhus.usermodule import VHUS
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     
@@ -54,7 +54,7 @@ class UserPolicyVHUS(Policy):
         return capital(usr_action), terminal
     
     def load(self, filename):
-        user_mdl = filename + '_simulator.mdl'
+        user_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_simulator.mdl')
         if os.path.exists(user_mdl):
             self.user.load_state_dict(torch.load(user_mdl))
             print('<<user simulator>> loaded checkpoint from file: {}'.format(user_mdl))
