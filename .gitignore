@@ -22,3 +22,9 @@ data/mdbt/word-vectors
 
 # test script
 *_test.py
+
+# log
+**/log/**
+
+# save
+**/save/**
