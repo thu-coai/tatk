@@ -4,10 +4,9 @@ import logging
 import torch.nn as nn
 import json
 import pickle
-root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-os.chdir(root_dir)
 import sys
-sys.path.append(os.getcwd())
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+sys.path.append(root_dir)
 
 from tatk.policy.rlmodule import MultiDiscretePolicy
 from tatk.policy.vector.vector_multiwoz import MultiWozVector
@@ -18,9 +17,9 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class MLE_Trainer():
     def __init__(self, manager, cfg):
-        self.data_train = manager.create_dataset_rl('train', cfg['batchsz'])
-        self.data_valid = manager.create_dataset_rl('valid', cfg['batchsz'])
-        self.data_test = manager.create_dataset_rl('test', cfg['batchsz'])
+        self.data_train = manager.create_dataset('train', cfg['batchsz'])
+        self.data_valid = manager.create_dataset('valid', cfg['batchsz'])
+        self.data_test = manager.create_dataset('test', cfg['batchsz'])
         self.save_dir = cfg['save_dir']
         self.print_per_batch = cfg['print_per_batch']
         
@@ -110,7 +109,7 @@ class MLE_Trainer():
         
 if __name__ == '__main__':
     manager = PolicyDataLoaderMultiWoz()
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
+    with open('config.json', 'r') as f:
         cfg = json.load(f)
     init_logging_handler(cfg['log_dir'])
     agent = MLE_Trainer(manager, cfg)
