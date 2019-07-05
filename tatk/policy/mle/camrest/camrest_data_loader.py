@@ -10,7 +10,7 @@ from tatk.policy.vector.vector_camrest import CamrestVector
 class PolicyDataLoaderCamrest():
     
     def __init__(self):
-        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
         voc_file = os.path.join(root_dir, 'data/camrest/sys_da_voc.txt')
         voc_opp_file = os.path.join(root_dir, 'data/camrest/usr_da_voc.txt')
         self.vector = CamrestVector(voc_file, voc_opp_file)
