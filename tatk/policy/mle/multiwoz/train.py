@@ -11,7 +11,7 @@ sys.path.append(os.getcwd())
 
 from tatk.policy.rlmodule import MultiDiscretePolicy
 from tatk.policy.vector.vector_multiwoz import MultiWozVector
-from tatk.policy.mle.multiwoz.data_loader import PolicyDataLoaderMultiWoz
+from tatk.policy.mle.multiwoz.multiwoz_data_loader import PolicyDataLoaderMultiWoz
 from tatk.util.train_util import to_device, init_logging_handler
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
