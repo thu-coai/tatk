@@ -19,7 +19,7 @@ class PG(Policy):
         
         self.policy = MultiDiscretePolicy(self.vector.state_dim, cfg['h_dim'], self.vector.da_dim).to(device=DEVICE)
         
-    def predict(self, state, sess=None):
+    def predict(self, state):
         """
         Predict an system action given state.
         Args:
