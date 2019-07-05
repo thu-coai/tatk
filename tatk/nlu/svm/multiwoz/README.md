@@ -21,7 +21,7 @@ output processed data on `data/[mode]_data` dir.
 On `svm` dir:
 
 ```sh
-$ PYTHONPATH=../../.. python train.py multiwoz/config/multiwoz_[mode].cfg
+$ PYTHONPATH=../../.. python train.py multiwoz/configs/multiwoz_[mode].cfg
 ```
 
 The model will be saved on `model/svm_multiwoz_[mode].pickle`. Also, it will be zipped as `model/svm_multiwoz_[mode].zip`. 
