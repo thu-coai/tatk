@@ -12,8 +12,6 @@ install:
 
 script:
   # - python setup.py test
-  #- uname -srm
-  - export NO_AT_BRIDGE=1
   - cd docs && rm source/tatk.*.rst
   - sphinx-apidoc -o ./source ../tatk/ && cd source && python gen_rst.py --project tatk && cd ..
   - make html
