@@ -92,7 +92,7 @@ class UserPolicyAgendaCamrest(Policy):
         # reward
         reward = self._reward()
 
-        return action, session_over, reward
+        return action, session_over
 
     def _reward(self):
         """

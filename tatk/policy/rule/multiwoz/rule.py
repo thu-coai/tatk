@@ -10,6 +10,7 @@ class Rule(Policy):
     
     def __init__(self, is_train=False, character='sys'):
         self.is_train = is_train
+        self.character = character
         
         if character == 'sys':
             self.policy = RuleBasedMultiwozBot()
@@ -27,9 +28,12 @@ class Rule(Policy):
         Returns:
             action : System act, with the form of (act_type, {slot_name_1: value_1, slot_name_2, value_2, ...})
         """
-        action = self.policy.predict(state)
-        
-        return action
+        if self.character == 'sys':
+            action = self.policy.predict(state)
+            return action
+        else:
+            action, terminal = self.policy.predict(state)
+            return action, terminal
 
     def init_session(self):
         """
