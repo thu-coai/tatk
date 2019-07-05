@@ -1,3 +1,7 @@
+from copy import deepcopy
+import numpy as np
+import torch
+
 def padding(old, l):
     """
     pad a list of different lens "old" to the same len "l"

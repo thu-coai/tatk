@@ -366,7 +366,8 @@ class UserDataManager(object):
 
     def vocab_loader(self):
         if self.__voc_goal is None or self.__voc_usr is None or self.__voc_usr_rev is None or self.__voc_sys is None:
-            vocab_path = self.data_dir + '/goal/vocab.pkl'
+            vocab_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))),
+                                      'data/multiwoz/goal/vocab.pkl')
 
             if os.path.exists(vocab_path):
                 with open(vocab_path, 'rb') as f:
