@@ -1,8 +1,8 @@
 {
-  "data_dir": "multiwoz_usr_data",
-  "output_dir": "multiwoz_output/usr_intent_weight_log",
-  "log_dir": "multiwoz_log/usr_intent_weight_log",
-  "DEVICE": "cuda:1",
+  "data_dir": "multiwoz/data/sys_data",
+  "output_dir": "multiwoz/output/sys",
+  "log_dir": "multiwoz/log/sys",
+  "DEVICE": "cuda:2",
   "model": {
     "pre-trained": "bert-base-uncased",
     "lr": 0.001,

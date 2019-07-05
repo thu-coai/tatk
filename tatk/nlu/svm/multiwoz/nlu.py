@@ -58,8 +58,8 @@ class SVMNLU(NLU):
         return dialog_act
 
 if __name__ == "__main__":
-    nlu = SVMNLU(config_file='config/multiwoz_usr.cfg',
-                 model_file='copy_model/svm_multiwoz_usr.zip')
+    nlu = SVMNLU(config_file='configs/multiwoz_usr.cfg',
+                 model_file='model/svm_multiwoz_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",

@@ -8,7 +8,7 @@ import re
 
 
 class Dataloader:
-    def __init__(self, data, intent_vocab, tag_vocab):
+    def __init__(self, data, intent_vocab, tag_vocab, tokenizer):
         self.data = data
         self.intent_vocab = intent_vocab
         self.tag_vocab = tag_vocab
@@ -18,7 +18,7 @@ class Dataloader:
         self.intent2id = dict([(x, i) for i, x in enumerate(intent_vocab)])
         self.id2tag = dict([(i, x) for i, x in enumerate(tag_vocab)])
         self.tag2id = dict([(x, i) for i, x in enumerate(tag_vocab)])
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.tokenizer = BertTokenizer.from_pretrained(tokenizer)
         self.intent_weight = [0]*len(self.intent2id)
         for key in self.data:
             for d in self.data[key]:
@@ -148,10 +148,3 @@ class Dataloader:
                 i += 1
             batch_intents.append(intents)
         return batch_intents
-
-if __name__ == '__main__':
-    data_dir = "multiwoz_usr_data"
-    data = pickle.load(open(os.path.join(data_dir, 'data.pkl'), 'rb'))
-    intent_vocab = pickle.load(open(os.path.join(data_dir, 'intent_vocab.pkl'), 'rb'))
-    tag_vocab = pickle.load(open(os.path.join(data_dir, 'tag_vocab.pkl'), 'rb'))
-    dataloader = Dataloader(data, intent_vocab, tag_vocab)

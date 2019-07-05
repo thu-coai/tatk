@@ -2,10 +2,9 @@ import argparse
 import pickle
 import os
 import json
-from convlab.modules.nlu.multiwoz.bert.dataloader import Dataloader
-from convlab.modules.nlu.multiwoz.bert.model import BertNLU
+from tatk.nlu.bert.dataloader import Dataloader
+from tatk.nlu.bert.model import BertNLU
 import torch
-from torch.utils.tensorboard import SummaryWriter
 import random
 import numpy as np
 
@@ -16,7 +15,6 @@ np.random.seed(9102)
 
 parser = argparse.ArgumentParser(description="Test a model.")
 parser.add_argument('--config_path',
-                    default='configs/multiwoz.json',
                     help='path to config file')
 
 
