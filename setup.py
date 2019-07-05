@@ -29,7 +29,7 @@ setup(
 		'Topic :: Scientific/Engineering :: Artificial Intelligence',
 	],
 	install_requires=[
-		'numpy>=1.13',
+		'numpy>=1.15.0',
 		'nltk>=3.4',
 		'tqdm>=4.30',
 		'checksumdir>=1.1',
