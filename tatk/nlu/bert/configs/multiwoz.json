@@ -1,0 +1,15 @@
+{
+  "data_dir": "multiwoz_usr_data",
+  "output_dir": "multiwoz_output/usr_intent_weight_log",
+  "log_dir": "multiwoz_log/usr_intent_weight_log",
+  "DEVICE": "cuda:1",
+  "model": {
+    "pre-trained": "bert-base-uncased",
+    "lr": 0.001,
+    "dropout": 0.3,
+    "optimizer": "Adam"
+  },
+  "check_step": 100,
+  "max_step": 20000,
+  "batch_size": 100
+}
