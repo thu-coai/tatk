@@ -9,8 +9,8 @@ root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.pa
 sys.path.append(root_dir)
 
 from tatk.policy.rlmodule import MultiDiscretePolicy
-from tatk.policy.vector.vector_multiwoz import MultiWozVector
-from tatk.policy.mle.multiwoz.multiwoz_data_loader import PolicyDataLoaderMultiWoz
+from tatk.policy.vector.vector_camrest import CamrestVector
+from tatk.policy.mle.camrest.camrest_data_loader import PolicyDataLoaderCamrest
 from tatk.util.train_util import to_device, init_logging_handler
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -24,9 +24,9 @@ class MLE_Trainer():
         self.print_per_batch = cfg['print_per_batch']
         self.save_per_epoch = cfg['save_per_epoch']
         
-        voc_file = os.path.join(root_dir, 'data/multiwoz/sys_da_voc.txt')
-        voc_opp_file = os.path.join(root_dir, 'data/multiwoz/usr_da_voc.txt')
-        vector = MultiWozVector(voc_file, voc_opp_file)
+        voc_file = os.path.join(root_dir, 'data/camrest/sys_da_voc.txt')
+        voc_opp_file = os.path.join(root_dir, 'data/camrest/usr_da_voc.txt')
+        vector = CamrestVector(voc_file, voc_opp_file)
         self.policy = MultiDiscretePolicy(vector.state_dim, cfg['h_dim'], vector.da_dim).to(device=DEVICE)
         self.policy.eval()
         self.policy_optim = torch.optim.Adam(self.policy.parameters(), lr=cfg['lr'])
@@ -109,7 +109,7 @@ class MLE_Trainer():
         return best
         
 if __name__ == '__main__':
-    manager = PolicyDataLoaderMultiWoz()
+    manager = PolicyDataLoaderCamrest()
     with open('config.json', 'r') as f:
         cfg = json.load(f)
     init_logging_handler(cfg['log_dir'])
