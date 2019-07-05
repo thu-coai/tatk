@@ -33,6 +33,7 @@ setup(
 		'nltk>=3.4',
 		'tqdm>=4.30',
 		'checksumdir>=1.1',
+		'tensorflow==1.14',
 		'requests'
 	],
 	extras_require={
