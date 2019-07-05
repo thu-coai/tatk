@@ -273,7 +273,7 @@ class RuleBasedMultiwozBot(Policy):
                             i -= 1
                         i += 1
                     random.shuffle(reqs)
-                    if len(reqs) == 0:
+                    if not reqs:
                         return
                     req_num = min(random.randint(0, 999999) % len(reqs) + 1, 2)
                     if (domain + "-Request") not in DA:
@@ -292,7 +292,7 @@ class RuleBasedMultiwozBot(Policy):
         if (domain + "-Inform") not in DA:
             DA[domain + "-Inform"] = []
         for slot in user_action[user_act]:
-            if len(kb_result) > 0:
+            if kb_result:
                 kb_slot_name = REF_SYS_DA[domain].get(slot[0], slot[0])
                 if kb_slot_name in kb_result[0]:
                     DA[domain + "-Inform"].append([slot[0], kb_result[0][kb_slot_name]])
@@ -345,7 +345,7 @@ class RuleBasedMultiwozBot(Policy):
             if state['belief_state']['train']['semi'][time] != "":
                 constraints.append([time, state['belief_state']['train']['semi'][time]])
 
-        if len(constraints) == 0:
+        if not constraints:
             p = random.random()
             if 'Train-Request' not in DA:
                 DA['Train-Request'] = []
@@ -380,14 +380,14 @@ class RuleBasedMultiwozBot(Policy):
                 if kb_result and slot_name in kb_result[0]:
                     DA['Train-Inform'].append([slot[0], kb_result[0][slot_name]])
             return
-        if len(kb_result) == 0:
+        if not kb_result:
             if 'Train-NoOffer' not in DA:
                 DA['Train-NoOffer'] = []
             for prop in constraints:
                 DA['Train-NoOffer'].append([REF_USR_DA['Train'].get(prop[0], prop[0]), prop[1]])
             if 'Train-Request' in DA:
                 del DA['Train-Request']
-        elif len(kb_result) >= 1:
+        else:
             if len(constraints) < 4:
                 return
             if 'Train-Request' in DA:
@@ -403,12 +403,12 @@ class RuleBasedMultiwozBot(Policy):
             self.recommend_flag = -1
             self.choice = ""
         elif self.recommend_flag == 1:
-            self.recommend_flag == 0
+            self.recommend_flag = 0
         domain, _ = user_act.split('-')
         for slot in user_action[user_act]:
             if domain in booking_info and slot[0] in booking_info[domain]:
                 if 'Booking-Book' not in DA:
-                    if domain in self.kb_result and len(self.kb_result[domain]) > 0:
+                    if domain in self.kb_result and self.kb_result[domain]:
                         DA['Booking-Book'] = [["Ref", self.kb_result[domain][0]['Ref']]]
 
 
@@ -504,12 +504,6 @@ def fake_state():
              'belief_state': init_belief_state,
              'kb_results_dict': kb_results,
              'hotel-request': [['phone']]}
-    '''
-    state = {'user_action': dict(),
-             'belief_state: dict(),
-             'kb_results_dict': kb_results
-    }
-    '''
     return state
 
 
@@ -528,3 +522,4 @@ def test_run():
     policy = RuleBasedMultiwozBot()
     system_act = policy.predict(fake_state())
     print(json.dumps(system_act, indent=4))
+    
