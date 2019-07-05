@@ -116,7 +116,7 @@ class UserPolicyAgendaMultiWoz(Policy):
         # transform to DA
         action = self._transform_usract_out(action)
 
-        return action, session_over, reward
+        return action, session_over
 
     def _reward(self):
         """
