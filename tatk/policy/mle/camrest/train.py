@@ -93,20 +93,6 @@ class MLE_Trainer():
         torch.save(self.policy.state_dict(), directory + '/' + str(epoch) + '_mle.pol.mdl')
 
         logging.info('<<dialog policy>> epoch {}: saved network to mdl'.format(epoch))
-
-    def load(self, filename):
-        policy_mdl = filename + '_mle.pol.mdl'
-        if os.path.exists(policy_mdl):
-            self.policy.load_state_dict(torch.load(policy_mdl))
-            logging.info('<<dialog policy>> loaded checkpoint from file: {}'.format(policy_mdl))
-        
-        best_pkl = filename + '.pkl'
-        if os.path.exists(best_pkl):
-            with open(best_pkl, 'rb') as f:
-                best = pickle.load(f)
-        else:
-            best = float('inf')
-        return best
         
 if __name__ == '__main__':
     manager = PolicyDataLoaderCamrest()
@@ -114,6 +100,8 @@ if __name__ == '__main__':
         cfg = json.load(f)
     init_logging_handler(cfg['log_dir'])
     agent = MLE_Trainer(manager, cfg)
+    
+    logging.debug('start training')
     
     best = float('inf')
     for e in range(cfg['epoch']):

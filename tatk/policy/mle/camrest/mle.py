@@ -23,6 +23,8 @@ class MLP(Policy):
                
         self.policy = MultiDiscretePolicy(self.vector.state_dim, cfg['h_dim'], self.vector.da_dim).to(device=DEVICE)
         
+        self.load(cfg['load'])
+        
     def predict(self, state):
         """
         Predict an system action given state.
@@ -42,3 +44,9 @@ class MLP(Policy):
         Restore after one session
         """
         pass
+    
+    def load(self, filename):
+        policy_mdl = filename + '_mle.pol.mdl'
+        if os.path.exists(policy_mdl):
+            self.policy.load_state_dict(torch.load(policy_mdl))
+            print('<<dialog policy>> loaded checkpoint from file: {}'.format(policy_mdl))
