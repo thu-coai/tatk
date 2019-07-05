@@ -122,11 +122,11 @@ class RuleBasedMultiwozBot(Policy):
             if random.random() < 0.5:
                 DA['general-reqmore'] = []
             user_acts = []
-            for user_act in DA:
-                if user_act != 'Booking-Book':
-                    user_acts.append(user_act)
-            for user_act in user_acts:
-                del DA[user_act]
+            for cur_user_act in DA:
+                if cur_user_act != 'Booking-Book':
+                    user_acts.append(cur_user_act)
+            for cur_user_act in user_acts:
+                del DA[cur_user_act]
 
     def _update_greeting(self, user_act, state, DA):
         """ General request / inform. """
@@ -155,7 +155,7 @@ class RuleBasedMultiwozBot(Policy):
 
 
         # Finish booking, tell user car type and phone number
-        if len(blank_info) == 0:
+        if blank_info:
             if 'Taxi-Inform' not in DA:
                 DA['Taxi-Inform'] = []
             car = generate_car()
@@ -189,66 +189,17 @@ class RuleBasedMultiwozBot(Policy):
         self.kb_result[domain] = deepcopy(kb_result)
 
 
-        # Respond to user's request
         if intent_type == 'Request':
-            if self.recommend_flag > 1:
-                self.recommend_flag = -1
-                self.choice = ""
-            elif self.recommend_flag == 1:
-                self.recommend_flag == 0
-            if (domain + "-Inform") not in DA:
-                DA[domain + "-Inform"] = []
-            for slot in user_action[user_act]:
-                if len(kb_result) > 0:
-                    kb_slot_name = REF_SYS_DA[domain].get(slot[0], slot[0])
-                    if kb_slot_name in kb_result[0]:
-                        DA[domain + "-Inform"].append([slot[0], kb_result[0][kb_slot_name]])
-                    else:
-                        DA[domain + "-Inform"].append([slot[0], "unknown"])
-                # DA[domain + "-Inform"].append([slot_name, state['kb_results_dict'][0][slot[0].lower()]])
+            self._respond_to_request(domain, user_act, user_action, kb_result, DA)
 
         else:
             # There's no result matching user's constraint
-            # if len(state['kb_results_dict']) == 0:
-            if len(kb_result) == 0:
-                if (domain + "-NoOffer") not in DA:
-                    DA[domain + "-NoOffer"] = []
-
-                for slot in state['belief_state'][domain.lower()]['semi']:
-                    if state['belief_state'][domain.lower()]['semi'][slot] != "" and \
-                            state['belief_state'][domain.lower()]['semi'][slot] != "do n't care":
-                        slot_name = REF_USR_DA[domain].get(slot, slot)
-                        DA[domain + "-NoOffer"].append([slot_name, state['belief_state'][domain.lower()]['semi'][slot]])
-
-                p = random.random()
-
-                # Ask user if he wants to change constraint
-                if p < 0.3:
-                    req_num = min(random.randint(0, 999999) % len(DA[domain + "-NoOffer"]) + 1, 3)
-                    if domain + "-Request" not in DA:
-                        DA[domain + "-Request"] = []
-                    for i in range(req_num):
-                        slot_name = REF_USR_DA[domain].get(DA[domain + "-NoOffer"][i][0], DA[domain + "-NoOffer"][i][0])
-                        DA[domain + "-Request"].append([slot_name, "?"])
+            if not kb_result:
+                self._no_matching(domain, DA, state)
 
             # There's exactly one result matching user's constraint
-            # elif len(state['kb_results_dict']) == 1:
             elif len(kb_result) == 1:
-
-                # Inform user about this result
-                if (domain + "-Inform") not in DA:
-                    DA[domain + "-Inform"] = []
-                props = []
-                for prop in state['belief_state'][domain.lower()]['semi']:
-                    props.append(prop)
-                property_num = len(props)
-                if property_num > 0:
-                    info_num = random.randint(0, 999999) % property_num + 1
-                    random.shuffle(props)
-                    for i in range(info_num):
-                        slot_name = REF_USR_DA[domain].get(props[i], props[i])
-                        # DA[domain + "-Inform"].append([slot_name, state['kb_results_dict'][0][props[i]]])
-                        DA[domain + "-Inform"].append([slot_name, kb_result[0][props[i]]])
+                self._exact_match(domain, DA, state, kb_result)
 
             # There are multiple resultes matching user's constraint
             else:
@@ -331,6 +282,61 @@ class RuleBasedMultiwozBot(Policy):
                         req = reqs[i]
                         req[0] = REF_USR_DA[domain].get(req[0], req[0])
                         DA[domain + "-Request"].append(req)
+
+    def _respond_to_request(self, domain, user_act, user_action, kb_result, DA):
+        if self.recommend_flag > 1:
+            self.recommend_flag = -1
+            self.choice = ""
+        elif self.recommend_flag == 1:
+            self.recommend_flag = 0
+        if (domain + "-Inform") not in DA:
+            DA[domain + "-Inform"] = []
+        for slot in user_action[user_act]:
+            if len(kb_result) > 0:
+                kb_slot_name = REF_SYS_DA[domain].get(slot[0], slot[0])
+                if kb_slot_name in kb_result[0]:
+                    DA[domain + "-Inform"].append([slot[0], kb_result[0][kb_slot_name]])
+                else:
+                    DA[domain + "-Inform"].append([slot[0], "unknown"])
+
+
+    def _no_matching(self, domain, DA, state):
+        if (domain + "-NoOffer") not in DA:
+            DA[domain + "-NoOffer"] = []
+
+        for slot in state['belief_state'][domain.lower()]['semi']:
+            if state['belief_state'][domain.lower()]['semi'][slot] != "" and \
+                    state['belief_state'][domain.lower()]['semi'][slot] != "do n't care":
+                slot_name = REF_USR_DA[domain].get(slot, slot)
+                DA[domain + "-NoOffer"].append([slot_name, state['belief_state'][domain.lower()]['semi'][slot]])
+
+        p = random.random()
+
+        # Ask user if he wants to change constraint
+        if p < 0.3:
+            req_num = min(random.randint(0, 999999) % len(DA[domain + "-NoOffer"]) + 1, 3)
+            if domain + "-Request" not in DA:
+                DA[domain + "-Request"] = []
+            for i in range(req_num):
+                slot_name = REF_USR_DA[domain].get(DA[domain + "-NoOffer"][i][0], DA[domain + "-NoOffer"][i][0])
+                DA[domain + "-Request"].append([slot_name, "?"])
+
+
+    def _exact_match(self, domain, DA, state, kb_result):
+        # Inform user about this result
+        if (domain + "-Inform") not in DA:
+            DA[domain + "-Inform"] = []
+        props = []
+        for prop in state['belief_state'][domain.lower()]['semi']:
+            props.append(prop)
+        property_num = len(props)
+        if property_num > 0:
+            info_num = random.randint(0, 999999) % property_num + 1
+            random.shuffle(props)
+            for i in range(info_num):
+                slot_name = REF_USR_DA[domain].get(props[i], props[i])
+                DA[domain + "-Inform"].append([slot_name, kb_result[0][props[i]]])
+
 
     def _update_train(self, user_act, user_action, state, DA):
         trans = {'day': 'Day', 'destination': 'Destination', 'departure': 'Departure'}
