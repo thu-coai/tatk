@@ -68,8 +68,8 @@ class PolicyDataLoaderCamrest():
         for item in self.data[part]:
             s.append(torch.Tensor(item[0]))
             a.append(torch.Tensor(item[1]))
-        s = torch.Tensor(s)
-        a = torch.Tensor(a)
+        s = torch.stack(s)
+        a = torch.stack(a)
         dataset = Dataset(s, a)
         dataloader = data.DataLoader(dataset, batchsz, True)
         print('Finish creating {} dataset'.format(part))
