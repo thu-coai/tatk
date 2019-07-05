@@ -22,6 +22,7 @@ class MLE_Trainer():
         self.data_test = manager.create_dataset('test', cfg['batchsz'])
         self.save_dir = cfg['save_dir']
         self.print_per_batch = cfg['print_per_batch']
+        self.save_per_epoch = cfg['save_per_epoch']
         
         voc_file = os.path.join(root_dir, 'data/multiwoz/sys_da_voc.txt')
         voc_opp_file = os.path.join(root_dir, 'data/multiwoz/usr_da_voc.txt')
