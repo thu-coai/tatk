@@ -21,7 +21,7 @@ class SVMNLU(NLU):
             print('Load from model_file param')
             archive_file = cached_path(model_file)
             archive = zipfile.ZipFile(archive_file, 'r')
-            archive.extractall(os.path.dirname(os.path.dirname(model_dir)))
+            archive.extractall(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             archive.close()
         self.c.load(model_path)
 
@@ -58,8 +58,8 @@ class SVMNLU(NLU):
         return dialog_act
 
 if __name__ == "__main__":
-    nlu = SVMNLU(config_file='config/multiwoz_usr.cfg',
-                 model_file='copy_model/svm_multiwoz_usr.zip')
+    nlu = SVMNLU(config_file='configs/multiwoz_usr.cfg',
+                 model_file='model/svm_multiwoz_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",

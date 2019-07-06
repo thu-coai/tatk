@@ -176,6 +176,10 @@ class tuples(object):
 def tuple_to_act(t) :
     if len(t) == 1 :
         return {"act":t[0],"slots":[]}
+    elif len(t) == 2:
+        assert t[0] == "request"
+        return {"act": "request", "slots": [["slot", t[1]]]}
+    return {"act": t[0], "slots": [[t[1], t[2]]]}
 
 
 def makes_valid_act(tuples):
