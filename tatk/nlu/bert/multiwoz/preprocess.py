@@ -1,3 +1,17 @@
+"""
+Preprocess multiwoz data for BertNLU.
+Usage:
+    python preprocess [mode=all|usr|sys]
+    mode: which side data will be use
+Require:
+    - `../../../../data/multiwoz/[train|val|test].json.zip` data file
+Output:
+    - `data/[mode]_data/` processed data dir
+        - `data.pkl`: data[data_key=train|val|test] is a list of [tokens,tags,intents],
+            tokens: list of words; tags: list of BIO tags(e.g. B-domain-intent+slot); intent: list of 'domain-intent+slot*value'.
+        - `intent_vocab.pkl`: list of all intents (format: 'domain-intent+slot*value')
+        - `tag_vocab.pkl`: list of all tags (format: 'O'|'B-domain-intent+slot'|'B-domain-intent+slot')
+"""
 import json
 import os
 import zipfile
@@ -10,14 +24,15 @@ def read_zipped_json(filepath, filename):
     archive = zipfile.ZipFile(filepath, 'r')
     return json.load(archive.open(filename))
 
+
 if __name__ == '__main__':
     mode = sys.argv[1]
     assert mode=='all' or mode=='usr' or mode=='sys'
-    data_dir = '../../../../../data/multiwoz'
-    processed_data_dir = 'multiwoz_{}_data'.format(mode)
+    data_dir = '../../../../data/multiwoz'
+    processed_data_dir = 'data/{}_data'.format(mode)
     if not os.path.exists(processed_data_dir):
         os.makedirs(processed_data_dir)
-    data_key = ['val', 'test', 'train']
+    data_key = ['train', 'val', 'test']
     data = {}
     for key in data_key:
         data[key] = read_zipped_json(os.path.join(data_dir,key+'.json.zip'), key+'.json')
@@ -27,7 +42,6 @@ if __name__ == '__main__':
     all_da = []
     all_intent = []
     all_tag = []
-    turn_num = 0
     for key in data_key:
         processed_data[key] = []
         for no, sess in data[key].items():
@@ -36,7 +50,6 @@ if __name__ == '__main__':
                     continue
                 elif mode == 'sys' and is_sys % 2 == 0:
                     continue
-                turn_num += 1
                 tokens = turn["text"].split()
                 dialog_act = {}
                 for dacts in turn["span_info"]:
@@ -46,13 +59,21 @@ if __name__ == '__main__':
 
                 spans = turn["span_info"]
                 tags = []
-                for i in range(len(tokens)):
+                for i, _ in enumerate(tokens):
                     for span in spans:
                         if i == span[3]:
-                            tags.append("B-" + span[0] + "+" + span[1])
+                            tag = "B-" + span[0] + "+" + span[1]
+                            if key != 'train' and tag not in all_tag:
+                                tags.append('O')
+                            else:
+                                tags.append(tag)
                             break
-                        if i > span[3] and i <= span[4]:
-                            tags.append("I-" + span[0] + "+" + span[1])
+                        if span[3] < i <= span[4]:
+                            tag = "I-" + span[0] + "+" + span[1]
+                            if key != 'train' and tag not in all_tag:
+                                tags.append('O')
+                            else:
+                                tags.append(tag)
                             break
                     else:
                         tags.append("O")
@@ -64,18 +85,21 @@ if __name__ == '__main__':
                             if dact[1] in ["none", "?", "yes", "no", "do nt care", "do n't care"]:
                                 intents.append(dacts + "+" + dact[0] + "*" + dact[1])
 
-                processed_data[key].append([tokens,tags,intents])
+                processed_data[key].append([tokens, tags, intents, dialog_act])
                 if key == 'train':
                     all_da += [da for da in turn['dialog_act']]
                     all_intent += intents
                     all_tag += tags
-    print('turn num:', turn_num)
-    print('dialog act num:', len(set(all_da)))
-    print('sentence label num:', len(set(all_intent)))
-    print('tag num:', len(set(all_tag)))
-    all_da = [x[0] for x in dict(Counter(all_da)).items() if x[1]]
-    all_intent = [x[0] for x in dict(Counter(all_intent)).items() if x[1]]
-    all_tag = [x[0] for x in dict(Counter(all_tag)).items() if x[1]]
+        if key == 'train':
+            all_da = [x[0] for x in dict(Counter(all_da)).items() if x[1]]
+            all_intent = [x[0] for x in dict(Counter(all_intent)).items() if x[1]]
+            all_tag = [x[0] for x in dict(Counter(all_tag)).items() if x[1]]
+
+    for key in data_key:
+        print('loaded {}, size {}'.format(key, len(processed_data[key])))
+    print('dialog act num:', len(all_da))
+    print('sentence label num:', len(all_intent))
+    print('tag num:', len(all_tag))
     pickle.dump(processed_data, open(os.path.join(processed_data_dir, 'data.pkl'), 'wb'))
     pickle.dump(all_intent, open(os.path.join(processed_data_dir, 'intent_vocab.pkl'), 'wb'))
     pickle.dump(all_tag, open(os.path.join(processed_data_dir, 'tag_vocab.pkl'), 'wb'))
