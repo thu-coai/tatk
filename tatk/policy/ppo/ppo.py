@@ -2,6 +2,8 @@
 import torch
 import numpy as np
 import logging
+import os
+import json
 from tatk.policy.policy import Policy
 from tatk.policy.rlmodule import MultiDiscretePolicy, Value
 
@@ -11,11 +13,15 @@ class PPO(Policy):
     
     def __init__(self, cfg, is_train=False):
         self.is_train = is_train
-        # construct policy and value network
-        self.policy = MultiDiscretePolicy(cfg).to(device=DEVICE)
-        self.value = Value(cfg).to(device=DEVICE)
         
-    def predict(self, state, sess=None):
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
+            cfg = json.load(f)
+        
+        # construct policy and value network
+        self.policy = MultiDiscretePolicy(self.vector.state_dim, cfg['h_dim'], self.vector.da_dim).to(device=DEVICE)
+        self.value = Value(self.vector.state_dim, cfg['hv_dim']).to(device=DEVICE)
+        
+    def predict(self, state):
         """
         Predict an system action given state.
         Args:

@@ -56,7 +56,7 @@ class UserPolicyAgendaCamrest(Policy):
         self.domain_goals = self.goal.domain_goals
         self.agenda = Agenda(self.goal)
 
-    def predict(self, state, sys_action):
+    def predict(self, state):
         """
         Predict an user act based on state and preorder system action.
         Args:
@@ -68,6 +68,7 @@ class UserPolicyAgendaCamrest(Policy):
             reward (float): Reward given by user.
         """
         self.__turn += 2
+        sys_action = state['system_action']
 
         # At the beginning of a dialog when there is no NLU.
         if sys_action == "null":
@@ -91,7 +92,7 @@ class UserPolicyAgendaCamrest(Policy):
         # reward
         reward = self._reward()
 
-        return action, session_over, reward
+        return action, session_over
 
     def _reward(self):
         """
