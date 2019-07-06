@@ -2,7 +2,7 @@
 import os
 import json
 import numpy as np
-from tatk.policy.vector import Vector
+from tatk.policy.vec import Vector
 from tatk.util.camrest.lexicalize import delexicalize_da, flat_da, deflat_da, lexicalize_da
 from tatk.util.camrest.dbquery import query
 

@@ -8,14 +8,14 @@ import random
 
 
 class DiscretePolicy(nn.Module):
-    def __init__(self, cfg):
+    def __init__(self, s_dim, h_dim, a_dim):
         super(DiscretePolicy, self).__init__()
 
-        self.net = nn.Sequential(nn.Linear(cfg.s_dim, cfg.h_dim),
+        self.net = nn.Sequential(nn.Linear(s_dim, h_dim),
                                  nn.ReLU(),
-                                 nn.Linear(cfg.h_dim, cfg.h_dim),
+                                 nn.Linear(h_dim, h_dim),
                                  nn.ReLU(),
-                                 nn.Linear(cfg.h_dim, cfg.a_dim))
+                                 nn.Linear(h_dim, a_dim))
 
     def forward(self, s):
         # [b, s_dim] => [b, a_dim]
@@ -58,14 +58,14 @@ class DiscretePolicy(nn.Module):
  
     
 class MultiDiscretePolicy(nn.Module):
-    def __init__(self, cfg):
+    def __init__(self, s_dim, h_dim, a_dim):
         super(MultiDiscretePolicy, self).__init__()
         
-        self.net = nn.Sequential(nn.Linear(cfg.s_dim, cfg.h_dim),
+        self.net = nn.Sequential(nn.Linear(s_dim, h_dim),
                                  nn.ReLU(),
-                                 nn.Linear(cfg.h_dim, cfg.h_dim),
+                                 nn.Linear(h_dim, h_dim),
                                  nn.ReLU(),
-                                 nn.Linear(cfg.h_dim, cfg.a_dim))
+                                 nn.Linear(h_dim, a_dim))
 
     def forward(self, s):
         # [b, s_dim] => [b, a_dim]
@@ -115,15 +115,15 @@ class MultiDiscretePolicy(nn.Module):
         
 
 class ContinuousPolicy(nn.Module):
-    def __init__(self, cfg):
+    def __init__(self, s_dim, h_dim, a_dim):
         super(ContinuousPolicy, self).__init__()
 
-        self.net = nn.Sequential(nn.Linear(cfg.s_dim, cfg.h_dim),
+        self.net = nn.Sequential(nn.Linear(s_dim, h_dim),
                                  nn.ReLU(),
-                                 nn.Linear(cfg.h_dim, cfg.h_dim),
+                                 nn.Linear(h_dim, h_dim),
                                  nn.ReLU())
-        self.net_mean = nn.Linear(cfg.h_dim, cfg.a_dim)
-        self.net_std = nn.Linear(cfg.h_dim, cfg.a_dim)
+        self.net_mean = nn.Linear(h_dim, a_dim)
+        self.net_std = nn.Linear(h_dim, a_dim)
 
     def forward(self, s):
         # [b, s_dim] => [b, h_dim]
@@ -182,14 +182,14 @@ class ContinuousPolicy(nn.Module):
     
     
 class Value(nn.Module):
-    def __init__(self, cfg):
+    def __init__(self, s_dim, hv_dim):
         super(Value, self).__init__()
 
-        self.net = nn.Sequential(nn.Linear(cfg.s_dim, cfg.hv_dim),
+        self.net = nn.Sequential(nn.Linear(s_dim, hv_dim),
                                  nn.ReLU(),
-                                 nn.Linear(cfg.hv_dim, cfg.hv_dim),
+                                 nn.Linear(hv_dim, hv_dim),
                                  nn.ReLU(),
-                                 nn.Linear(cfg.hv_dim, 1))
+                                 nn.Linear(hv_dim, 1))
 
     def forward(self, s):
         """
