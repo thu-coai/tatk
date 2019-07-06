@@ -1,7 +1,7 @@
 """
-Evaluate NLU models on Multiwoz test dataset
+Evaluate SVMNLU models on Multiwoz test dataset
 Metric: dataset level Precision/Recall/F1
-Usage: PYTHONPATH=../../../.. python evaluate.py [OneNetLU|MILU|SVMNLU] [usr|sys|all]
+Usage: PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
 """
 import json
 import random

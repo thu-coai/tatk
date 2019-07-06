@@ -8,8 +8,9 @@ class BertNLU(nn.Module):
         super(BertNLU, self).__init__()
         self.DEVICE = DEVICE
         self.bert = BertModel.from_pretrained(model_config['pre-trained'])
-        for p in self.parameters():
-            p.requires_grad = False
+        if not model_config['train_bert']:
+            for p in self.parameters():
+                p.requires_grad = False
         self.intent_dim = intent_dim
         self.tag_dim = tag_dim
         self.dropout = nn.Dropout(model_config['dropout'])

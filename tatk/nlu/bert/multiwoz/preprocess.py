@@ -24,6 +24,7 @@ def read_zipped_json(filepath, filename):
     archive = zipfile.ZipFile(filepath, 'r')
     return json.load(archive.open(filename))
 
+
 if __name__ == '__main__':
     mode = sys.argv[1]
     assert mode=='all' or mode=='usr' or mode=='sys'
@@ -84,7 +85,7 @@ if __name__ == '__main__':
                             if dact[1] in ["none", "?", "yes", "no", "do nt care", "do n't care"]:
                                 intents.append(dacts + "+" + dact[0] + "*" + dact[1])
 
-                processed_data[key].append([tokens,tags,intents])
+                processed_data[key].append([tokens, tags, intents, dialog_act])
                 if key == 'train':
                     all_da += [da for da in turn['dialog_act']]
                     all_intent += intents

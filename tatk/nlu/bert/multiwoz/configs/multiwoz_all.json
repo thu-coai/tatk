@@ -1,9 +1,11 @@
 {
   "data_dir": "multiwoz/data/all_data",
   "output_dir": "multiwoz/output/all",
+  "zipped_model_path": "multiwoz/output/all/bert_multiwoz_all.zip",
   "log_dir": "multiwoz/log/all",
   "DEVICE": "cuda:3",
   "model": {
+    "train_bert": false,
     "pre-trained": "bert-base-uncased",
     "lr": 0.001,
     "dropout": 0.3,
