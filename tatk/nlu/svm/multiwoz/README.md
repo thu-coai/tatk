@@ -36,7 +36,7 @@ $ PYTHONPATH=../../../.. python evaluate.py [mode]
 
 #### Predict
 
-In `nlu.py` , the `SVMNLU` class inherits the NLU interface and adapts to multiwoz dataset. Example usage:
+In `mdbt.py` , the `SVMNLU` class inherits the NLU interface and adapts to multiwoz dataset. Example usage:
 
 ```python
 from tatk.nlu.svm.multiwoz.nlu import SVMNLU
