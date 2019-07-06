@@ -84,8 +84,7 @@ if __name__ == '__main__':
                         if dacts not in dialog_act or dact[0] not in [sv[0] for sv in dialog_act[dacts]]:
                             if dact[1] in ["none", "?", "yes", "no", "do nt care", "do n't care"]:
                                 intents.append(dacts + "+" + dact[0] + "*" + dact[1])
-
-                processed_data[key].append([tokens, tags, intents, dialog_act])
+                processed_data[key].append([tokens, tags, intents, turn["dialog_act"]])
                 if key == 'train':
                     all_da += [da for da in turn['dialog_act']]
                     all_intent += intents
