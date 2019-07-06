@@ -80,12 +80,13 @@ if __name__ == '__main__':
         intent_logits, tag_logits = model.forward(word_seq_tensor, word_mask_tensor)
         for j in range(real_batch_size):
             intent = recover_intent(dataloader, intent_logits[j], tag_logits[j], tag_mask_tensor[j],
-                                    batch_data[j][0], batch_data[j][4])
+                                    batch_data[j][0], batch_data[j][-4])
+            intent = [(x[0], x[1], x[2].lower()) for x in intent]
             output_da_triples.append(intent)
             triples = []
             for act, svs in batch_data[j][3].items():
                 for s, v in svs:
-                    triples.append((act, s, v))
+                    triples.append((act, s, v.lower()))
             golden_da_triples.append(triples)
 
     TP, FP, FN = 0, 0, 0
