@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from allennlp.common.file_utils import cached_path as allennlp_cached_path
+from tatk.util.allennlp_file_utils import cached_path as allennlp_cached_path
 
 
 def cached_path(file_path, cached_dir=None):

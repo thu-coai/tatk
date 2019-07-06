@@ -7,7 +7,7 @@ Require:
     - `../../../../data/multiwoz/[train|val|test].json.zip` data file
     - `../../../../data/multiwoz/db` database dir
 Output:
-    - `config/ontology_multiwoz_[mode].json` ontology file
+    - `configs/ontology_multiwoz_[mode].json` ontology file
     - `data/[mode]_data/` processed data dir
 """
 import json
@@ -178,4 +178,4 @@ if __name__ == '__main__':
         "informable": informable_onto,
         "all_tuples": all_tuples
     }
-    json.dump(ontology_multiwoz, open('config/ontology_multiwoz_{}.json'.format(mode), 'w'), indent=4)
+    json.dump(ontology_multiwoz, open('configs/ontology_multiwoz_{}.json'.format(mode), 'w'), indent=4)

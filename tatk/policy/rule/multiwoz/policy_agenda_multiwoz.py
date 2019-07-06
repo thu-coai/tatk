@@ -37,13 +37,12 @@ for dom, ref_slots in REF_SYS_DA.items():
 # def book slot
 BOOK_SLOT = ['people', 'day', 'stay', 'time']
 
+
 class UserPolicyAgendaMultiWoz(Policy):
     """ The rule-based user policy model by agenda. Derived from the UserPolicy class """
 
     # load stand value
-    with open(os.path.join(os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-                'data/multiwoz/value_set.json')) as f:
+    with open(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir, 'data/multiwoz/value_set.json')) as f:
         stand_value_dict = json.load(f)
 
     def __init__(self, max_goal_num=100, seed=2019):
@@ -54,22 +53,22 @@ class UserPolicyAgendaMultiWoz(Policy):
         self.max_initiative = 4
 
         self.goal_generator = GoalGenerator(corpus_path=os.path.join(os.path.dirname(
-                os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-                'data/multiwoz/annotated_user_da_with_span_full.json'))
+            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
+            'data/multiwoz/annotated_user_da_with_span_full.json'))
 
         self.__turn = 0
         self.goal = None
         self.agenda = None
 
         random.seed(seed)
-        self.goal_seeds = [random.randint(1,1e7) for i in range(max_goal_num)]
+        self.goal_seeds = [random.randint(1, 1e7) for i in range(max_goal_num)]
 
         Policy.__init__(self)
 
     def init_session(self):
         """ Build new Goal and Agenda for next session """
         self.__turn = 0
-        if len(self.goal_seeds)>1:
+        if len(self.goal_seeds) > 1:
             self.goal = Goal(self.goal_generator, self.goal_seeds[0])
             self.goal_seeds = self.goal_seeds[1:]
         else:
@@ -81,8 +80,7 @@ class UserPolicyAgendaMultiWoz(Policy):
         """
         Predict an user act based on state and preorder system action.
         Args:
-            state (tuple): Dialog state.
-            sys_action (tuple): Preorder system action.s
+            state (dict): Dialog state.
         Returns:
             action (tuple): User act.
             session_over (boolean): True to terminate session, otherwise session continues.
@@ -145,7 +143,7 @@ class UserPolicyAgendaMultiWoz(Policy):
                         slot = REF_USR_DA_M[dom.capitalize()].get(pairs[0], None)
                         if slot is not None:
                             new_action[new_act].append([slot, pairs[1]])
-                    #new_action[new_act] = [[REF_USR_DA_M[dom.capitalize()].get(pairs[0], pairs[0]), pairs[1]] for pairs in action[act]]
+                    # new_action[new_act] = [[REF_USR_DA_M[dom.capitalize()].get(pairs[0], pairs[0]), pairs[1]] for pairs in action[act]]
                 else:
                     new_action[act] = action[act]
             else:
@@ -169,14 +167,15 @@ class UserPolicyAgendaMultiWoz(Policy):
                 if dom in REF_SYS_DA_M.keys():
                     new_list = []
                     for pairs in action[act]:
-                        if (not isinstance(pairs, list) and not isinstance(pairs, tuple)) or\
-                                (len(pairs) < 2) or\
+                        if (not isinstance(pairs, list) and not isinstance(pairs, tuple)) or \
+                                (len(pairs) < 2) or \
                                 (not isinstance(pairs[0], str) or (not isinstance(pairs[1], str) and not isinstance(pairs[1], int))):
                             logging.warning(f'illegal pairs: {pairs}')
                             continue
 
                         if REF_SYS_DA_M[dom].get(pairs[0].lower(), None) is not None:
-                            new_list.append([REF_SYS_DA_M[dom][pairs[0].lower()], cls._normalize_value(dom, intent, REF_SYS_DA_M[dom][pairs[0].lower()], pairs[1])])
+                            new_list.append([REF_SYS_DA_M[dom][pairs[0].lower()],
+                                             cls._normalize_value(dom, intent, REF_SYS_DA_M[dom][pairs[0].lower()], pairs[1])])
 
                     if len(new_list) > 0:
                         new_action[act.lower()] = new_list
@@ -215,6 +214,7 @@ class UserPolicyAgendaMultiWoz(Policy):
             logging.debug('Value not found in standard value set: [%s] (slot: %s domain: %s)' % (value, slot, domain))
         return value
 
+
 def transform_value(value):
     cand_list = []
     # a 's -> a's
@@ -224,6 +224,7 @@ def transform_value(value):
     if " - " in value:
         cand_list.append(value.replace(" - ", "-"))
     return cand_list
+
 
 def simple_fuzzy_match(value_list, value):
     # check contain relation
@@ -242,13 +243,14 @@ def simple_fuzzy_match(value_list, value):
             return v1
     return None
 
+
 def check_if_time(value):
     value = value.strip()
     match = re.search(r"(\d{1,2}:\d{1,2})", value)
     if match is None:
         return False
     groups = match.groups()
-    if len(groups) <= 0:
+    if not groups:
         return False
     return True
 
@@ -299,14 +301,15 @@ class Goal(object):
             if 'reqt' in self.domain_goals[domain]:
                 requests = self.domain_goals[domain]['reqt']
                 unknow_reqts = [key for (key, val) in requests.items() if val in NOT_SURE_VALS]
-                if len(unknow_reqts) > 0:
+                if unknow_reqts:
                     return domain, 'reqt', ['name'] if 'name' in unknow_reqts else unknow_reqts
 
             # book
             if 'booked' in self.domain_goals[domain]:
                 if self.domain_goals[domain]['booked'] in NOT_SURE_VALS:
                     return domain, 'book', \
-                           self.domain_goals[domain]['fail_book'] if 'fail_book' in self.domain_goals[domain].keys() else self.domain_goals[domain]['book']
+                           self.domain_goals[domain]['fail_book'] if 'fail_book' in self.domain_goals[domain].keys() else \
+                               self.domain_goals[domain]['book']
 
         return None, None, None
 
@@ -355,7 +358,7 @@ class Agenda(object):
         """
         update Goal by current agent action and current goal. { A' + G" + sys_action -> A" }
         Args:
-            sys_action (tuple): Preorder system action.s
+            sys_action (dict): Preorder system action.s
             goal (Goal): User Goal
         """
         self.__cur_push_num = 0
@@ -385,6 +388,9 @@ class Agenda(object):
                 if self.update_domain(diaact, slot_vals, goal):
                     return
 
+        self.post_process(goal)
+
+    def post_process(self, goal: Goal):
         unk_dom, unk_type, data = goal.next_domain_incomplete()
         if unk_dom is not None:
             if unk_type == 'reqt' and not self._check_reqt_info(unk_dom) and not self._check_reqt(unk_dom):
@@ -405,111 +411,20 @@ class Agenda(object):
         _, intent = diaact.split('-')
         domain = self.cur_domain
 
+        isover = False
         if domain not in goal.domains:
-            return False
+            isover = False
 
-        g_reqt = goal.domain_goals[domain].get('reqt', dict({}))
-        g_info = goal.domain_goals[domain].get('info', dict({}))
-        g_fail_info = goal.domain_goals[domain].get('fail_info', dict({}))
-        g_book = goal.domain_goals[domain].get('book', dict({}))
-        g_fail_book = goal.domain_goals[domain].get('fail_book', dict({}))
-
-        if intent in ['book', 'inform']:
-            info_right = True
-            for [slot, value] in slot_vals:
-                if slot == 'time':
-                    if domain in ['train', 'restaurant']:
-                        slot = 'duration' if domain == 'train' else 'time'
-                    else:
-                        logging.warning(f'illegal booking slot: {slot}, domain: {domain}')
-                        continue
-
-                if slot in g_reqt:
-                    if not self._check_reqt_info(domain):
-                        self._remove_item(domain + '-request', slot)
-                        if value in NOT_SURE_VALS:
-                            g_reqt[slot] = '\"' + value + '\"'
-                        else:
-                            g_reqt[slot] = value
-
-                elif slot in g_fail_info and value != g_fail_info[slot]:
-                    self._push_item(domain + '-inform', slot, g_fail_info[slot])
-                    info_right = False
-                elif len(g_fail_info) <= 0 and slot in g_info and value != g_info[slot]:
-                    self._push_item(domain + '-inform', slot, g_info[slot])
-                    info_right = False
-
-                elif slot in g_fail_book and value != g_fail_book[slot]:
-                    self._push_item(domain + '-inform', slot, g_fail_book[slot])
-                    info_right = False
-                elif len(g_fail_book) <= 0 and slot in g_book and value != g_book[slot]:
-                    self._push_item(domain + '-inform', slot, g_book[slot])
-                    info_right = False
-
-                else:
-                    pass
-
-            if intent == 'book' and info_right:
-                # booked ok
-                if 'booked' in goal.domain_goals[domain]:
-                    goal.domain_goals[domain]['booked'] = DEF_VAL_BOOKED
-                self._push_item('general-thank')
+        elif intent in ['book', 'inform']:
+            isover = self._handle_inform(domain, intent, slot_vals, goal)
 
         elif intent in ['nobook']:
-            if len(g_fail_book) > 0:
-                # Discard fail_book data and update the book data to the stack
-                for slot in g_book.keys():
-                    if (slot not in g_fail_book) or (slot in g_fail_book and g_fail_book[slot] != g_book[slot]):
-                        self._push_item(domain + '-inform', slot, g_book[slot])
-
-                # change fail_info name
-                goal.domain_goals[domain]['fail_book_fail'] = goal.domain_goals[domain].pop('fail_book')
-            elif 'booked' in goal.domain_goals[domain].keys():
-                self.close_session()
-                return True
+            isover = self._handle_nobook(domain, intent, slot_vals, goal)
 
         elif intent in ['request']:
-            for [slot, _] in slot_vals:
-                if slot == 'time':
-                    if domain in ['train', 'restaurant']:
-                        slot = 'duration' if domain == 'train' else 'time'
-                    else:
-                        logging.warning('illegal booking slot: %s, slot: %s domain' % (slot, domain))
-                        continue
+            isover = self._handle_request(domain, intent, slot_vals, goal)
 
-                if slot in g_reqt:
-                    pass
-                elif slot in g_fail_info:
-                    self._push_item(domain + '-inform', slot, g_fail_info[slot])
-                elif len(g_fail_info) <= 0 and slot in g_info:
-                    self._push_item(domain + '-inform', slot, g_info[slot])
-
-                elif slot in g_fail_book:
-                    self._push_item(domain + '-inform', slot, g_fail_book[slot])
-                elif len(g_fail_book) <= 0 and slot in g_book:
-                    self._push_item(domain + '-inform', slot, g_book[slot])
-
-                else:
-
-                    if domain == 'taxi' and (slot == 'destination' or slot == 'departure'):
-                        places = [dom for dom in goal.domains[: goal.domains.index('taxi')] if
-                                  'address' in goal.domain_goals[dom]['reqt']]
-
-                        if len(places) >= 1 and slot == 'destination' and \
-                                goal.domain_goals[places[-1]]['reqt']['address'] not in NOT_SURE_VALS:
-                            self._push_item(domain + '-inform', slot, goal.domain_goals[places[-1]]['reqt']['address'])
-
-                        elif len(places) >= 2 and slot == 'departure' and \
-                                goal.domain_goals[places[-2]]['reqt']['address'] not in NOT_SURE_VALS:
-                            self._push_item(domain + '-inform', slot, goal.domain_goals[places[-2]]['reqt']['address'])
-
-                        elif random.random() < 0.5:
-                            self._push_item(domain + '-inform', slot, DEF_VAL_DNC)
-
-                    elif random.random() < 0.5:
-                        self._push_item(domain + '-inform', slot, DEF_VAL_DNC)
-
-        return False
+        return isover
 
     def update_domain(self, diaact, slot_vals, goal: Goal):
         """
@@ -521,123 +436,23 @@ class Agenda(object):
         """
         domain, intent = diaact.split('-')
 
+        isover = False
         if domain not in goal.domains:
-            return False
+            isover = False
 
-        g_reqt = goal.domain_goals[domain].get('reqt', dict({}))
-        g_info = goal.domain_goals[domain].get('info', dict({}))
-        g_fail_info = goal.domain_goals[domain].get('fail_info', dict({}))
-        g_book = goal.domain_goals[domain].get('book', dict({}))
-        g_fail_book = goal.domain_goals[domain].get('fail_book', dict({}))
-
-        if intent in ['inform', 'recommend', 'offerbook', 'offerbooked']:
-            info_right = True
-            for [slot, value] in slot_vals:
-                if slot in g_reqt:
-                    if not self._check_reqt_info(domain):
-                        self._remove_item(domain + '-request', slot)
-                        if value in NOT_SURE_VALS:
-                            g_reqt[slot] = '\"' + value + '\"'
-                        else:
-                            g_reqt[slot] = value
-
-                elif slot in g_fail_info and value != g_fail_info[slot]:
-                    self._push_item(domain + '-inform', slot, g_fail_info[slot])
-                    info_right = False
-                elif len(g_fail_info) <= 0 and slot in g_info and value != g_info[slot]:
-                    self._push_item(domain + '-inform', slot, g_info[slot])
-                    info_right = False
-
-                elif slot in g_fail_book and value != g_fail_book[slot]:
-                    self._push_item(domain + '-inform', slot, g_fail_book[slot])
-                    info_right = False
-                elif len(g_fail_book) <= 0 and slot in g_book and value != g_book[slot]:
-                    self._push_item(domain + '-inform', slot, g_book[slot])
-                    info_right = False
-
-                else:
-                    pass
-
-            if intent == 'offerbooked' and info_right:
-                # booked ok
-                if 'booked' in goal.domain_goals[domain]:
-                    goal.domain_goals[domain]['booked'] = DEF_VAL_BOOKED
-                self._push_item('general-thank')
+        elif intent in ['inform', 'recommend', 'offerbook', 'offerbooked']:
+            isover = self._handle_inform(domain, intent, slot_vals, goal)
 
         elif intent in ['request']:
-            for [slot, _] in slot_vals:
-                if slot in g_reqt:
-                    pass
-                elif slot in g_fail_info:
-                    self._push_item(domain + '-inform', slot, g_fail_info[slot])
-                elif len(g_fail_info) <= 0 and slot in g_info:
-                    self._push_item(domain + '-inform', slot, g_info[slot])
-
-                elif slot in g_fail_book:
-                    self._push_item(domain + '-inform', slot, g_fail_book[slot])
-                elif len(g_fail_book) <= 0 and slot in g_book:
-                    self._push_item(domain + '-inform', slot, g_book[slot])
-
-                else:
-
-                    if domain == 'taxi' and (slot == 'destination' or slot == 'departure'):
-                        places = [dom for dom in goal.domains[: goal.domains.index('taxi')] if
-                                  'address' in goal.domain_goals[dom]['reqt']]
-
-                        if len(places) >= 1 and slot == 'destination' and \
-                                goal.domain_goals[places[-1]]['reqt']['address'] not in NOT_SURE_VALS:
-                            self._push_item(domain + '-inform', slot, goal.domain_goals[places[-1]]['reqt']['address'])
-
-                        elif len(places) >= 2 and slot == 'departure' and \
-                                goal.domain_goals[places[-2]]['reqt']['address'] not in NOT_SURE_VALS:
-                            self._push_item(domain + '-inform', slot, goal.domain_goals[places[-2]]['reqt']['address'])
-
-                        elif random.random() < 0.5:
-                            self._push_item(domain + '-inform', slot, DEF_VAL_DNC)
-
-                    elif random.random() < 0.5:
-                        self._push_item(domain + '-inform', slot, DEF_VAL_DNC)
+            isover = self._handle_request(domain, intent, slot_vals, goal)
 
         elif intent in ['nooffer']:
-            if len(g_fail_info) > 0:
-                # update info data to the stack
-                for slot in g_info.keys():
-                    if (slot not in g_fail_info) or (slot in g_fail_info and g_fail_info[slot] != g_info[slot]):
-                        self._push_item(domain + '-inform', slot, g_info[slot])
-
-                # change fail_info name
-                goal.domain_goals[domain]['fail_info_fail'] = goal.domain_goals[domain].pop('fail_info')
-            elif len(g_reqt.keys()) > 0:
-                self.close_session()
-                return True
+            isover = self._handle_nooffer(domain, intent, slot_vals, goal)
 
         elif intent in ['select']:
-            # delete Choice
-            slot_vals = [[slot, val] for [slot, val] in slot_vals if slot != 'choice']
+            isover = self._handle_select(domain, intent, slot_vals, goal)
 
-            if len(slot_vals) > 0:
-                slot = slot_vals[0][0]
-
-                if slot in g_fail_info:
-                    self._push_item(domain + '-inform', slot, g_fail_info[slot])
-                elif len(g_fail_info) <= 0 and slot in g_info:
-                    self._push_item(domain + '-inform', slot, g_info[slot])
-
-                elif slot in g_fail_book:
-                    self._push_item(domain + '-inform', slot, g_fail_book[slot])
-                elif len(g_fail_book) <= 0 and slot in g_book:
-                    self._push_item(domain + '-inform', slot, g_book[slot])
-
-                else:
-                    if not self._check_reqt_info(domain):
-                        [slot, value] = random.choice(slot_vals)
-                        self._push_item(domain + '-inform', slot, value)
-
-                        if slot in g_reqt:
-                            self._remove_item(domain + '-request', slot)
-                            g_reqt[slot] = value
-
-        return False
+        return isover
 
     def update_general(self, diaact, slot_vals, goal: Goal):
         domain, intent = diaact.split('-')
@@ -684,6 +499,163 @@ class Agenda(object):
             (boolean): True for empty, False for not.
         """
         return len(self.__stack) <= 0
+
+    @staticmethod
+    def _my_value(value):
+        new_value = value
+        if value in NOT_SURE_VALS:
+            new_value = '\"' + value + '\"'
+        return new_value
+
+    def _get_goal_infos(self, domain, goal: Goal):
+        g_reqt = goal.domain_goals[domain].get('reqt', dict({}))
+        g_info = goal.domain_goals[domain].get('info', dict({}))
+        g_fail_info = goal.domain_goals[domain].get('fail_info', dict({}))
+        g_book = goal.domain_goals[domain].get('book', dict({}))
+        g_fail_book = goal.domain_goals[domain].get('fail_book', dict({}))
+        return g_reqt, g_info, g_fail_info, g_book, g_fail_book
+
+    def _handle_inform(self, domain, intent, slot_vals, goal: Goal):
+        g_reqt, g_info, g_fail_info, g_book, g_fail_book = self._get_goal_infos(domain, goal)
+
+        info_right = True
+        for [slot, value] in slot_vals:
+            if slot == 'time':
+                if domain in ['train', 'restaurant']:
+                    slot = 'duration' if domain == 'train' else 'time'
+                else:
+                    logging.warning(f'illegal booking slot: {slot}, domain: {domain}')
+                    continue
+
+            if slot in g_reqt:
+                if not self._check_reqt_info(domain):
+                    self._remove_item(domain + '-request', slot)
+                    g_reqt[slot] = self._my_value(value)
+
+            elif slot in g_fail_info and value != g_fail_info[slot]:
+                self._push_item(domain + '-inform', slot, g_fail_info[slot])
+                info_right = False
+
+            elif not g_fail_info and slot in g_info and value != g_info[slot]:
+                self._push_item(domain + '-inform', slot, g_info[slot])
+                info_right = False
+
+            elif slot in g_fail_book and value != g_fail_book[slot]:
+                self._push_item(domain + '-inform', slot, g_fail_book[slot])
+                info_right = False
+
+            elif not g_fail_book and slot in g_book and value != g_book[slot]:
+                self._push_item(domain + '-inform', slot, g_book[slot])
+                info_right = False
+
+        if intent in ['book', 'offerbooked'] and info_right:
+            # booked ok
+            if 'booked' in goal.domain_goals[domain]:
+                goal.domain_goals[domain]['booked'] = DEF_VAL_BOOKED
+            self._push_item('general-thank')
+
+        return False
+
+    def _handle_request(self, domain, intent, slot_vals, goal: Goal):
+        g_reqt, g_info, g_fail_info, g_book, g_fail_book = self._get_goal_infos(domain, goal)
+        for [slot, _] in slot_vals:
+            if slot == 'time':
+                if domain in ['train', 'restaurant']:
+                    slot = 'duration' if domain == 'train' else 'time'
+                else:
+                    logging.warning('illegal booking slot: %s, slot: %s domain' % (slot, domain))
+                    continue
+
+            if slot in g_reqt:
+                pass
+            elif slot in g_fail_info:
+                self._push_item(domain + '-inform', slot, g_fail_info[slot])
+            elif not g_fail_info and slot in g_info:
+                self._push_item(domain + '-inform', slot, g_info[slot])
+
+            elif slot in g_fail_book:
+                self._push_item(domain + '-inform', slot, g_fail_book[slot])
+            elif not g_fail_book and slot in g_book:
+                self._push_item(domain + '-inform', slot, g_book[slot])
+
+            else:
+
+                if domain == 'taxi' and (slot == 'destination' or slot == 'departure'):
+                    places = [dom for dom in goal.domains[: goal.domains.index('taxi')] if
+                              'address' in goal.domain_goals[dom]['reqt']]
+
+                    if len(places) >= 1 and slot == 'destination' and \
+                            goal.domain_goals[places[-1]]['reqt']['address'] not in NOT_SURE_VALS:
+                        self._push_item(domain + '-inform', slot, goal.domain_goals[places[-1]]['reqt']['address'])
+
+                    elif len(places) >= 2 and slot == 'departure' and \
+                            goal.domain_goals[places[-2]]['reqt']['address'] not in NOT_SURE_VALS:
+                        self._push_item(domain + '-inform', slot, goal.domain_goals[places[-2]]['reqt']['address'])
+
+                    elif random.random() < 0.5:
+                        self._push_item(domain + '-inform', slot, DEF_VAL_DNC)
+
+                elif random.random() < 0.5:
+                    self._push_item(domain + '-inform', slot, DEF_VAL_DNC)
+        return False
+
+    def _handle_nooffer(self, domain, intent, slot_vals, goal: Goal):
+        g_reqt, g_info, g_fail_info, g_book, g_fail_book = self._get_goal_infos(domain, goal)
+        if g_fail_info:
+            # update info data to the stack
+            for slot in g_info.keys():
+                if (slot not in g_fail_info) or (slot in g_fail_info and g_fail_info[slot] != g_info[slot]):
+                    self._push_item(domain + '-inform', slot, g_info[slot])
+
+            # change fail_info name
+            goal.domain_goals[domain]['fail_info_fail'] = goal.domain_goals[domain].pop('fail_info')
+        elif g_reqt:
+            self.close_session()
+            return True
+        return False
+
+    def _handle_nobook(self, domain, intent, slot_vals, goal: Goal):
+        g_reqt, g_info, g_fail_info, g_book, g_fail_book = self._get_goal_infos(domain, goal)
+        if g_fail_book:
+            # Discard fail_book data and update the book data to the stack
+            for slot in g_book.keys():
+                if (slot not in g_fail_book) or (slot in g_fail_book and g_fail_book[slot] != g_book[slot]):
+                    self._push_item(domain + '-inform', slot, g_book[slot])
+
+            # change fail_info name
+            goal.domain_goals[domain]['fail_book_fail'] = goal.domain_goals[domain].pop('fail_book')
+        elif 'booked' in goal.domain_goals[domain].keys():
+            self.close_session()
+            return True
+        return False
+
+    def _handle_select(self, domain, intent, slot_vals, goal: Goal):
+        g_reqt, g_info, g_fail_info, g_book, g_fail_book = self._get_goal_infos(domain, goal)
+        # delete Choice
+        slot_vals = [[slot, val] for [slot, val] in slot_vals if slot != 'choice']
+
+        if slot_vals:
+            slot = slot_vals[0][0]
+
+            if slot in g_fail_info:
+                self._push_item(domain + '-inform', slot, g_fail_info[slot])
+            elif not g_fail_info and slot in g_info:
+                self._push_item(domain + '-inform', slot, g_info[slot])
+
+            elif slot in g_fail_book:
+                self._push_item(domain + '-inform', slot, g_fail_book[slot])
+            elif not g_fail_book and slot in g_book:
+                self._push_item(domain + '-inform', slot, g_book[slot])
+
+            else:
+                if not self._check_reqt_info(domain):
+                    [slot, value] = random.choice(slot_vals)
+                    self._push_item(domain + '-inform', slot, value)
+
+                    if slot in g_reqt:
+                        self._remove_item(domain + '-request', slot)
+                        g_reqt[slot] = value
+        return False
 
     def _update_current_domain(self, sys_action, goal: Goal):
         for diaact in sys_action.keys():
@@ -736,12 +708,12 @@ class Agenda(object):
         return False
 
     def __check_next_diaact_slot(self):
-        if len(self.__stack) > 0:
+        if self.__stack:
             return self.__stack[-1]['diaact'], self.__stack[-1]['slot']
         return None, None
 
     def __check_next_diaact(self):
-        if len(self.__stack) > 0:
+        if self.__stack:
             return self.__stack[-1]['diaact']
         return None
 
@@ -769,7 +741,7 @@ class Agenda(object):
                             next_diaact != cur_diaact or \
                             next_diaact.split('-')[1] != 'inform' or next_slot not in BOOK_SLOT:
                         break
-                except:
+                except Exception as e:
                     break
         else:
             for _ in range(initiative if self.__cur_push_num == 0 else self.__cur_push_num):
@@ -786,7 +758,7 @@ class Agenda(object):
                             next_diaact != cur_diaact or \
                             (cur_diaact.split('-')[1] == 'request' and item['slot'] == 'name'):
                         break
-                except:
+                except Exception as e:
                     break
 
         return diaacts, slots, values
@@ -805,10 +777,12 @@ def test():
     user_simulator = UserPolicyAgendaMultiWoz()
     user_simulator.init_session()
 
-    test_turn(user_simulator, {'Train-NoOffer': [['Day', 'saturday'], ['Dest', 'place'], ['Depart', 'place']]})
-    test_turn(user_simulator, {'Hotel-NoOffer': [['stars', '3'], ['internet', 'yes'], ['type', 'guest house']], 'Hotel-Request': [['stars', '?']]})
-    test_turn(user_simulator, {"Hotel-Inform": [["Type", "qqq"], ["Parking", "no"], ["Internet", "yes"]]})
-    test_turn(user_simulator, {"Hotel-Inform": [["Type", "qqq"], ["Parking", "no"]]})
+    test_turn(user_simulator, {"Train-Request": [["Dest", "?"], ["Day", "?"]]})
+    test_turn(user_simulator, {"Train-Request": [["Depart", "?"], ["Leave", "?"]]})
+    test_turn(user_simulator, {"Train-Request": [["Dest", "?"]]})
+    test_turn(user_simulator, {"Train-Inform": [["Ticket", "300"]]})
+    test_turn(user_simulator, {"Train-Inform": [["Arrive", "10:30"]]})
+    test_turn(user_simulator, {"Train-Inform": [["Id", "9999"]]})
     test_turn(user_simulator, {"Booking-Request": [["Day", "123"], ["Time", "no"]]})
     test_turn(user_simulator, {"Hotel-Request": [["Addr", "?"]], "Hotel-Inform": [["Internet", "yes"]]})
     test_turn(user_simulator, {"Hotel-Request": [["Type", "?"], ["Parking", "?"]]})
@@ -816,28 +790,16 @@ def test():
     test_turn(user_simulator, {"Hotel-Select": [["Area", "aa"], ["Area", "bb"], ["Area", "cc"], ['Choice', 3]]})
     test_turn(user_simulator, {"Hotel-Offerbooked": [["Ref", "12345"]]})
 
+
 def test_turn(user_simulator, sys_action):
     print('input:', sys_action)
-    action, session_over, reward = user_simulator.predict(None, sys_action)
+    # action, session_over, reward = user_simulator.predict({'system_action': sys_action})
+    action, session_over = user_simulator.predict({'system_action': sys_action})
     print('----------------------------------')
     print('sys_action :' + str(sys_action))
     print('user_action:' + str(action))
     print('over       :' + str(session_over))
-    print('reward     :' + str(reward))
+    # print('reward     :' + str(reward))
     print(user_simulator.goal)
     print(user_simulator.agenda)
-
-
-def test_with_system():
-    from tatk.policy.multiwoz.rule_based_multiwoz_bot import RuleBasedMultiwozBot, fake_state
-    user_simulator = UserPolicyAgendaMultiWoz()
-    user_simulator.init_session()
-    state = fake_state()
-    system_agent = RuleBasedMultiwozBot()
-    sys_action = system_agent.predict(state)
-    action, session_over, reward = user_simulator.predict(None, sys_action)
-    print("Sys:")
-    print(json.dumps(sys_action, indent=4))
-    print("User:")
-    print(json.dumps(action, indent=4))
 
