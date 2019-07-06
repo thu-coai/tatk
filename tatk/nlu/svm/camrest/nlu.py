@@ -47,11 +47,10 @@ class SVMNLU(NLU):
         dialog_act = {}
         for act in act_list:
             intent = act['act']
-            if intent=='request':
-                domain, slot = act['slots'][0][1].split('-')
-                intent = domain+'-'+intent.capitalize()
+            if intent == 'request':
+                slot = act['slots'][0][1]
                 dialog_act.setdefault(intent,[])
-                dialog_act[intent].append([slot,'?'])
+                dialog_act[intent].append([slot, '?'])
             else:
                 dialog_act.setdefault(intent, [])
                 dialog_act[intent].append(act['slots'][0])
@@ -59,8 +58,8 @@ class SVMNLU(NLU):
 
 
 if __name__ == "__main__":
-    nlu = SVMNLU(config_file='configs/multiwoz_usr.cfg',
-                 model_file='model/svm_multiwoz_usr.zip')
+    nlu = SVMNLU(config_file='configs/camrest_usr.cfg',
+                 model_file='model/svm_camrest_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",
