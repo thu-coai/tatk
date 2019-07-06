@@ -179,8 +179,7 @@ def tuple_to_act(t) :
     elif len(t) == 2:
         assert t[0] == "request"
         return {"act": "request", "slots": [["slot", t[1]]]}
-    else:
-        return {"act": t[0], "slots": [[t[1], t[2]]]}
+    return {"act": t[0], "slots": [[t[1], t[2]]]}
 
 
 def makes_valid_act(tuples):
