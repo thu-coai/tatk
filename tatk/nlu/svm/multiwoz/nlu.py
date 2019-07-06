@@ -21,7 +21,7 @@ class SVMNLU(NLU):
             print('Load from model_file param')
             archive_file = cached_path(model_file)
             archive = zipfile.ZipFile(archive_file, 'r')
-            archive.extractall(os.path.dirname(os.path.dirname(model_dir)))
+            archive.extractall(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             archive.close()
         self.c.load(model_path)
 

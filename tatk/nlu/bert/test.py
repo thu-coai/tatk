@@ -2,11 +2,15 @@ import argparse
 import pickle
 import os
 import json
-from tatk.nlu.bert.dataloader import Dataloader
-from tatk.nlu.bert.model import BertNLU
 import torch
 import random
 import numpy as np
+import zipfile
+
+from tatk.nlu.bert.dataloader import Dataloader
+from tatk.nlu.bert.model import BertNLU
+from tatk.util.file_util import cached_path
+
 
 torch.manual_seed(9102)
 random.seed(9102)
@@ -34,27 +38,45 @@ if __name__ == '__main__':
     print('intent num:', len(intent_vocab))
     print('tag num:', len(tag_vocab))
 
-    dataloader = Dataloader(data, intent_vocab, tag_vocab)
+    dataloader = Dataloader(data, intent_vocab, tag_vocab, config['model']["pre-trained"])
 
     best_model_path = best_model_path = os.path.join(output_dir, 'bestcheckpoint.tar')
+    if not os.path.exists(best_model_path):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
+        print('Load from zipped_model_path param')
+        archive_file = cached_path(config['zipped_model_path'])
+        archive = zipfile.ZipFile(archive_file, 'r')
+        archive.extractall()
+        archive.close()
+    print('Load from',best_model_path)
     checkpoint = torch.load(best_model_path)
+    print('train step', checkpoint['step'])
 
-    model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim, DEVICE=DEVICE,
+    model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
+                    DEVICE=DEVICE,
                     intent_weight=dataloader.intent_weight)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    model_dict = model.state_dict()
+    state_dict = {k: v for k, v in checkpoint['model_state_dict'].items() if k in model_dict.keys()}
+    model_dict.update(state_dict)
+    model.load_state_dict(model_dict)
     model.to(DEVICE)
     model.eval()
 
-    batch_size = 1 # config['batch_size']
+    batch_size = config['batch_size']
 
-    batch_num = len(dataloader.data['test']) // batch_size + 1
-    for i in range(batch_num):
-        batch_data = dataloader.data['test'][i * batch_size:(i + 1) * batch_size]
-        word_seq_tensor, tag_seq_tensor, intent_tensor, word_mask_tensor, tag_mask_tensor = dataloader._pad_batch(batch_data)
-        intent_logits, tag_logits = model.forward(word_seq_tensor, word_mask_tensor)
-        ori_word_seq = batch_data[0][0]
-        new2ori = batch_data[0][-4]
-        intents = dataloader.recover_intent(intent_logits,tag_logits,tag_mask_tensor,ori_word_seq,new2ori)
-        print(batch_data)
-        print(intent_logits)
-        print(intents)
+    test_loss = 0
+    test_intent_loss = 0
+    test_tag_loss = 0
+    for batched_data, real_batch_size in dataloader.yield_batches(batch_size, data_key='test'):
+        intent_loss, tag_loss, total_loss = model.eval_batch(*batched_data)
+        test_intent_loss += intent_loss * real_batch_size
+        test_tag_loss += tag_loss * real_batch_size
+        test_loss += total_loss * real_batch_size
+    total = len(dataloader.data['test'])
+    test_loss /= total
+    test_intent_loss /= total
+    test_tag_loss /= total
+    print('%d samples test loss: %f' % (total, test_loss))
+    print('\t intent loss:', test_intent_loss)
+    print('\t tag loss:', test_tag_loss)
