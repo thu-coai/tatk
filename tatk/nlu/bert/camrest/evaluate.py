@@ -1,5 +1,5 @@
 """
-Evaluate BertNLU models on multiwoz test dataset
+Evaluate BertNLU models on camrest test dataset
 Metric: dataset level Precision/Recall/F1
 Usage: PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
 """
@@ -10,7 +10,7 @@ import json
 import zipfile
 from tatk.nlu.bert.dataloader import Dataloader
 from tatk.nlu.bert.model import BertNLU
-from tatk.nlu.bert.multiwoz.postprocess import recover_intent
+from tatk.nlu.bert.camrest.postprocess import recover_intent
 from tatk.util.file_util import cached_path
 import torch
 import random
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     golden_da_triples = []
     output_da_triples = []
     for i in range(batch_num):
-        print("batch [%d|%d]" % (i + 1, batch_num))
+        print("batch [%d|%d]" % (i+1, batch_num))
         batch_data = dataloader.data['test'][i * batch_size:(i + 1) * batch_size]
         real_batch_size = len(batch_data)
         word_seq_tensor, tag_seq_tensor, intent_tensor, word_mask_tensor, tag_mask_tensor = dataloader._pad_batch(batch_data)

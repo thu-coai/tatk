@@ -8,7 +8,7 @@ from tatk.util.file_util import cached_path
 from tatk.nlu.nlu import NLU
 from tatk.nlu.bert.dataloader import Dataloader
 from tatk.nlu.bert.model import BertNLU
-from tatk.nlu.bert.multiwoz.postprocess import recover_intent
+from tatk.nlu.bert.camrest.postprocess import recover_intent
 
 
 class BERTNLU(NLU):
@@ -74,7 +74,7 @@ class BERTNLU(NLU):
 
 
 if __name__ == '__main__':
-    nlu = BERTNLU(config_file='configs/multiwoz_usr.json', model_file='output/usr/bert_multiwoz_usr.zip')
+    nlu = BERTNLU(config_file='configs/camrest_usr.json', model_file='output/usr/bert_camrest_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",
