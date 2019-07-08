@@ -61,13 +61,13 @@ class Dataloader:
         return split_tokens, new_tag_seq, new2ori
 
     def seq_tag2id(self, tags):
-        return [self.tag2id[x] for x in tags]
+        return [self.tag2id[x] for x in tags if x in self.tag2id]
 
     def seq_id2tag(self, ids):
         return [self.id2tag[x] for x in ids]
 
     def seq_intent2id(self, intents):
-        return [self.intent2id[x] for x in intents]
+        return [self.intent2id[x] for x in intents if x in self.intent2id]
 
     def seq_id2intent(self, ids):
         return [self.id2intent[x] for x in ids]
