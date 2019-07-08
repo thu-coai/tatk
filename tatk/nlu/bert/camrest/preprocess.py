@@ -29,10 +29,7 @@ def read_zipped_json(filepath, filename):
 def phrase_in_utt(phrase, utt):
     phrase_low = phrase.lower()
     utt_low = utt.lower()
-    if ' ' + phrase_low in utt_low or utt_low.startswith(phrase_low):
-        return True
-    else:
-        return False
+    return (' ' + phrase_low in utt_low) or utt_low.startswith(phrase_low)
 
 
 def phrase_idx_utt(phrase, utt):
@@ -40,8 +37,7 @@ def phrase_idx_utt(phrase, utt):
     utt_low = utt.lower()
     if ' ' + phrase_low in utt_low or utt_low.startswith(phrase_low):
         return get_idx(phrase_low, utt_low)
-    else:
-        return None
+    return None
 
 
 def get_idx(phrase, utt):
