@@ -5,7 +5,7 @@ from pprint import pprint
 from tatk.nlg import NLG
 
 
-class CamrestTemplateNLG(NLG):
+class TemplateNLG(NLG):
     def __init__(self, is_user, mode="manual"):
         """
         :param is_user: if dialog_act from user or system
@@ -176,12 +176,12 @@ class CamrestTemplateNLG(NLG):
 
 def test():
     data_file = os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir, 'data/camrest/train.json')
-    data = CamrestTemplateNLG.read_json(data_file)
+    data = TemplateNLG.read_json(data_file)
 
     def test_role(role):
-        model_a = CamrestTemplateNLG(role == 'user', 'auto')
-        model_m = CamrestTemplateNLG(role == 'user', 'manual')
-        model_am = CamrestTemplateNLG(role == 'user', 'auto_manual')
+        model_a = TemplateNLG(role == 'user', 'auto')
+        model_m = TemplateNLG(role == 'user', 'manual')
+        model_am = TemplateNLG(role == 'user', 'auto_manual')
 
         num_of_all = 0
         num_of_non = 0
