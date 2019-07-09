@@ -43,7 +43,7 @@ slot2word = {
 }
 
 
-class MultiwozTemplateNLG(NLG):
+class TemplateNLG(NLG):
     def __init__(self, is_user, mode="manual"):
         """
         :param is_user: if dialog_act from user or system
@@ -187,7 +187,7 @@ def example():
     # whether from user or system
     is_user = False
 
-    multiwoz_template_nlg = MultiwozTemplateNLG(is_user)
+    multiwoz_template_nlg = TemplateNLG(is_user)
     # print(dialog_acts)
     print(multiwoz_template_nlg.generate(dialog_acts))
 
