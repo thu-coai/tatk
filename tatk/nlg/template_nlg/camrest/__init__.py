@@ -1,1 +1,1 @@
-from tatk.nlg.template_nlg.camrest.camrest_template_nlg import CamrestTemplateNLG
+from tatk.nlg.template_nlg.camrest.nlg import TemplateNLG
