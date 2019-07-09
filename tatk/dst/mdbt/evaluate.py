@@ -1,13 +1,13 @@
 import json
 
 from tatk.dst.rule.dst_util import minDistance
-from tatk.dst.mdbt.mdbt import MDBTTracker
+from tatk.dst.mdbt.mdbt import MDBT
 
 
 class Word_DST:
     """A temporary semi-finishingv agent for word_dst testing, which takes as input utterances and output dialog state."""
     def __init__(self):
-        self.dst = MDBTTracker(data_dir='../../../../data/mdbt')
+        self.dst = MDBT(data_dir='../../../../data/mdbt')
         self.nlu = None
 
     def update(self, action, observation):
