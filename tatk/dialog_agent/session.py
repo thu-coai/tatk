@@ -56,17 +56,17 @@ class BiSession(Session):
         self.kb_query = kb_query
 
         self.dialog_history = []
-        self.turn_indicator = 0
+        self.__turn_indicator = 0
 
         self.init_session()
 
     def next_agent(self):
         """The user and system agent response in turn."""
-        if self.turn_indicator % 2 == 0:
+        if self.__turn_indicator % 2 == 0:
             next_agent = self.user_agent
         else:
             next_agent = self.sys_agent
-        self.turn_indicator += 1
+        self.__turn_indicator += 1
         return next_agent
 
     def next_response(self, observation):
