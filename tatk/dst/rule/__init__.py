@@ -1,1 +1,0 @@
-from tatk.dst.rule.rule_dst import RuleDST

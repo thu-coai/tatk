@@ -1,6 +1,7 @@
 """Dialog State Tracker Interface"""
 from abc import ABCMeta, abstractmethod
 
+
 class Tracker(metaclass=ABCMeta):
     """Base class for dialog state tracker models."""
 
