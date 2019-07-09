@@ -1,117 +1,16 @@
 import re
 from difflib import SequenceMatcher
 
-init_belief_state = {
-        "police": {
-            "book": {
-                "booked": []
-            },
-            "semi": {}
-        },
-        "hotel": {
-            "book": {
-                "booked": [],
-                "people": "",
-                "day": "",
-                "stay": ""
-            },
-            "semi": {
-                "name": "",
-                "area": "",
-                "parking": "",
-                "pricerange": "",
-                "stars": "",
-                "internet": "",
-                "type": ""
-            }
-        },
-        "attraction": {
-            "book": {
-                "booked": []
-            },
-            "semi": {
-                "type": "",
-                "name": "",
-                "area": "",
-                "entrance fee": ""
-            }
-        },
-        "restaurant": {
-            "book": {
-                "booked": [],
-                "people": "",
-                "day": "",
-                "time": ""
-            },
-            "semi": {
-                "food": "",
-                "pricerange": "",
-                "name": "",
-                "area": "",
-            }
-        },
-        "hospital": {
-            "book": {
-                "booked": []
-            },
-            "semi": {
-                "department": ""
-            }
-        },
-        "taxi": {
-            "book": {
-                "booked": [],
-                "departure": "",
-                "destination": ""
-            },
-            "semi": {
-                "leaveAt": "",
-                "arriveBy": ""
-            }
-        },
-        "train": {
-            "book": {
-                "booked": [],
-                "people": "",
-                "trainID": ""
-            },
-            "semi": {
-                "leaveAt": "",
-                "destination": "",
-                "day": "",
-                "arriveBy": "",
-                "departure": ""
-            }
-        }
-    }
-
-
-def init_state():
-    """
-    The init state to start a session.
-    Example:
-    state = {
-            'user_action': None,
-            'history': [],
-            'belief_state': None,
-            'request_state': {}
-        }
-    """
-    # user_action = {'general-hello':{}}
-    user_action = {}
-    state = {'user_action': user_action,
-             'belief_state': init_belief_state,
-             'request_state': {},
-             'history': []}
-    return state
 
 def str_similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
+
 
 def _log(info):
     with open('fuzzy_recognition.log', 'a+') as f:
         f.write('{}\n'.format(info))
     f.close()
+
 
 def minDistance(word1, word2):
     """The minimum edit distance between word 1 and 2."""
@@ -131,9 +30,10 @@ def minDistance(word1, word2):
                 value = last
             else:
                 value = 1 + min(last, tmp[j], tmp[j + 1])
-            last = tmp[j+1]
-            tmp[j+1] = value
+            last = tmp[j + 1]
+            tmp[j + 1] = value
     return value
+
 
 def normalize_value(value_set, domain, slot, value):
     """
@@ -154,7 +54,9 @@ def normalize_value(value_set, domain, slot, value):
     except:
         raise Exception('domain <{}> not found in value set'.format(domain))
     if slot not in value_set[domain]:
-        raise Exception('slot <{}> not found in db_values[{}]'.format(slot, domain))
+        raise Exception(
+            'slot <{}> not found in db_values[{}]'.format(
+                slot, domain))
     value_list = value_set[domain][slot]
     # exact match or containing match
     v = _match_or_contain(value, value_list)
@@ -170,8 +72,13 @@ def normalize_value(value_set, domain, slot, value):
     v = special_match(domain, slot, value)
     if v is not None:
         return v
-    _log('Failed: domain {} slot {} value {}, raw value returned.'.format(domain, slot, value))
+    _log(
+        'Failed: domain {} slot {} value {}, raw value returned.'.format(
+            domain,
+            slot,
+            value))
     return value
+
 
 def _transform_value(value):
     cand_list = []
@@ -191,6 +98,7 @@ def _transform_value(value):
         cand_list.append('the ' + value)
     return cand_list
 
+
 def _match_or_contain(value, value_list):
     """match value by exact match or containing"""
     if value in value_list:
@@ -198,12 +106,13 @@ def _match_or_contain(value, value_list):
     for v in value_list:
         if v in value or value in v:
             return v
-    ## fuzzy match, when len(value) is large and distance(v1, v2) is small
+    # fuzzy match, when len(value) is large and distance(v1, v2) is small
     for v in value_list:
         d = minDistance(value, v)
         if (d <= 2 and len(value) >= 10) or (d <= 3 and len(value) >= 15):
             return v
     return None
+
 
 def special_match(domain, slot, value):
     """special slot fuzzy matching"""
@@ -218,6 +127,7 @@ def special_match(domain, slot, value):
         matched_result = _match_duration(value)
     return matched_result
 
+
 def _match_time(value):
     """Return the time (leaveby, arriveat) in value, None if no time in value."""
     mat = re.search(r"(\d{1,2}:\d{1,2})", value)
@@ -225,12 +135,14 @@ def _match_time(value):
         return mat.groups()[0]
     return None
 
+
 def _match_trainid(value):
     """Return the trainID in value, None if no trainID."""
     mat = re.search(r"TR(\d{4})", value)
     if mat is not None and len(mat.groups()) > 0:
         return mat.groups()[0]
     return None
+
 
 def _match_pound_price(value):
     """Return the price with pounds in value, None if no trainID."""
@@ -246,6 +158,7 @@ def _match_pound_price(value):
         return 'free'
     return None
 
+
 def _match_duration(value):
     """Return the durations (by minute) in value, None if no trainID."""
     mat = re.search(r"(\d{1,2} minutes)", value)
@@ -256,4 +169,7 @@ def _match_duration(value):
 if __name__ == "__main__":
     # value_set = json.load(open('../../../data/multiwoz/db/db_values.json'))
     # print(normalize_value(value_set, 'restaurant', 'address', 'regent street city center'))
-    print(minDistance("museum of archaeology and anthropology", "museum of archaelogy and anthropology"))
+    print(
+        minDistance(
+            "museum of archaeology and anthropology",
+            "museum of archaelogy and anthropology"))
