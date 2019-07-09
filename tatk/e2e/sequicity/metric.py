@@ -197,418 +197,418 @@ class GenericEvaluator:
         return s
 
 
-class CamRestEvaluator(GenericEvaluator):
-    def __init__(self, result_path):
-        super().__init__(result_path)
-        self.entities = []
-        self.entity_dict = {}
-
-    def run_metrics(self):
-        raw_json = open('./data/CamRest676/CamRest676.json')
-        raw_entities = open('./data/CamRest676/CamRestOTGY.json')
-        raw_data = json.loads(raw_json.read().lower())
-        raw_entities = json.loads(raw_entities.read().lower())
-        self.get_entities(raw_entities)
-        data = self.read_result_data()
-        for i, row in enumerate(data):
-            data[i]['response'] = self.clean(data[i]['response'])
-            data[i]['generated_response'] = self.clean(data[i]['generated_response'])
-        bleu_score = self.bleu_metric(data,'bleu')
-        success_f1 = self.success_f1_metric(data, 'success')
-        match = self.match_metric(data, 'match', raw_data=raw_data)
-        self._print_dict(self.metric_dict)
-        return -success_f1[0]
-
-    def get_entities(self, entity_data):
-        for k in entity_data['informable']:
-            self.entities.extend(entity_data['informable'][k])
-            for item in entity_data['informable'][k]:
-                self.entity_dict[item] = k
-
-    def _extract_constraint(self, z):
-        z = z.split()
-        if 'EOS_Z1' not in z:
-            s = set(z)
-        else:
-            idx = z.index('EOS_Z1')
-            s = set(z[:idx])
-        if 'moderately' in s:
-            s.discard('moderately')
-            s.add('moderate')
-        #print(self.entities) 
-        #return s
-        return s.intersection(self.entities)
-        #return set(z).difference(['name', 'address', 'postcode', 'phone', 'area', 'pricerange'])
-
-    def _extract_request(self, z):
-        z = z.split()
-        return set(z).intersection(['address', 'postcode', 'phone', 'area', 'pricerange','food'])
-
-    @report
-    def match_metric(self, data, sub='match',raw_data=None):
-        dials = self.pack_dial(data)
-        match,total = 0,1e-8
-        success = 0
-        # find out the last placeholder and see whether that is correct
-        # if no such placeholder, see the final turn, because it can be a yes/no question or scheduling dialogue
-        for dial_id in dials:
-            truth_req, gen_req = [], []
-            dial = dials[dial_id]
-            gen_bspan, truth_cons, gen_cons = None, None, set()
-            truth_turn_num = -1
-            truth_response_req = []
-            for turn_num,turn in enumerate(dial):
-                if 'SLOT' in turn['generated_response']:
-                    gen_bspan = turn['generated_bspan']
-                    gen_cons = self._extract_constraint(gen_bspan)
-                if 'SLOT' in turn['response']:
-                    truth_cons = self._extract_constraint(turn['bspan'])
-                gen_response_token = turn['generated_response'].split()
-                response_token = turn['response'].split()
-                for idx, w in enumerate(gen_response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        gen_req.append(w.split('_')[0])
-                    if w == 'SLOT' and idx != 0:
-                        gen_req.append(gen_response_token[idx - 1])
-                for idx, w in enumerate(response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        truth_response_req.append(w.split('_')[0])
-            if not gen_cons:
-                gen_bspan = dial[-1]['generated_bspan']
-                gen_cons = self._extract_constraint(gen_bspan)
-            if truth_cons:
-                if gen_cons == truth_cons:
-                    match += 1
-                else:
-                    print(gen_cons, truth_cons)
-                total += 1
-
-        return match / total, success / total
-
-    @report
-    def success_f1_metric(self, data, sub='successf1'):
-        dials = self.pack_dial(data)
-        tp,fp,fn = 0,0,0
-        for dial_id in dials:
-            truth_req, gen_req = set(),set()
-            dial = dials[dial_id]
-            for turn_num, turn in enumerate(dial):
-                gen_response_token = turn['generated_response'].split()
-                response_token = turn['response'].split()
-                for idx, w in enumerate(gen_response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        gen_req.add(w.split('_')[0])
-                for idx, w in enumerate(response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        truth_req.add(w.split('_')[0])
-
-            gen_req.discard('name')
-            truth_req.discard('name')
-            for req in gen_req:
-                if req in truth_req:
-                    tp += 1
-                else:
-                    fp += 1
-            for req in truth_req:
-                if req not in gen_req:
-                    fn += 1
-        precision, recall = tp / (tp + fp + 1e-8), tp / (tp + fn + 1e-8)
-        f1 = 2 * precision * recall / (precision + recall + 1e-8)
-        return f1, precision, recall
-
-class KvretEvaluator(GenericEvaluator):
-    def __init__(self, result_path):
-        super().__init__(result_path)
-        ent_json = open('./data/kvret/kvret_entities.json')
-        self.ent_data = json.loads(ent_json.read().lower())
-        ent_json.close()
-        self._get_entity_dict(self.ent_data)
-        raw_json = open('./data/kvret/kvret_test_public.json')
-        self.raw_data = json.loads(raw_json.read().lower())
-        raw_json.close()
-
-    def run_metrics(self):
-        data = self.read_result_data()
-        for i, row in enumerate(data):
-            data[i]['response'] = self.clean_by_intent(data[i]['response'],int(data[i]['dial_id']))
-            data[i]['generated_response'] = self.clean_by_intent(data[i]['generated_response'],int(data[i]['dial_id']))
-        match_rate = self.match_rate_metric(data, 'match')
-        bleu_score = self.bleu_metric(data,'bleu')
-        success_f1 = self.success_f1_metric(data,'success_f1')
-        self._print_dict(self.metric_dict)
-
-    def clean_by_intent(self,s,i):
-        s = s.replace('<go> ', '').replace(' SLOT', '_SLOT')
-        s = '<GO> ' + s + ' </s>'
-        intent = self.raw_data[i]['scenario']['task']['intent']
-        slot = {
-            'weather':['weather_attribute','location','weekly_time'],
-            'navigate':['poi','poi_type','distance','traffic','address'],
-            'schedule':['event','date','time','party','room','agenda']
-        }
-
-        for item in self.entity_dict:
-            if self.entity_dict[item] in slot[intent]:
-                # s = s.replace(item, 'VALUE_{}'.format(self.entity_dict[item]))
-                s = clean_replace(s, item, '{}_SLOT'.format(self.entity_dict[item]))
-        return s
-
-
-    def _extract_constraint(self, z):
-        z = z.split()
-        if 'EOS_Z1' not in z:
-            s = set(z)
-        else:
-            idx = z.index('EOS_Z1')
-            s = set(z[:idx])
-        reqs = ['address', 'traffic', 'poi', 'poi_type', 'distance', 'weather', 'temperature', 'weather_attribute',
-                'date', 'time', 'location', 'event', 'agenda', 'party', 'room', 'weekly_time', 'forecast']
-        informable = {
-            'weather': ['date','location','weather_attribute'],
-            'navigate': ['poi_type','distance'],
-            'schedule': ['event', 'date', 'time', 'agenda', 'party', 'room']
-        }
-        infs = []
-        for v in informable.values():
-            infs.extend(v)
-        junk = ['good','great','quickest','shortest','route','week','fastest','nearest','next','closest','way','mile',
-               'activity','restaurant','appointment' ]
-        s = s.difference(junk).difference(en_sws).difference(reqs)
-        res = set()
-        for item in s:
-            if item in junk:
-                continue
-            flg = False
-            for canon_ent in sorted(list(self.entity_dict.keys())):
-                if self.entity_dict[canon_ent] in infs:
-                    if similar(item, canon_ent):
-                        flg = True
-                        junk.extend(canon_ent.split())
-                        res.add(canon_ent)
-                    if flg:
-                        break
-        return res
-
-    def constraint_same(self, truth_cons, gen_cons):
-        if not truth_cons and not gen_cons:
-            return True
-        if not truth_cons or not gen_cons:
-            return False
-        return setsim(gen_cons, truth_cons)
-
-    def _get_entity_dict(self, entity_data):
-        entity_dict = {}
-        for k in entity_data:
-            if isinstance(entity_data[k][0], str):
-                for entity in entity_data[k]:
-                    entity = self._lemmatize(self._tokenize(entity))
-                    entity_dict[entity] = k
-                    if k in ['event','poi_type']:
-                        entity_dict[entity.split()[0]] = k
-            elif isinstance(entity_data[k][0], dict):
-                for entity_entry in entity_data[k]:
-                    for entity_type, entity in entity_entry.items():
-                        entity_type = 'poi_type' if entity_type == 'type' else entity_type
-                        entity = self._lemmatize(self._tokenize(entity))
-                        entity_dict[entity] = entity_type
-                        if entity_type in ['event', 'poi_type']:
-                            entity_dict[entity.split()[0]] = entity_type
-        self.entity_dict = entity_dict
-
-    @report
-    def match_rate_metric(self, data, sub='match',bspans='./data/kvret/test.bspan.pkl'):
-        dials = self.pack_dial(data)
-        match,total = 0,1e-8
-        #bspan_data = pickle.load(open(bspans,'rb'))
-        # find out the last placeholder and see whether that is correct
-        # if no such placeholder, see the final turn, because it can be a yes/no question or scheduling conversation
-        for dial_id in dials:
-            dial = dials[dial_id]
-            gen_bspan, truth_cons, gen_cons = None, None, set()
-            truth_turn_num = -1
-            for turn_num,turn in enumerate(dial):
-                if 'SLOT' in turn['generated_response']:
-                    gen_bspan = turn['generated_bspan']
-                    gen_cons = self._extract_constraint(gen_bspan)
-                if 'SLOT' in turn['response']:
-                    truth_cons = self._extract_constraint(turn['bspan'])
-
-            # KVRET dataset includes "scheduling" (so often no SLOT decoded in ground truth)
-            if not truth_cons:
-                truth_bspan = dial[-1]['bspan']
-                truth_cons = self._extract_constraint(truth_bspan)
-            if not gen_cons:
-                gen_bspan = dial[-1]['generated_bspan']
-                gen_cons = self._extract_constraint(gen_bspan)
-
-            if truth_cons:
-                if self.constraint_same(gen_cons, truth_cons):
-                    match += 1
-                    #print(gen_cons, truth_cons, '+')
-                else:
-                    print(gen_cons, truth_cons, '-')
-                total += 1
-
-        return match / total
-
-    def _tokenize(self, sent):
-        return ' '.join(word_tokenize(sent))
-
-    def _lemmatize(self, sent):
-        words = [wn.lemmatize(_) for _ in sent.split()]
-        #for idx,w in enumerate(words):
-        #    if w !=
-        return ' '.join(words)
-
-    @report
-    def success_f1_metric(self, data, sub='successf1'):
-        dials = self.pack_dial(data)
-        tp,fp,fn = 0,0,0
-        for dial_id in dials:
-            truth_req, gen_req = set(),set()
-            dial = dials[dial_id]
-            for turn_num, turn in enumerate(dial):
-                gen_response_token = turn['generated_response'].split()
-                response_token = turn['response'].split()
-                for idx, w in enumerate(gen_response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        gen_req.add(w.split('_')[0])
-                for idx, w in enumerate(response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        truth_req.add(w.split('_')[0])
-            gen_req.discard('name')
-            truth_req.discard('name')
-            for req in gen_req:
-                if req in truth_req:
-                    tp += 1
-                else:
-                    fp += 1
-            for req in truth_req:
-                if req not in gen_req:
-                    fn += 1
-        precision, recall = tp / (tp + fp + 1e-8), tp / (tp + fn + 1e-8)
-        f1 = 2 * precision * recall / (precision + recall + 1e-8)
-        return f1
-
-class MultiWozEvaluator(GenericEvaluator):
-    def __init__(self, result_path):
-        super().__init__(result_path)
-        self.entities = []
-        self.entity_dict = {}
-
-    def run_metrics(self):
-        with open('./data/MultiWoz/test.json') as f:
-            raw_data = json.loads(f.read().lower())
-        with open('./data/MultiWoz/entities.json') as f:
-            raw_entities = json.loads(f.read().lower())
-        self.get_entities(raw_entities)
-        data = self.read_result_data()
-        for i, row in enumerate(data):
-            data[i]['response'] = self.clean(data[i]['response'])
-            data[i]['generated_response'] = self.clean(data[i]['generated_response'])
-        bleu_score = self.bleu_metric(data,'bleu')
-        success_f1 = self.success_f1_metric(data, 'success')
-        match = self.match_metric(data, 'match', raw_data=raw_data)
-        self._print_dict(self.metric_dict)
-        return -success_f1[0]
-
-    def get_entities(self, entity_data):
-        for k in entity_data:
-            k_attr = k.split('_')[1][:-1]
-            self.entities.extend(entity_data[k])
-            for item in entity_data[k]:
-                self.entity_dict[item] = k_attr
-
-    def _extract_constraint(self, z):
-        z = z.split()
-        if 'EOS_Z1' not in z:
-            s = set(z)
-        else:
-            idx = z.index('EOS_Z1')
-            s = set(z[:idx])
-        if 'moderately' in s:
-            s.discard('moderately')
-            s.add('moderate')
-        #print(self.entities) 
-        #return s
-        return s.intersection(self.entities)
-        #return set(z).difference(['name', 'address', 'postcode', 'phone', 'area', 'pricerange'])
-
-    def _extract_request(self, z):
-        z = z.split()
-        return set(z).intersection(['address', 'postcode', 'phone', 'area', 'pricerange','food'])
-
-    @report
-    def match_metric(self, data, sub='match',raw_data=None):
-        dials = self.pack_dial(data)
-        match,total = 0,1e-8
-        # find out the last placeholder and see whether that is correct
-        # if no such placeholder, see the final turn, because it can be a yes/no question or scheduling dialogue
-        for dial_id in dials:
-            truth_req, gen_req = [], []
-            dial = dials[dial_id]
-            gen_bspan, truth_cons, gen_cons = None, None, set()
-            truth_turn_num = -1
-            truth_response_req = []
-            for turn_num,turn in enumerate(dial):
-                if 'SLOT' in turn['generated_response']:
-                    gen_bspan = turn['generated_bspan']
-                    gen_cons = self._extract_constraint(gen_bspan)
-                if 'SLOT' in turn['response']:
-                    truth_cons = self._extract_constraint(turn['bspan'])
-                gen_response_token = turn['generated_response'].split()
-                response_token = turn['response'].split()
-                for idx, w in enumerate(gen_response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        gen_req.append(w.split('_')[0])
-                    if w == 'SLOT' and idx != 0:
-                        gen_req.append(gen_response_token[idx - 1])
-                for idx, w in enumerate(response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        truth_response_req.append(w.split('_')[0])
-            if not gen_cons:
-                gen_bspan = dial[-1]['generated_bspan']
-                gen_cons = self._extract_constraint(gen_bspan)
-            if truth_cons:
-                if gen_cons == truth_cons:
-                    match += 1
-                else:
-                    pass
-#                    print(gen_cons, truth_cons)
-                total += 1
-
-        return match / total
-
-    @report
-    def success_f1_metric(self, data, sub='successf1'):
-        dials = self.pack_dial(data)
-        tp,fp,fn = 0,0,0
-        for dial_id in dials:
-            truth_req, gen_req = set(),set()
-            dial = dials[dial_id]
-            for turn_num, turn in enumerate(dial):
-                gen_response_token = turn['generated_response'].split()
-                response_token = turn['response'].split()
-                for idx, w in enumerate(gen_response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        gen_req.add(w.split('_')[0])
-                for idx, w in enumerate(response_token):
-                    if w.endswith('SLOT') and w != 'SLOT':
-                        truth_req.add(w.split('_')[0])
-
-            gen_req.discard('name')
-            truth_req.discard('name')
-            for req in gen_req:
-                if req in truth_req:
-                    tp += 1
-                else:
-                    fp += 1
-            for req in truth_req:
-                if req not in gen_req:
-                    fn += 1
-        precision, recall = tp / (tp + fp + 1e-8), tp / (tp + fn + 1e-8)
-        f1 = 2 * precision * recall / (precision + recall + 1e-8)
-        return f1, precision, recall
+# class CamRestEvaluator(GenericEvaluator):
+#     def __init__(self, result_path):
+#         super().__init__(result_path)
+#         self.entities = []
+#         self.entity_dict = {}
+#
+#     def run_metrics(self):
+#         raw_json = open('./data/CamRest676/CamRest676.json')
+#         raw_entities = open('./data/CamRest676/CamRestOTGY.json')
+#         raw_data = json.loads(raw_json.read().lower())
+#         raw_entities = json.loads(raw_entities.read().lower())
+#         self.get_entities(raw_entities)
+#         data = self.read_result_data()
+#         for i, row in enumerate(data):
+#             data[i]['response'] = self.clean(data[i]['response'])
+#             data[i]['generated_response'] = self.clean(data[i]['generated_response'])
+#         bleu_score = self.bleu_metric(data,'bleu')
+#         success_f1 = self.success_f1_metric(data, 'success')
+#         match = self.match_metric(data, 'match', raw_data=raw_data)
+#         self._print_dict(self.metric_dict)
+#         return -success_f1[0]
+#
+#     def get_entities(self, entity_data):
+#         for k in entity_data['informable']:
+#             self.entities.extend(entity_data['informable'][k])
+#             for item in entity_data['informable'][k]:
+#                 self.entity_dict[item] = k
+#
+#     def _extract_constraint(self, z):
+#         z = z.split()
+#         if 'EOS_Z1' not in z:
+#             s = set(z)
+#         else:
+#             idx = z.index('EOS_Z1')
+#             s = set(z[:idx])
+#         if 'moderately' in s:
+#             s.discard('moderately')
+#             s.add('moderate')
+#         #print(self.entities)
+#         #return s
+#         return s.intersection(self.entities)
+#         #return set(z).difference(['name', 'address', 'postcode', 'phone', 'area', 'pricerange'])
+#
+#     def _extract_request(self, z):
+#         z = z.split()
+#         return set(z).intersection(['address', 'postcode', 'phone', 'area', 'pricerange','food'])
+#
+#     @report
+#     def match_metric(self, data, sub='match',raw_data=None):
+#         dials = self.pack_dial(data)
+#         match,total = 0,1e-8
+#         success = 0
+#         # find out the last placeholder and see whether that is correct
+#         # if no such placeholder, see the final turn, because it can be a yes/no question or scheduling dialogue
+#         for dial_id in dials:
+#             truth_req, gen_req = [], []
+#             dial = dials[dial_id]
+#             gen_bspan, truth_cons, gen_cons = None, None, set()
+#             truth_turn_num = -1
+#             truth_response_req = []
+#             for turn_num,turn in enumerate(dial):
+#                 if 'SLOT' in turn['generated_response']:
+#                     gen_bspan = turn['generated_bspan']
+#                     gen_cons = self._extract_constraint(gen_bspan)
+#                 if 'SLOT' in turn['response']:
+#                     truth_cons = self._extract_constraint(turn['bspan'])
+#                 gen_response_token = turn['generated_response'].split()
+#                 response_token = turn['response'].split()
+#                 for idx, w in enumerate(gen_response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         gen_req.append(w.split('_')[0])
+#                     if w == 'SLOT' and idx != 0:
+#                         gen_req.append(gen_response_token[idx - 1])
+#                 for idx, w in enumerate(response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         truth_response_req.append(w.split('_')[0])
+#             if not gen_cons:
+#                 gen_bspan = dial[-1]['generated_bspan']
+#                 gen_cons = self._extract_constraint(gen_bspan)
+#             if truth_cons:
+#                 if gen_cons == truth_cons:
+#                     match += 1
+#                 else:
+#                     print(gen_cons, truth_cons)
+#                 total += 1
+#
+#         return match / total, success / total
+#
+#     @report
+#     def success_f1_metric(self, data, sub='successf1'):
+#         dials = self.pack_dial(data)
+#         tp,fp,fn = 0,0,0
+#         for dial_id in dials:
+#             truth_req, gen_req = set(),set()
+#             dial = dials[dial_id]
+#             for turn_num, turn in enumerate(dial):
+#                 gen_response_token = turn['generated_response'].split()
+#                 response_token = turn['response'].split()
+#                 for idx, w in enumerate(gen_response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         gen_req.add(w.split('_')[0])
+#                 for idx, w in enumerate(response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         truth_req.add(w.split('_')[0])
+#
+#             gen_req.discard('name')
+#             truth_req.discard('name')
+#             for req in gen_req:
+#                 if req in truth_req:
+#                     tp += 1
+#                 else:
+#                     fp += 1
+#             for req in truth_req:
+#                 if req not in gen_req:
+#                     fn += 1
+#         precision, recall = tp / (tp + fp + 1e-8), tp / (tp + fn + 1e-8)
+#         f1 = 2 * precision * recall / (precision + recall + 1e-8)
+#         return f1, precision, recall
+#
+# class KvretEvaluator(GenericEvaluator):
+#     def __init__(self, result_path):
+#         super().__init__(result_path)
+#         ent_json = open('./data/kvret/kvret_entities.json')
+#         self.ent_data = json.loads(ent_json.read().lower())
+#         ent_json.close()
+#         self._get_entity_dict(self.ent_data)
+#         raw_json = open('./data/kvret/kvret_test_public.json')
+#         self.raw_data = json.loads(raw_json.read().lower())
+#         raw_json.close()
+#
+#     def run_metrics(self):
+#         data = self.read_result_data()
+#         for i, row in enumerate(data):
+#             data[i]['response'] = self.clean_by_intent(data[i]['response'],int(data[i]['dial_id']))
+#             data[i]['generated_response'] = self.clean_by_intent(data[i]['generated_response'],int(data[i]['dial_id']))
+#         match_rate = self.match_rate_metric(data, 'match')
+#         bleu_score = self.bleu_metric(data,'bleu')
+#         success_f1 = self.success_f1_metric(data,'success_f1')
+#         self._print_dict(self.metric_dict)
+#
+#     def clean_by_intent(self,s,i):
+#         s = s.replace('<go> ', '').replace(' SLOT', '_SLOT')
+#         s = '<GO> ' + s + ' </s>'
+#         intent = self.raw_data[i]['scenario']['task']['intent']
+#         slot = {
+#             'weather':['weather_attribute','location','weekly_time'],
+#             'navigate':['poi','poi_type','distance','traffic','address'],
+#             'schedule':['event','date','time','party','room','agenda']
+#         }
+#
+#         for item in self.entity_dict:
+#             if self.entity_dict[item] in slot[intent]:
+#                 # s = s.replace(item, 'VALUE_{}'.format(self.entity_dict[item]))
+#                 s = clean_replace(s, item, '{}_SLOT'.format(self.entity_dict[item]))
+#         return s
+#
+#
+#     def _extract_constraint(self, z):
+#         z = z.split()
+#         if 'EOS_Z1' not in z:
+#             s = set(z)
+#         else:
+#             idx = z.index('EOS_Z1')
+#             s = set(z[:idx])
+#         reqs = ['address', 'traffic', 'poi', 'poi_type', 'distance', 'weather', 'temperature', 'weather_attribute',
+#                 'date', 'time', 'location', 'event', 'agenda', 'party', 'room', 'weekly_time', 'forecast']
+#         informable = {
+#             'weather': ['date','location','weather_attribute'],
+#             'navigate': ['poi_type','distance'],
+#             'schedule': ['event', 'date', 'time', 'agenda', 'party', 'room']
+#         }
+#         infs = []
+#         for v in informable.values():
+#             infs.extend(v)
+#         junk = ['good','great','quickest','shortest','route','week','fastest','nearest','next','closest','way','mile',
+#                'activity','restaurant','appointment' ]
+#         s = s.difference(junk).difference(en_sws).difference(reqs)
+#         res = set()
+#         for item in s:
+#             if item in junk:
+#                 continue
+#             flg = False
+#             for canon_ent in sorted(list(self.entity_dict.keys())):
+#                 if self.entity_dict[canon_ent] in infs:
+#                     if similar(item, canon_ent):
+#                         flg = True
+#                         junk.extend(canon_ent.split())
+#                         res.add(canon_ent)
+#                     if flg:
+#                         break
+#         return res
+#
+#     def constraint_same(self, truth_cons, gen_cons):
+#         if not truth_cons and not gen_cons:
+#             return True
+#         if not truth_cons or not gen_cons:
+#             return False
+#         return setsim(gen_cons, truth_cons)
+#
+#     def _get_entity_dict(self, entity_data):
+#         entity_dict = {}
+#         for k in entity_data:
+#             if isinstance(entity_data[k][0], str):
+#                 for entity in entity_data[k]:
+#                     entity = self._lemmatize(self._tokenize(entity))
+#                     entity_dict[entity] = k
+#                     if k in ['event','poi_type']:
+#                         entity_dict[entity.split()[0]] = k
+#             elif isinstance(entity_data[k][0], dict):
+#                 for entity_entry in entity_data[k]:
+#                     for entity_type, entity in entity_entry.items():
+#                         entity_type = 'poi_type' if entity_type == 'type' else entity_type
+#                         entity = self._lemmatize(self._tokenize(entity))
+#                         entity_dict[entity] = entity_type
+#                         if entity_type in ['event', 'poi_type']:
+#                             entity_dict[entity.split()[0]] = entity_type
+#         self.entity_dict = entity_dict
+#
+#     @report
+#     def match_rate_metric(self, data, sub='match',bspans='./data/kvret/test.bspan.pkl'):
+#         dials = self.pack_dial(data)
+#         match,total = 0,1e-8
+#         #bspan_data = pickle.load(open(bspans,'rb'))
+#         # find out the last placeholder and see whether that is correct
+#         # if no such placeholder, see the final turn, because it can be a yes/no question or scheduling conversation
+#         for dial_id in dials:
+#             dial = dials[dial_id]
+#             gen_bspan, truth_cons, gen_cons = None, None, set()
+#             truth_turn_num = -1
+#             for turn_num,turn in enumerate(dial):
+#                 if 'SLOT' in turn['generated_response']:
+#                     gen_bspan = turn['generated_bspan']
+#                     gen_cons = self._extract_constraint(gen_bspan)
+#                 if 'SLOT' in turn['response']:
+#                     truth_cons = self._extract_constraint(turn['bspan'])
+#
+#             # KVRET dataset includes "scheduling" (so often no SLOT decoded in ground truth)
+#             if not truth_cons:
+#                 truth_bspan = dial[-1]['bspan']
+#                 truth_cons = self._extract_constraint(truth_bspan)
+#             if not gen_cons:
+#                 gen_bspan = dial[-1]['generated_bspan']
+#                 gen_cons = self._extract_constraint(gen_bspan)
+#
+#             if truth_cons:
+#                 if self.constraint_same(gen_cons, truth_cons):
+#                     match += 1
+#                     #print(gen_cons, truth_cons, '+')
+#                 else:
+#                     print(gen_cons, truth_cons, '-')
+#                 total += 1
+#
+#         return match / total
+#
+#     def _tokenize(self, sent):
+#         return ' '.join(word_tokenize(sent))
+#
+#     def _lemmatize(self, sent):
+#         words = [wn.lemmatize(_) for _ in sent.split()]
+#         #for idx,w in enumerate(words):
+#         #    if w !=
+#         return ' '.join(words)
+#
+#     @report
+#     def success_f1_metric(self, data, sub='successf1'):
+#         dials = self.pack_dial(data)
+#         tp,fp,fn = 0,0,0
+#         for dial_id in dials:
+#             truth_req, gen_req = set(),set()
+#             dial = dials[dial_id]
+#             for turn_num, turn in enumerate(dial):
+#                 gen_response_token = turn['generated_response'].split()
+#                 response_token = turn['response'].split()
+#                 for idx, w in enumerate(gen_response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         gen_req.add(w.split('_')[0])
+#                 for idx, w in enumerate(response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         truth_req.add(w.split('_')[0])
+#             gen_req.discard('name')
+#             truth_req.discard('name')
+#             for req in gen_req:
+#                 if req in truth_req:
+#                     tp += 1
+#                 else:
+#                     fp += 1
+#             for req in truth_req:
+#                 if req not in gen_req:
+#                     fn += 1
+#         precision, recall = tp / (tp + fp + 1e-8), tp / (tp + fn + 1e-8)
+#         f1 = 2 * precision * recall / (precision + recall + 1e-8)
+#         return f1
+#
+# class MultiWozEvaluator(GenericEvaluator):
+#     def __init__(self, result_path):
+#         super().__init__(result_path)
+#         self.entities = []
+#         self.entity_dict = {}
+#
+#     def run_metrics(self):
+#         with open('./data/MultiWoz/test.json') as f:
+#             raw_data = json.loads(f.read().lower())
+#         with open('./data/MultiWoz/entities.json') as f:
+#             raw_entities = json.loads(f.read().lower())
+#         self.get_entities(raw_entities)
+#         data = self.read_result_data()
+#         for i, row in enumerate(data):
+#             data[i]['response'] = self.clean(data[i]['response'])
+#             data[i]['generated_response'] = self.clean(data[i]['generated_response'])
+#         bleu_score = self.bleu_metric(data,'bleu')
+#         success_f1 = self.success_f1_metric(data, 'success')
+#         match = self.match_metric(data, 'match', raw_data=raw_data)
+#         self._print_dict(self.metric_dict)
+#         return -success_f1[0]
+#
+#     def get_entities(self, entity_data):
+#         for k in entity_data:
+#             k_attr = k.split('_')[1][:-1]
+#             self.entities.extend(entity_data[k])
+#             for item in entity_data[k]:
+#                 self.entity_dict[item] = k_attr
+#
+#     def _extract_constraint(self, z):
+#         z = z.split()
+#         if 'EOS_Z1' not in z:
+#             s = set(z)
+#         else:
+#             idx = z.index('EOS_Z1')
+#             s = set(z[:idx])
+#         if 'moderately' in s:
+#             s.discard('moderately')
+#             s.add('moderate')
+#         #print(self.entities)
+#         #return s
+#         return s.intersection(self.entities)
+#         #return set(z).difference(['name', 'address', 'postcode', 'phone', 'area', 'pricerange'])
+#
+#     def _extract_request(self, z):
+#         z = z.split()
+#         return set(z).intersection(['address', 'postcode', 'phone', 'area', 'pricerange','food'])
+#
+#     @report
+#     def match_metric(self, data, sub='match',raw_data=None):
+#         dials = self.pack_dial(data)
+#         match,total = 0,1e-8
+#         # find out the last placeholder and see whether that is correct
+#         # if no such placeholder, see the final turn, because it can be a yes/no question or scheduling dialogue
+#         for dial_id in dials:
+#             truth_req, gen_req = [], []
+#             dial = dials[dial_id]
+#             gen_bspan, truth_cons, gen_cons = None, None, set()
+#             truth_turn_num = -1
+#             truth_response_req = []
+#             for turn_num,turn in enumerate(dial):
+#                 if 'SLOT' in turn['generated_response']:
+#                     gen_bspan = turn['generated_bspan']
+#                     gen_cons = self._extract_constraint(gen_bspan)
+#                 if 'SLOT' in turn['response']:
+#                     truth_cons = self._extract_constraint(turn['bspan'])
+#                 gen_response_token = turn['generated_response'].split()
+#                 response_token = turn['response'].split()
+#                 for idx, w in enumerate(gen_response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         gen_req.append(w.split('_')[0])
+#                     if w == 'SLOT' and idx != 0:
+#                         gen_req.append(gen_response_token[idx - 1])
+#                 for idx, w in enumerate(response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         truth_response_req.append(w.split('_')[0])
+#             if not gen_cons:
+#                 gen_bspan = dial[-1]['generated_bspan']
+#                 gen_cons = self._extract_constraint(gen_bspan)
+#             if truth_cons:
+#                 if gen_cons == truth_cons:
+#                     match += 1
+#                 else:
+#                     pass
+# #                    print(gen_cons, truth_cons)
+#                 total += 1
+#
+#         return match / total
+#
+#     @report
+#     def success_f1_metric(self, data, sub='successf1'):
+#         dials = self.pack_dial(data)
+#         tp,fp,fn = 0,0,0
+#         for dial_id in dials:
+#             truth_req, gen_req = set(),set()
+#             dial = dials[dial_id]
+#             for turn_num, turn in enumerate(dial):
+#                 gen_response_token = turn['generated_response'].split()
+#                 response_token = turn['response'].split()
+#                 for idx, w in enumerate(gen_response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         gen_req.add(w.split('_')[0])
+#                 for idx, w in enumerate(response_token):
+#                     if w.endswith('SLOT') and w != 'SLOT':
+#                         truth_req.add(w.split('_')[0])
+#
+#             gen_req.discard('name')
+#             truth_req.discard('name')
+#             for req in gen_req:
+#                 if req in truth_req:
+#                     tp += 1
+#                 else:
+#                     fp += 1
+#             for req in truth_req:
+#                 if req not in gen_req:
+#                     fn += 1
+#         precision, recall = tp / (tp + fp + 1e-8), tp / (tp + fn + 1e-8)
+#         f1 = 2 * precision * recall / (precision + recall + 1e-8)
+#         return f1, precision, recall
 
 def metric_handler():
     parser = argparse.ArgumentParser()

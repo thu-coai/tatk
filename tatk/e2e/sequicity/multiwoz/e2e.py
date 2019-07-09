@@ -13,11 +13,12 @@ from tatk.e2e.sequicity.config import global_config as cfg
 from tatk.e2e.sequicity.model import Model
 from tatk.e2e.sequicity.reader import pad_sequences
 from tatk.e2e.sequicity.tsd_net import cuda_
-from tatk.policy.policy import Policy
+from tatk.e2e.e2e import E2E
 
-DEFAULT_CUDA_DEVICE=-1
+DEFAULT_CUDA_DEVICE = -1
 DEFAULT_DIRECTORY = "model"
 DEFAULT_ARCHIVE_FILE = os.path.join(DEFAULT_DIRECTORY, "Sequicity.rar")
+
 
 def denormalize(uttr):
     uttr = uttr.replace(' -s', 's')
@@ -25,12 +26,11 @@ def denormalize(uttr):
     uttr = uttr.replace(' -er', 'er')
     return uttr
 
-class Sequicity(Policy):
-    def __init__(self, 
-                 archive_file=DEFAULT_ARCHIVE_FILE, 
+
+class Sequicity(E2E):
+    def __init__(self,
+                 archive_file=DEFAULT_ARCHIVE_FILE,
                  model_file=None):
-        Policy.__init__(self)
-        
         if not os.path.isfile(archive_file):
             if not model_file:
                 raise Exception("No model for Sequicity is specified!")
@@ -39,9 +39,9 @@ class Sequicity(Policy):
         if not os.path.exists(os.path.join(model_dir, 'data')):
             archive = zipfile.ZipFile(archive_file, 'r')
             archive.extractall(model_dir)
-        
+
         cfg.init_handler('tsdf-multiwoz')
-        
+
         torch.manual_seed(cfg.seed)
         torch.cuda.manual_seed(cfg.seed)
         random.seed(cfg.seed)
@@ -50,23 +50,23 @@ class Sequicity(Policy):
         self.m.count_params()
         self.m.load_model()
         self.reset()
-        
+
     def reset(self):
-        self.kw_ret = dict({'func':self.z2degree})
-    
+        self.kw_ret = dict({'func': self.z2degree})
+
     def z2degree(self, gen_z):
         gen_bspan = self.m.reader.vocab.sentence_decode(gen_z, eos='EOS_Z2')
         constraint_request = gen_bspan.split()
         constraints = constraint_request[:constraint_request.index('EOS_Z1')] if 'EOS_Z1' \
-            in constraint_request else constraint_request
+                                                                                 in constraint_request else constraint_request
         for j, ent in enumerate(constraints):
             constraints[j] = ent.replace('_', ' ')
         degree = self.m.reader.db_search(constraints)
         degree_input_list = self.m.reader._degree_vec_mapping(len(degree))
         degree_input = cuda_(Variable(torch.Tensor(degree_input_list).unsqueeze(0)))
         return degree, degree_input
-    
-    def predict(self, usr):            
+
+    def predict(self, usr):
         print('usr:', usr)
         usr = word_tokenize(usr.lower())
         usr_words = usr + ['EOS_U']
@@ -102,7 +102,7 @@ class Sequicity(Policy):
                 z_idx[0] = z_idx[0][:idx + 1]
             for j, word in enumerate(z_idx[0]):
                 if word >= cfg.vocab_size:
-                    z_idx[0][j] = 2 #unk
+                    z_idx[0][j] = 2  # unk
             prev_z_input_np = pad_sequences(z_idx, cfg.max_ts, padding='post', truncating='pre').transpose((1, 0))
             prev_z_len = np.array([len(_) for _ in z_idx])
             prev_z_input = cuda_(Variable(torch.from_numpy(prev_z_input_np).long()))

@@ -2,6 +2,7 @@ import argparse
 import logging
 import random
 import time
+import json
 
 import numpy as np
 import torch
@@ -10,8 +11,12 @@ from torch.autograd import Variable
 from torch.optim import Adam
 
 from tatk.e2e.sequicity.config import global_config as cfg
-from tatk.e2e.sequicity.metric import CamRestEvaluator, KvretEvaluator, MultiWozEvaluator
-from tatk.e2e.sequicity.reader import CamRest676Reader, KvretReader, MultiWozReader
+# from tatk.e2e.sequicity.metric import CamRestEvaluator, KvretEvaluator, MultiWozEvaluator
+# from tatk.e2e.sequicity.reader import CamRest676Reader, KvretReader, MultiWozReader
+from tatk.e2e.sequicity.multiwoz.metric import MultiWozEvaluator
+from tatk.e2e.sequicity.camrest.metric import CamRestEvaluator
+from tatk.e2e.sequicity.multiwoz.reader import MultiWozReader
+from tatk.e2e.sequicity.camrest.reader import CamRest676Reader
 from tatk.e2e.sequicity.reader import get_glove_matrix
 from tatk.e2e.sequicity.reader import pad_sequences
 from tatk.e2e.sequicity.tsd_net import TSD, cuda_
@@ -21,7 +26,7 @@ class Model:
     def __init__(self, dataset):
         reader_dict = {
             'camrest': CamRest676Reader,
-            'kvret': KvretReader,
+            # 'kvret': KvretReader,
             'multiwoz': MultiWozReader
         }
         model_dict = {
@@ -29,7 +34,7 @@ class Model:
         }
         evaluator_dict = {
             'camrest': CamRestEvaluator,
-            'kvret': KvretEvaluator,
+            # 'kvret': KvretEvaluator,
             'multiwoz': MultiWozEvaluator
         }
         self.reader = reader_dict[dataset]()
@@ -461,7 +466,8 @@ def main(arg_mode=None, arg_model=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('-mode')
     parser.add_argument('-model')
-    parser.add_argument('-cfg', nargs='*')
+    # parser.add_argument('-cfg', nargs='*')
+    parser.add_argument('-cfg')
     args = parser.parse_args()
 
     if arg_mode is not None:
@@ -469,19 +475,21 @@ def main(arg_mode=None, arg_model=None):
     if arg_model is not None:
         args.model = arg_model
 
-    cfg.init_handler(args.model)
+    # cfg.init_handler(args.model)
+    c = json.load(open(args.cfg))
+    cfg.init_handler(c['tsdf_init'])
 
-    if args.cfg:
-        for pair in args.cfg:
-            k, v = tuple(pair.split('='))
-            dtype = type(getattr(cfg, k))
-            if isinstance(None, dtype):
-                raise ValueError()
-            if dtype is bool:
-                v = False if v == 'False' else True
-            else:
-                v = dtype(v)
-            setattr(cfg, k, v)
+    # if args.cfg:
+    #     for pair in args.cfg:
+    #         k, v = tuple(pair.split('='))
+    #         dtype = type(getattr(cfg, k))
+    #         if isinstance(None, dtype):
+    #             raise ValueError()
+    #         if dtype is bool:
+    #             v = False if v == 'False' else True
+    #         else:
+    #             v = dtype(v)
+    #         setattr(cfg, k, v)
 
     logging.debug(str(cfg))
     if cfg.cuda:
@@ -493,7 +501,8 @@ def main(arg_mode=None, arg_model=None):
     random.seed(cfg.seed)
     np.random.seed(cfg.seed)
 
-    m = Model(args.model.split('-')[-1])
+    # m = Model(args.model.split('-')[-1])
+    m = Model(args.model)
     m.count_params()
     if args.mode == 'train':
         m.load_glove_embedding()
