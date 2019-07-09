@@ -1,0 +1,17 @@
+{
+  "data_dir": "camrest/data/usr_data",
+  "output_dir": "camrest/output/usr",
+  "zipped_model_path": "camrest/output/usr/bert_camrest_usr.zip",
+  "log_dir": "camrest/log/usr",
+  "DEVICE": "cuda:1",
+  "model": {
+    "train_bert": false,
+    "pre-trained": "bert-base-uncased",
+    "lr": 0.001,
+    "dropout": 0.3,
+    "optimizer": "Adam"
+  },
+  "check_step": 100,
+  "max_step": 10000,
+  "batch_size": 100
+}

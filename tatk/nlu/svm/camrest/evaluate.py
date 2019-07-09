@@ -1,5 +1,5 @@
 """
-Evaluate SVMNLU models on Multiwoz test dataset
+Evaluate SVMNLU models on Camrest test dataset
 Metric: dataset level Precision/Recall/F1
 Usage: PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
 """
@@ -11,7 +11,7 @@ import zipfile
 import numpy
 import torch
 
-from tatk.nlu.svm.multiwoz.nlu import SVMNLU
+from tatk.nlu.svm.camrest.nlu import SVMNLU
 
 seed = 2019
 random.seed(seed)
@@ -35,23 +35,23 @@ if __name__ == '__main__':
         sys.exit()
     mode = sys.argv[1]
     if mode== 'usr':
-        model = SVMNLU(config_file='configs/multiwoz_usr.cfg',
-                       model_file='model/svm_multiwoz_usr.zip')
+        model = SVMNLU(config_file='configs/camrest_usr.cfg',
+                       model_file='model/svm_camrest_usr.zip')
     elif mode== 'sys':
-        model = SVMNLU(config_file='configs/multiwoz_sys.cfg',
-                       model_file='model/svm_multiwoz_sys.zip')
+        model = SVMNLU(config_file='configs/camrest_sys.cfg',
+                       model_file='model/svm_camrest_sys.zip')
     elif mode== 'all':
-        model = SVMNLU(config_file='configs/multiwoz_all.cfg',
-                       model_file='model/svm_multiwoz_all.zip')
+        model = SVMNLU(config_file='configs/camrest_all.cfg',
+                       model_file='model/svm_camrest_all.zip')
     else:
         raise Exception("Invalid mode")
 
-    archive = zipfile.ZipFile('../../../../data/multiwoz/test.json.zip', 'r')
+    archive = zipfile.ZipFile('../../../../data/camrest/test.json.zip', 'r')
     test_data = json.load(archive.open('test.json'))
     TP, FP, FN = 0, 0, 0
     sen_num = 0
     sess_num = 0
-    for no, session in test_data.items():
+    for dialog in test_data:
         sess_num += 1
         if sess_num%10==0:
             print('Session [%d|%d]' % (sess_num, len(test_data)))
@@ -62,22 +62,31 @@ if __name__ == '__main__':
             print('\t Precision: %.2f' % (100 * precision))
             print('\t Recall: %.2f' % (100 * recall))
             print('\t F1: %.2f' % (100 * F1))
-        for i, turn in enumerate(session['log']):
-            if i % 2 == 0 and mode == 'sys':
-                continue
-            elif i % 2 == 1 and mode == 'usr':
-                continue
-            sen_num += 1
-            labels = da2triples(turn['dialog_act'])
-            predicts = da2triples(model.predict(turn['text']))
-            for triple in predicts:
-                if triple in labels:
-                    TP += 1
-                else:
-                    FP += 1
-            for triple in labels:
-                if triple not in predicts:
-                    FN += 1
+        for turn in dialog['dial']:
+            if mode == 'usr' or mode == 'all':
+                sen_num += 1
+                labels = da2triples(turn['usr']['dialog_act'])
+                predicts = da2triples(model.predict(turn['usr']['transcript']))
+                for triple in predicts:
+                    if triple in labels:
+                        TP += 1
+                    else:
+                        FP += 1
+                for triple in labels:
+                    if triple not in predicts:
+                        FN += 1
+            if mode == 'sys' or mode == 'all':
+                sen_num += 1
+                labels = da2triples(turn['sys']['dialog_act'])
+                predicts = da2triples(model.predict(turn['sys']['sent']))
+                for triple in predicts:
+                    if triple in labels:
+                        TP += 1
+                    else:
+                        FP += 1
+                for triple in labels:
+                    if triple not in predicts:
+                        FN += 1
     print(TP,FP,FN)
     precision = 1.0 * TP / (TP + FP)
     recall = 1.0 * TP / (TP + FN)
