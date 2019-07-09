@@ -4,7 +4,7 @@ import zipfile
 
 from tatk.util.file_util import cached_path
 from tatk.nlu.svm import Classifier
-from tatk.nlu.nlu import NLU
+from tatk.nlu import NLU
 
 
 class SVMNLU(NLU):

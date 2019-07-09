@@ -5,7 +5,7 @@ import pickle
 import torch
 
 from tatk.util.file_util import cached_path
-from tatk.nlu.nlu import NLU
+from tatk.nlu import NLU
 from tatk.nlu.bert.dataloader import Dataloader
 from tatk.nlu.bert.model import BertNLU
 from tatk.nlu.bert.camrest.postprocess import recover_intent
