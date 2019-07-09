@@ -108,7 +108,7 @@ class TemplateNLG(NLG):
 
     def _postprocess(self, sen):
         sen = sen.strip().capitalize()
-        if len(sen) > 0 and sen[-1] != '?' and sen[-1] != '.':
+        if sen and sen[-1] != '?' and sen[-1] != '.':
             sen += '.'
         sen += ' '
         return sen
@@ -123,7 +123,8 @@ class TemplateNLG(NLG):
                     slot2values.setdefault(slot, [])
                     slot2values[slot].append(value)
                 for slot, values in slot2values.items():
-                    if slot == 'none': continue
+                    if slot == 'none':
+                        continue
                     sentence = 'Do you prefer ' + values[0]
                     for i, value in enumerate(values[1:]):
                         if i == (len(values) - 2):
