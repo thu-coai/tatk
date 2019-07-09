@@ -8,7 +8,7 @@
     "split": [3,1,1],
     "lr": 0.003,
     "lr_decay": 0.5,
-    "vocab_path": "multiwoz/data/vocab-multiwoz.pkl",
+    "vocab_path": "multiwoz/data/vocab.pkl",
     "train": "multiwoz/data/train.json",
     "dev": "multiwoz/data/val.json",
     "test": "multiwoz/data/test.json",
