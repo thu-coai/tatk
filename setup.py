@@ -38,8 +38,8 @@ setup(
         'torch',
         'pytorch_pretrained_bert',
         'tensorflow==1.14',
-        'scikit-learn',
         'scipy',
+        'scikit-learn',
         'tensorboard>=1.14.0',
         'tensorboardX==1.7',
         'requests'
