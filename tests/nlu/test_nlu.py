@@ -38,7 +38,7 @@ class BaseTestNLU:
     def _check_result(self, result):
         assert isinstance(result, dict)
         for key, value in result.items():
-            assert isinstance(key, str)
+            assert isinstance(key, str)git 
             assert self.is_iterable(value)
             for item in value:
                 assert self.is_iterable(item)
