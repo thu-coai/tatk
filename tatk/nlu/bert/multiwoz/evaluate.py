@@ -55,7 +55,7 @@ if __name__ == '__main__':
         archive.extractall(root_dir)
         archive.close()
     print('Load from', best_model_path)
-    checkpoint = torch.load(best_model_path)
+    checkpoint = torch.load(best_model_path, map_location=DEVICE)
     print('train step', checkpoint['step'])
 
     model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
