@@ -59,6 +59,7 @@ class PipelineAgent(Agent):
         self.tracker = tracker
         self.policy = policy
         self.nlg_model = nlg_model
+        self.init_session()
 
     def response(self, observation):
         """Generate agent response using the agent modules."""
@@ -82,6 +83,16 @@ class PipelineAgent(Agent):
             model_response = action
 
         return model_response
+
+    def is_terminal(self):
+        if hasattr(self.policy, 'is_terminal'):
+            return self.policy.is_terminal()
+        return None
+
+    def get_reward(self):
+        if hasattr(self.policy, 'get_reward'):
+            return self.policy.get_reward()
+        return None
 
     def init_session(self):
         """Init the attributes of DST and Policy module."""

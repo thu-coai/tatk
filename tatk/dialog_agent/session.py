@@ -49,7 +49,6 @@ class BiSession(Session):
             sys_agent (Agent): An instance of system agent.
             user_agent (Agent): An instance of user agent.
             kb_query (KBquery): An instance of database query tool.
-            user_first (boolean): True if user speak firstly, else system speak first.
         """
         self.sys_agent = sys_agent
         self.user_agent = user_agent
@@ -88,7 +87,9 @@ class BiSession(Session):
             session_over (boolean): True if session ends, else session continues.
             reward (float): The reward given by the user.
         """
-        user_response, session_over, reward = self.next_response(last_observation)
+        user_response = self.next_response(last_observation)
+        session_over = self.user_agent.is_terminal()
+        reward = self.user_agent.get_reward()
         sys_response = self.next_response(user_response)
 
         return sys_response, user_response, session_over, reward
@@ -100,5 +101,5 @@ class BiSession(Session):
         self.sys_agent.policy.train()
 
     def init_session(self):
-        self.sys_agent.init()
-        self.user_agent.init()
+        self.sys_agent.init_session()
+        self.user_agent.init_session()
