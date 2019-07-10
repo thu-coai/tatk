@@ -1,4 +1,3 @@
-import os
 from tatk.nlu.svm.camrest.nlu import SVMNLU
 from tests.nlu.test_nlu import BaseTestNLUCamrest
 
