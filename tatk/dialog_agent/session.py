@@ -41,7 +41,6 @@ class BiSession(Session):
         user_agent (Agent): user dialog agent.
         kb_query (KBquery): knowledge base query tool.
         dialog_history (list): The dialog history, formatted as [[user_uttr1, sys_uttr1], [user_uttr2, sys_uttr2], ...]
-        turn_indicator (boolean): Indicates which agent should speak.
     """
     def __init__(self, sys_agent, user_agent, kb_query):
         """
@@ -49,7 +48,6 @@ class BiSession(Session):
             sys_agent (Agent): An instance of system agent.
             user_agent (Agent): An instance of user agent.
             kb_query (KBquery): An instance of database query tool.
-            user_first (boolean): True if user speak firstly, else system speak first.
         """
         self.sys_agent = sys_agent
         self.user_agent = user_agent
