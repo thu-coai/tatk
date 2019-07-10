@@ -135,8 +135,8 @@ class UserDataManager(object):
     @ staticmethod
     def usrgoal2seq(goal: dict):
         def add(lt: list, domain_goal: dict, domain: str, intent: str):
-            map = domain_goal.get(intent, {})
-            slots = [slot for slot in map.keys() if isinstance(map[slot], str)]
+            mapping = domain_goal.get(intent, {})
+            slots = [slot for slot in mapping.keys() if isinstance(mapping[slot], str)]
             if len(slots) > 0:
                 lt.append(domain + '_' + intent)
                 lt.append('(')

@@ -44,8 +44,8 @@ class UserDataManager(object):
     @staticmethod
     def usrgoal2seq(goal: dict):
         def add(lt: list, domain_goal: dict, intent: str):
-            map = domain_goal.get(intent, {})
-            slots = [slot for slot in map.keys() if isinstance(map[slot], str)]
+            mapping = domain_goal.get(intent, {})
+            slots = [slot for slot in mapping.keys() if isinstance(mapping[slot], str)]
             if len(slots) > 0:
                 lt.append(intent)
                 lt.append('(')
@@ -54,7 +54,7 @@ class UserDataManager(object):
                 lt.append(')')
 
         ret = []
-        domain_goal = goal.items()
+        domain_goal = goal
         # info
         add(ret, domain_goal, 'info')
         # reqt
@@ -207,7 +207,6 @@ class UserDataManager(object):
     @staticmethod
     def ref_data2stand(da):
         return eval(str(da).lower())
-
 
     def org_data_loader(self):
         if self.__org_goals is None or self.__org_usr_dass is None or self.__org_sys_dass is None:
