@@ -70,7 +70,7 @@ class UserDataManager(object):
     @staticmethod
     def query_goal_for_sys(slot, value, goal):
         ret = None
-        goal_slot = informable_keys.get(slot, 'Unknow')
+        goal_slot = slot if slot in informable_keys else 'Unknow'
         if goal_slot != 'Unknow':
             check = {'info': None}
             for zone in check.keys():
@@ -120,7 +120,7 @@ class UserDataManager(object):
     @staticmethod
     def query_goal_for_usr(slot, value, goal):
         ret = None
-        goal_slot = informable_keys.get(slot, 'Unknow')
+        goal_slot = slot if slot in informable_keys else 'Unknow'
         if goal_slot is not None and goal_slot != 'Unknow':
             check = {'info': None}
             for zone in check.keys():
@@ -181,7 +181,7 @@ class UserDataManager(object):
             elif '=' in word and cur_act is not None:
                 slot_da, value_pos = word.split('=')
                 value_pos = value_pos.lower()
-                slot_goal = informable_keys.get(slot_da, None)
+                slot_goal = slot_da if slot_da in informable_keys else None
                 if slot_goal is not None:
                     value = None
                     if value_pos == 'ininfo':
@@ -206,9 +206,6 @@ class UserDataManager(object):
 
     @staticmethod
     def ref_data2stand(da):
-        for act in da.keys():
-            for idx in range(len(da[act])):
-                da[act][idx][0] = informable_keys.get(da[act][idx][0], da[act][idx][0])
         return eval(str(da).lower())
 
 
