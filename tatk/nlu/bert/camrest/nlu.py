@@ -5,14 +5,16 @@ import pickle
 import torch
 
 from tatk.util.file_util import cached_path
-from tatk.nlu.nlu import NLU
+from tatk.nlu import NLU
 from tatk.nlu.bert.dataloader import Dataloader
 from tatk.nlu.bert.model import BertNLU
 from tatk.nlu.bert.camrest.postprocess import recover_intent
 
 
 class BERTNLU(NLU):
-    def __init__(self, config_file, model_file):
+    def __init__(self, mode, model_file):
+        assert mode == 'usr' or mode == 'sys' or mode == 'all'
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs/camrest_{}.json'.format(mode))
         config = json.load(open(config_file))
         DEVICE = config['DEVICE']
         root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,12 +32,12 @@ class BERTNLU(NLU):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
             print('Load from model_file param')
-            archive_file = cached_path(os.path.join(root_dir, model_file))
+            archive_file = cached_path(model_file)
             archive = zipfile.ZipFile(archive_file, 'r')
             archive.extractall(root_dir)
             archive.close()
         print('Load from', best_model_path)
-        checkpoint = torch.load(best_model_path)
+        checkpoint = torch.load(best_model_path, map_location=DEVICE)
         print('train step', checkpoint['step'])
 
         model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
@@ -74,7 +76,7 @@ class BERTNLU(NLU):
 
 
 if __name__ == '__main__':
-    nlu = BERTNLU(config_file='configs/camrest_usr.json', model_file='output/usr/bert_camrest_usr.zip')
+    nlu = BERTNLU(mode='usr', model_file='output/usr/bert_camrest_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",

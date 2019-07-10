@@ -2,9 +2,8 @@ import copy
 import json
 import os
 
-import tatk
-from tatk.dst.rule.dst_util import init_state
-from tatk.dst.rule.dst_util import normalize_value
+from tatk.util.multiwoz.state import default_state
+from tatk.dst.rule.multiwoz.dst_util import normalize_value
 from tatk.dst.state_tracker import Tracker
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA
 
@@ -13,9 +12,10 @@ class RuleDST(Tracker):
     """Rule based DST which trivially updates new values from NLU result to states."""
     def __init__(self):
         Tracker.__init__(self)
-        self.state = init_state()
-        prefix = os.path.dirname(os.path.dirname(tatk.__file__))
-        self.value_dict = json.load(open(prefix+'/data/multiwoz/value_dict.json'))
+        self.state = default_state()
+        path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
+        path = os.path.join(path,'data/multiwoz/value_dict.json')
+        self.value_dict = json.load(open(path))
 
     def update(self, user_act=None):
         # print('------------------{}'.format(user_act))
@@ -74,4 +74,4 @@ class RuleDST(Tracker):
         return self.state
 
     def init_session(self):
-        self.state = init_state()
+        self.state = default_state()

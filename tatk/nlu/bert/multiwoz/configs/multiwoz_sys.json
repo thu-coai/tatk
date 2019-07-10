@@ -3,7 +3,7 @@
   "output_dir": "multiwoz/output/sys",
   "zipped_model_path": "multiwoz/output/sys/bert_multiwoz_sys.zip",
   "log_dir": "multiwoz/log/sys",
-  "DEVICE": "cuda:2",
+  "DEVICE": "cpu",
   "model": {
     "train_bert": false,
     "pre-trained": "bert-base-uncased",

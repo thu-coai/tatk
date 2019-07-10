@@ -1,22 +1,25 @@
 import json
+import os
 
-from tatk.dst.rule.dst_util import minDistance
-from tatk.dst.rule.rule_dst import RuleDST
-from tatk.nlu.onenet.nlu import OneNetLU
+from tatk.dst.rule.multiwoz import RuleDST
+from tatk.nlu.bert.multiwoz import BERTNLU
+
+from tatk.dst.rule.multiwoz.dst_util import minDistance
 
 
 class NLU_DST:
     def __init__(self):
         self.dst = RuleDST()
-        self.nlu = OneNetLU(archive_file='models/onenet.tar.gz', cuda_device=-1,
-                            model_file='https://convlab.blob.core.windows.net/models/onenet.tar.gz')
+        proj_dir = os.path.join('../../../../',os.path.abspath(__file__))
+        self.nlu = BERTNLU(config_file=os.path.join(proj_dir,'nlu/bert/multiwoz/configs/multiwoz_usr.json'),
+                           model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/bert_multiwoz_usr.zip')
 
     def update(self, action, observation):
         # update history
         self.dst.state['history'].append([str(action)])
 
         # NLU parsing
-        input_act = self.nlu.parse(observation, sum(self.dst.state['history'], [])) if self.nlu else observation
+        input_act = self.nlu.predict(observation) if self.nlu else observation
 
         # state tracking
         self.dst.update(input_act)
