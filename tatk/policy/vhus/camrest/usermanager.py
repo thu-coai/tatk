@@ -55,6 +55,7 @@ class UserDataManager(object):
 
         ret = []
         domain_goal = goal
+
         # info
         add(ret, domain_goal, 'info')
         # reqt
