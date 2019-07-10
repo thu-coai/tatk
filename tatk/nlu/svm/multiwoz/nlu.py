@@ -1,3 +1,10 @@
+"""
+SVM NLU trained on multiwoz dataset
+Trained models can be download on:
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_all.zip
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_sys.zip
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip
+"""
 import configparser
 import os
 import zipfile
@@ -9,6 +16,15 @@ from tatk.nlu import NLU
 
 class SVMNLU(NLU):
     def __init__(self, mode, model_file):
+        """
+        SVM NLU initialization.
+
+        Args:
+            mode (str): can be either `'usr'`, `'sys'` or `'all'`, representing which side of data the model was trained on.
+            model_file (str): trained model path or url, should be coherent with mode.
+
+        Example usage: nlu = SVMNLU(mode='usr', model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip')
+        """
         assert mode == 'usr' or mode == 'sys' or mode == 'all'
         config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),'configs/multiwoz_{}.cfg'.format(mode))
         self.config = configparser.ConfigParser()
