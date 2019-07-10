@@ -12,7 +12,9 @@ from tatk.nlu.bert.multiwoz.postprocess import recover_intent
 
 
 class BERTNLU(NLU):
-    def __init__(self, config_file, model_file):
+    def __init__(self, mode, model_file):
+        assert mode == 'usr' or mode == 'sys' or mode == 'all'
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs/multiwoz_{}.json'.format(mode))
         config = json.load(open(config_file))
         DEVICE = config['DEVICE']
         root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,7 +76,7 @@ class BERTNLU(NLU):
 
 
 if __name__ == '__main__':
-    nlu = BERTNLU(config_file='configs/multiwoz_usr.json', model_file='output/usr/bert_multiwoz_usr.zip')
+    nlu = BERTNLU(mode='usr', model_file='output/usr/bert_multiwoz_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",

@@ -12,7 +12,9 @@ from tatk.nlu.bert.camrest.postprocess import recover_intent
 
 
 class BERTNLU(NLU):
-    def __init__(self, config_file, model_file):
+    def __init__(self, mode, model_file):
+        assert mode == 'usr' or mode == 'sys' or mode == 'all'
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs/camrest_{}.json'.format(mode))
         config = json.load(open(config_file))
         DEVICE = config['DEVICE']
         root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -74,7 +76,7 @@ class BERTNLU(NLU):
 
 
 if __name__ == '__main__':
-    nlu = BERTNLU(config_file='configs/camrest_usr.json', model_file='output/usr/bert_camrest_usr.zip')
+    nlu = BERTNLU(mode='usr', model_file='output/usr/bert_camrest_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",
