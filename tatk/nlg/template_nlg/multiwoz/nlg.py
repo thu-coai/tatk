@@ -43,7 +43,7 @@ slot2word = {
 }
 
 
-class MultiwozTemplateNLG(NLG):
+class TemplateNLG(NLG):
     def __init__(self, is_user, mode="manual"):
         """
         :param is_user: if dialog_act from user or system
@@ -108,7 +108,7 @@ class MultiwozTemplateNLG(NLG):
 
     def _postprocess(self, sen):
         sen = sen.strip().capitalize()
-        if len(sen) > 0 and sen[-1] != '?' and sen[-1] != '.':
+        if sen and sen[-1] != '?' and sen[-1] != '.':
             sen += '.'
         sen += ' '
         return sen
@@ -123,7 +123,8 @@ class MultiwozTemplateNLG(NLG):
                     slot2values.setdefault(slot, [])
                     slot2values[slot].append(value)
                 for slot, values in slot2values.items():
-                    if slot == 'none': continue
+                    if slot == 'none':
+                        continue
                     sentence = 'Do you prefer ' + values[0]
                     for i, value in enumerate(values[1:]):
                         if i == (len(values) - 2):
@@ -187,7 +188,7 @@ def example():
     # whether from user or system
     is_user = False
 
-    multiwoz_template_nlg = MultiwozTemplateNLG(is_user)
+    multiwoz_template_nlg = TemplateNLG(is_user)
     # print(dialog_acts)
     print(multiwoz_template_nlg.generate(dialog_acts))
 

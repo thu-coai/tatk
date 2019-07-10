@@ -11,7 +11,7 @@ import zipfile
 import numpy
 import torch
 
-from tatk.nlu.svm.camrest.nlu import SVMNLU
+from tatk.nlu.svm.camrest import SVMNLU
 
 seed = 2019
 random.seed(seed)

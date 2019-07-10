@@ -17,8 +17,8 @@ SELECTABLE_SLOTS = {
     'Police': [],
 }
 
-INFORMABLE_SLOTS = ["Fee", "Addr", "Area", "Stars", "Internet", "Department", "Choice", "Ref", "Food", "Type", "Price",\
-                    "Stay", "Phone", "Post", "Day", "Name", "Car", "Leave", "Time", "Arrive", "Ticket", None, "Depart",\
+INFORMABLE_SLOTS = ["Fee", "Addr", "Area", "Stars", "Internet", "Department", "Choice", "Ref", "Food", "Type", "Price", \
+                    "Stay", "Phone", "Post", "Day", "Name", "Car", "Leave", "Time", "Arrive", "Ticket", None, "Depart", \
                     "People", "Dest", "Parking", "Open", "Id"]
 
 REQUESTABLE_SLOTS = ['Food', 'Area', 'Fee', 'Price', 'Type', 'Department', 'Internet', 'Parking', 'Stars', 'Type']
@@ -71,7 +71,7 @@ class RuleBasedMultiwozBot(Policy):
             user_action = check_diff(self.last_state, state)
 
         # Debug info for check_diff function
-        
+
         last_state_cpy = copy.deepcopy(self.last_state)
         state_cpy = copy.deepcopy(state)
 
@@ -90,7 +90,6 @@ class RuleBasedMultiwozBot(Policy):
             print("State: ", state_cpy)
             print("Predicted action: ", user_action)
         '''
-
 
         self.last_state = state
 
@@ -157,9 +156,9 @@ class RuleBasedMultiwozBot(Policy):
             if state['belief_state']['taxi']['semi'] == "":
                 info = REF_USR_DA['Taxi'].get(info, info)
                 blank_info.append(info)
-        if state['belief_state']['taxi']['semi']['leaveAt'] == "" and state['belief_state']['taxi']['semi']['arriveBy'] == "":
+        if state['belief_state']['taxi']['semi']['leaveAt'] == "" and state['belief_state']['taxi']['semi'][
+            'arriveBy'] == "":
             blank_info += ['Leave', 'Arrive']
-
 
         # Finish booking, tell user car type and phone number
         if len(blank_info) == 0:
@@ -217,7 +216,7 @@ class RuleBasedMultiwozBot(Policy):
                         DA[domain + "-Inform"].append([slot[0], kb_result[0][kb_slot_name]])
                     else:
                         DA[domain + "-Inform"].append([slot[0], "unknown"])
-                # DA[domain + "-Inform"].append([slot_name, state['kb_results_dict'][0][slot[0].lower()]])
+                        # DA[domain + "-Inform"].append([slot_name, state['kb_results_dict'][0][slot[0].lower()]])
 
         else:
             # There's no result matching user's constraint
@@ -228,7 +227,7 @@ class RuleBasedMultiwozBot(Policy):
 
                 for slot in state['belief_state'][domain.lower()]['semi']:
                     if state['belief_state'][domain.lower()]['semi'][slot] != "" and \
-                            state['belief_state'][domain.lower()]['semi'][slot] != "do n't care":
+                                    state['belief_state'][domain.lower()]['semi'][slot] != "do n't care":
                         slot_name = REF_USR_DA[domain].get(slot, slot)
                         DA[domain + "-NoOffer"].append([slot_name, state['belief_state'][domain.lower()]['semi'][slot]])
 
@@ -267,14 +266,14 @@ class RuleBasedMultiwozBot(Policy):
                 p = random.random()
 
                 # Recommend a choice from kb_list
-                if True: #p < 0.3:
+                if True:  # p < 0.3:
                     if (domain + "-Inform") not in DA:
                         DA[domain + "-Inform"] = []
                     if (domain + "-Recommend") not in DA:
                         DA[domain + "-Recommend"] = []
                     DA[domain + "-Inform"].append(["Choice", str(len(kb_result))])
                     idx = random.randint(0, 999999) % len(kb_result)
-                    # idx = 0 
+                    # idx = 0
                     choice = kb_result[idx]
                     if domain in ["Hotel", "Attraction", "Police", "Restaurant"]:
                         DA[domain + "-Recommend"].append(['Name', choice['name']])
@@ -378,7 +377,7 @@ class RuleBasedMultiwozBot(Policy):
         # print(constraints)
         # print(len(kb_result))
         if user_act == 'Train-Request':
-            del(DA['Train-Request'])
+            del (DA['Train-Request'])
             if 'Train-Inform' not in DA:
                 DA['Train-Inform'] = []
             for slot in user_action[user_act]:
@@ -420,7 +419,8 @@ class RuleBasedMultiwozBot(Policy):
                 if 'Booking-Book' not in DA:
                     if domain in self.kb_result and len(self.kb_result[domain]) > 0:
                         DA['Booking-Book'] = [["Ref", self.kb_result[domain][0]['Ref']]]
-        # TODO handle booking between multi turn
+                        # TODO handle booking between multi turn
+
 
 def check_diff(last_state, state):
     # print(state)
@@ -433,16 +433,18 @@ def check_diff(last_state, state):
                         user_action[domain.capitalize() + "-Inform"] = []
                     if [REF_USR_DA[domain.capitalize()].get(slot, slot), state['belief_state'][domain]['book'][slot]] \
                             not in user_action[domain.capitalize() + "-Inform"]:
-                        user_action[domain.capitalize() + "-Inform"].append([REF_USR_DA[domain.capitalize()].get(slot, slot), \
-                                                                    state['belief_state'][domain]['book'][slot]])
+                        user_action[domain.capitalize() + "-Inform"].append(
+                            [REF_USR_DA[domain.capitalize()].get(slot, slot), \
+                             state['belief_state'][domain]['book'][slot]])
             for slot in state['belief_state'][domain]['semi']:
                 if state['belief_state'][domain]['semi'][slot] != "":
                     if (domain.capitalize() + "-Inform") not in user_action:
                         user_action[domain.capitalize() + "-Inform"] = []
                     if [REF_USR_DA[domain.capitalize()].get(slot, slot), state['belief_state'][domain]['semi'][slot]] \
                             not in user_action[domain.capitalize() + "-Inform"]:
-                        user_action[domain.capitalize() + "-Inform"].append([REF_USR_DA[domain.capitalize()].get(slot, slot), \
-                                                                    state['belief_state'][domain]['semi'][slot]])
+                        user_action[domain.capitalize() + "-Inform"].append(
+                            [REF_USR_DA[domain.capitalize()].get(slot, slot), \
+                             state['belief_state'][domain]['semi'][slot]])
         for domain in state['request_state']:
             for slot in state['request_state'][domain]:
                 if (domain.capitalize() + "-Request") not in user_action:
@@ -453,7 +455,8 @@ def check_diff(last_state, state):
     else:
         for domain in state['belief_state']:
             for slot in state['belief_state'][domain]['book']:
-                if slot != 'booked' and state['belief_state'][domain]['book'][slot] != last_state['belief_state'][domain]['book'][slot]:
+                if slot != 'booked' and state['belief_state'][domain]['book'][slot] != \
+                        last_state['belief_state'][domain]['book'][slot]:
                     if (domain.capitalize() + "-Inform") not in user_action:
                         user_action[domain.capitalize() + "-Inform"] = []
                     if [REF_USR_DA[domain.capitalize()].get(slot, slot),
@@ -464,31 +467,35 @@ def check_diff(last_state, state):
                              state['belief_state'][domain]['book'][slot]])
             for slot in state['belief_state'][domain]['semi']:
                 if state['belief_state'][domain]['semi'][slot] != last_state['belief_state'][domain]['semi'][slot] and \
-                        state['belief_state'][domain]['semi'][slot] != '':
+                                state['belief_state'][domain]['semi'][slot] != '':
                     if (domain.capitalize() + "-Inform") not in user_action:
                         user_action[domain.capitalize() + "-Inform"] = []
                     if [REF_USR_DA[domain.capitalize()].get(slot, slot), state['belief_state'][domain]['semi'][slot]] \
-                        not in user_action[domain.capitalize() + "-Inform"]:
-                        user_action[domain.capitalize() + "-Inform"].append([REF_USR_DA[domain.capitalize()].get(slot, slot), \
-                                                                    state['belief_state'][domain]['semi'][slot]])
+                            not in user_action[domain.capitalize() + "-Inform"]:
+                        user_action[domain.capitalize() + "-Inform"].append(
+                            [REF_USR_DA[domain.capitalize()].get(slot, slot), \
+                             state['belief_state'][domain]['semi'][slot]])
         for domain in state['request_state']:
             for slot in state['request_state'][domain]:
                 if (domain not in last_state['request_state']) or (slot not in last_state['request_state'][domain]):
                     if (domain.capitalize() + "-Request") not in user_action:
                         user_action[domain.capitalize() + "-Request"] = []
-                    if [REF_USR_DA[domain.capitalize()].get(slot, slot), '?'] not in user_action[domain.capitalize() + "-Request"]:
-                        user_action[domain.capitalize() + "-Request"].append([REF_USR_DA[domain.capitalize()].get(slot, slot), '?'])
+                    if [REF_USR_DA[domain.capitalize()].get(slot, slot), '?'] not in user_action[
+                                domain.capitalize() + "-Request"]:
+                        user_action[domain.capitalize() + "-Request"].append(
+                            [REF_USR_DA[domain.capitalize()].get(slot, slot), '?'])
     return user_action
 
 
 def deduplicate(lst):
     i = 0
     while i < len(lst):
-        if lst[i] in lst[0 : i]:
+        if lst[i] in lst[0: i]:
             lst.pop(i)
             i -= 1
         i += 1
     return lst
+
 
 def generate_ref_num(length):
     """ Generate a ref num for booking. """
@@ -497,11 +504,13 @@ def generate_ref_num(length):
         string += alphabet[random.randint(0, 999999) % 36]
     return string
 
+
 def generate_car():
     """ Generate a car for taxi booking. """
     car_types = ["toyota", "skoda", "bmw", "honda", "ford", "audi", "lexus", "volvo", "volkswagen", "tesla"]
     p = random.randint(0, 999999) % len(car_types)
     return car_types[p]
+
 
 def fake_state():
     user_action = {'Hotel-Request': [['Name', '?']], 'Train-Inform': [['Day', 'don\'t care']]}
@@ -534,8 +543,8 @@ def test_init_state():
              'kb_results_dict': []}
     return state
 
+
 def test_run():
     policy = RuleBasedMultiwozBot()
     system_act = policy.predict(fake_state())
     print(json.dumps(system_act, indent=4))
-

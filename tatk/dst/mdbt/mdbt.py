@@ -1,19 +1,14 @@
 import copy
 import json
-import math
 import os
-import sys
-import time
-from random import shuffle
 
-import numpy as np
 import tensorflow as tf
 
-from tatk.dst.rule.dst_util import init_state, init_belief_state, normalize_value
-from tatk.dst.state_tracker import Tracker
-from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 from tatk.dst.mdbt.mdbt_util import model_definition, \
     track_dialogue, generate_batch, process_history
+from tatk.dst.rule import init_state, init_belief_state, normalize_value
+from tatk.dst.state_tracker import Tracker
+from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 
 train_batch_size = 1
 batches_per_eval = 10

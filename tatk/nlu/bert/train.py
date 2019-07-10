@@ -115,7 +115,7 @@ if __name__ == '__main__':
             print('\t intent loss:', test_intent_loss)
             print('\t tag loss:', test_tag_loss)
 
-            if val_tag_loss < best_val_tag_loss and val_intent_loss < best_val_intent_loss:
+            if val_loss < best_val_loss:
                 best_val_tag_loss = val_tag_loss
                 best_val_intent_loss = val_intent_loss
                 best_val_loss = val_loss
