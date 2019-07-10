@@ -3,7 +3,7 @@
   "output_dir": "camrest/output/sys",
   "zipped_model_path": "camrest/output/sys/bert_camrest_sys.zip",
   "log_dir": "camrest/log/sys",
-  "DEVICE": "cuda:1",
+  "DEVICE": "cpu",
   "model": {
     "train_bert": false,
     "pre-trained": "bert-base-uncased",

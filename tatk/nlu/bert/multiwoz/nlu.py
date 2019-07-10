@@ -30,12 +30,12 @@ class BERTNLU(NLU):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
             print('Load from model_file param')
-            archive_file = cached_path(os.path.join(root_dir, model_file))
+            archive_file = cached_path(model_file)
             archive = zipfile.ZipFile(archive_file, 'r')
             archive.extractall(root_dir)
             archive.close()
         print('Load from', best_model_path)
-        checkpoint = torch.load(best_model_path)
+        checkpoint = torch.load(best_model_path, map_location=DEVICE)
         print('train step', checkpoint['step'])
 
         model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
