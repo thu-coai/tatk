@@ -325,8 +325,10 @@ class classifier(object):
         tuple_distribution = {}
         for this_tuple in active_tuples:
             index = counter[this_tuple]
-            assert len(decode_results[this_tuple])==1
-            if len(decode_results[this_tuple]) - 1 < index:
+            if this_tuple not in decode_results:
+                p = 0
+            elif len(decode_results[this_tuple]) - 1 < index:
+                assert len(decode_results[this_tuple]) == 1
                 p = 0
             else:
                 p = decode_results[this_tuple][index]
