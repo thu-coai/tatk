@@ -1,9 +1,8 @@
-import os
 from tatk.nlu.svm.multiwoz.nlu import SVMNLU
-from tests.nlu.test_nlu import BaseTestNLU
+from tests.nlu.test_nlu import BaseTestNLUMultiwoz
 
 
-class TestSVMNLU(BaseTestNLU):
+class TestSVMNLU(BaseTestNLUMultiwoz):
     def test_usr(self):
         model_file = self.model_urls['svm_multiwoz_usr']
         self.nlu = SVMNLU('usr', model_file)
