@@ -328,7 +328,7 @@ class classifier(object):
             if this_tuple not in decode_results:
                 p = 0
             elif len(decode_results[this_tuple]) - 1 < index:
-                assert len(decode_results[this_tuple])==1
+                assert len(decode_results[this_tuple]) == 1
                 p = 0
             else:
                 p = decode_results[this_tuple][index]

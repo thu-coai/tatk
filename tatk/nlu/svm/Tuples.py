@@ -104,7 +104,7 @@ class tuples(object):
             if is_generic(this_tuple[-1]) :
                 # this is a generic value
                 act, slot, gvalue = this_tuple
-                if slot not in self.ontology['informable']:
+                if slot not in self.ontology["informable"]:
                     continue
                 for value in self.ontology["informable"][this_tuple[-2]]:
                     if value.lower() in asr_hyps_conc :
