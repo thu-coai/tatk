@@ -31,15 +31,15 @@ setup(
                 'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
     install_requires=[
-        'numpy>=1.15.0',
         'nltk>=3.4',
         'tqdm>=4.30',
         'checksumdir>=1.1',
+        'numpy>=1.15.0',
+        'scipy',
+        'scikit-learn',
         'torch',
         'pytorch_pretrained_bert',
         'tensorflow==1.14',
-        'scipy',
-        'scikit-learn',
         'tensorboard>=1.14.0',
         'tensorboardX==1.7',
         'requests'
