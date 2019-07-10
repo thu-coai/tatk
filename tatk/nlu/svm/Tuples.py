@@ -9,8 +9,8 @@ from tatk.nlu.svm import sutils
 class tuples(object):
     def __init__(self, config):
         self.acts = json.loads(config.get("grammar", "acts"))
-        self.nonempty_acts = json.loads(config.get("grammar", "nonempty_acts"))
-        self.nonfull_acts = [act for act in self.acts if act not in self.nonempty_acts]
+        # self.nonempty_acts = json.loads(config.get("grammar", "nonempty_acts"))
+        # self.nonfull_acts = [act for act in self.acts if act not in self.nonempty_acts]
         
         rootpath=os.path.dirname(os.path.abspath(__file__))
         # if "semi" not in rootpath:
@@ -104,6 +104,8 @@ class tuples(object):
             if is_generic(this_tuple[-1]) :
                 # this is a generic value
                 act, slot, gvalue = this_tuple
+                if slot not in self.ontology["informable"]:
+                    continue
                 for value in self.ontology["informable"][this_tuple[-2]]:
                     if value.lower() in asr_hyps_conc :
                         out.append((act, slot, genericValue(slot, value)))
@@ -176,6 +178,10 @@ class tuples(object):
 def tuple_to_act(t) :
     if len(t) == 1 :
         return {"act":t[0],"slots":[]}
+    elif len(t) == 2:
+        assert t[0] == "request"
+        return {"act": "request", "slots": [["slot", t[1]]]}
+    return {"act": t[0], "slots": [[t[1], t[2]]]}
 
 
 def makes_valid_act(tuples):

@@ -2,12 +2,13 @@ import argparse
 import pickle
 import os
 import json
-from convlab.modules.nlu.multiwoz.bert.dataloader import Dataloader
-from convlab.modules.nlu.multiwoz.bert.model import BertNLU
+from tatk.nlu.bert.dataloader import Dataloader
+from tatk.nlu.bert.model import BertNLU
 import torch
 from torch.utils.tensorboard import SummaryWriter
 import random
 import numpy as np
+import zipfile
 
 torch.manual_seed(9102)
 random.seed(9102)
@@ -16,7 +17,6 @@ np.random.seed(9102)
 
 parser = argparse.ArgumentParser(description="Train a model.")
 parser.add_argument('--config_path',
-                    default='configs/multiwoz.json',
                     help='path to config file')
 
 
@@ -43,14 +43,17 @@ if __name__ == '__main__':
 
     writer = SummaryWriter(log_dir)
 
-    dataloader = Dataloader(data, intent_vocab, tag_vocab)
+    dataloader = Dataloader(data, intent_vocab, tag_vocab, config['model']["pre-trained"])
 
     model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
                     DEVICE=DEVICE,
                     intent_weight=dataloader.intent_weight)
     model.to(DEVICE)
-    for params in model.parameters():
-        print(params.shape,params.device,params.requires_grad)
+    save_params = []
+    for name, param in model.named_parameters():
+        if param.requires_grad:
+            print(name, param.shape, param.device)
+            save_params.append(name)
 
     max_step = config['max_step']
     check_step = config['check_step']
@@ -112,21 +115,22 @@ if __name__ == '__main__':
             print('\t intent loss:', test_intent_loss)
             print('\t tag loss:', test_tag_loss)
 
-            if val_tag_loss < best_val_tag_loss and val_intent_loss < best_val_intent_loss:
+            if val_loss < best_val_loss:
                 best_val_tag_loss = val_tag_loss
                 best_val_intent_loss = val_intent_loss
                 best_val_loss = val_loss
                 print("Update best checkpoint")
+                model_state_dict = {k: v for k, v in model.state_dict().items() if k in save_params}
                 best_model_path = os.path.join(output_dir, 'bestcheckpoint_step-{}.tar'.format(step))
                 torch.save({
                     'step': step,
-                    'model_state_dict': model.state_dict(),
+                    'model_state_dict': model_state_dict,
                     'optimizer_state_dict': model.optim.state_dict(),
                 }, best_model_path)
                 best_model_path = os.path.join(output_dir, 'bestcheckpoint.tar')
                 torch.save({
                     'step': step,
-                    'model_state_dict': model.state_dict(),
+                    'model_state_dict': model_state_dict,
                     'optimizer_state_dict': model.optim.state_dict(),
                 }, best_model_path)
 
@@ -154,3 +158,10 @@ if __name__ == '__main__':
             train_tag_loss = 0.0
 
     writer.close()
+
+    model_path = os.path.join(output_dir, 'bestcheckpoint.tar')
+    zip_path = config['zipped_model_path']
+    print('zip model to', zip_path)
+
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
+        zf.write(model_path)

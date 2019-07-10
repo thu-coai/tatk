@@ -2,13 +2,11 @@ import numpy as np
 import torch
 import random
 from pytorch_pretrained_bert import BertTokenizer
-import pickle
-import os
-import re
+import math
 
 
 class Dataloader:
-    def __init__(self, data, intent_vocab, tag_vocab):
+    def __init__(self, data, intent_vocab, tag_vocab, tokenizer):
         self.data = data
         self.intent_vocab = intent_vocab
         self.tag_vocab = tag_vocab
@@ -18,7 +16,7 @@ class Dataloader:
         self.intent2id = dict([(x, i) for i, x in enumerate(intent_vocab)])
         self.id2tag = dict([(i, x) for i, x in enumerate(tag_vocab)])
         self.tag2id = dict([(x, i) for i, x in enumerate(tag_vocab)])
-        self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+        self.tokenizer = BertTokenizer.from_pretrained(tokenizer)
         self.intent_weight = [0]*len(self.intent2id)
         for key in self.data:
             for d in self.data[key]:
@@ -63,13 +61,13 @@ class Dataloader:
         return split_tokens, new_tag_seq, new2ori
 
     def seq_tag2id(self, tags):
-        return [self.tag2id[x] for x in tags]
+        return [self.tag2id[x] for x in tags if x in self.tag2id]
 
     def seq_id2tag(self, ids):
         return [self.id2tag[x] for x in ids]
 
     def seq_intent2id(self, intents):
-        return [self.intent2id[x] for x in intents]
+        return [self.intent2id[x] for x in intents if x in self.intent2id]
 
     def seq_id2intent(self, ids):
         return [self.id2intent[x] for x in ids]
@@ -84,7 +82,9 @@ class Dataloader:
         tag_seq_tensor = torch.zeros((batch_size, max_seq_len), dtype=torch.long)
         intent_tensor = torch.zeros((batch_size, self.intent_dim), dtype=torch.long)
         for i in range(batch_size):
-            _, _, _, _, words, tags, intents = batch_data[i]
+            words = batch_data[i][-3]
+            tags = batch_data[i][-2]
+            intents = batch_data[i][-1]
             words = ['[CLS]'] + words + ['[SEP]']
             indexed_tokens = self.tokenizer.convert_tokens_to_ids(words)
             sen_len = len(words)
@@ -102,56 +102,7 @@ class Dataloader:
         return self._pad_batch(batch_data)
 
     def yield_batches(self, batch_size, data_key):
-        batch_num = len(self.data[data_key]) // batch_size + 1
+        batch_num = math.ceil(len(self.data[data_key]) / batch_size)
         for i in range(batch_num):
             batch_data = self.data[data_key][i * batch_size:(i + 1) * batch_size]
             yield self._pad_batch(batch_data), len(batch_data)
-
-    def recover_intent(self, intent_logits, tag_logits, tag_mask_tensor, ori_word_seq, new2ori):
-        # tag_logits = [batch_size, sequence_length, tag_dim]
-        # intent_logits = [batch_size, intent_dim]
-        # tag_mask_tensor = [batch_size, sequence_length]
-        # new2ori = {(new_idx:old_idx),...} (after removing [CLS] and [SEP]
-        batch_size = tag_logits.size(0)
-        max_seq_len = tag_logits.size(1)
-        batch_intents = []
-        for i in range(batch_size):
-            intents = []
-            for j in range(self.intent_dim):
-                if intent_logits[i,j] > 0.5:
-                    intent, slot, value = re.split('[+*]',self.id2intent[j])
-                    intents.append((intent, slot, value))
-            tags = []
-            for j in range(1,max_seq_len-1):
-                if tag_mask_tensor[i,j] == 1:
-                    value, tag_id = torch.max(tag_logits[i,j], dim=-1)
-                    tags.append(self.id2tag[tag_id.item()])
-            recover_tags = []
-            for i, tag in enumerate(tags):
-                if new2ori[i] >= len(recover_tags):
-                    recover_tags.append(tag)
-            i = 0
-            while i < len(recover_tags):
-                tag = recover_tags[i]
-                if tag.startswith('B'):
-                    intent, slot = tag[2:].split('+')
-                    value = ori_word_seq[i]
-                    j = i + 1
-                    while j < len(recover_tags):
-                        if recover_tags[j].startswith('I') and recover_tags[j][2:] == tag[2:]:
-                            value += ' ' + ori_word_seq[j]
-                            i += 1
-                            j += 1
-                        else:
-                            break
-                    intents.append((intent, slot, value))
-                i += 1
-            batch_intents.append(intents)
-        return batch_intents
-
-if __name__ == '__main__':
-    data_dir = "multiwoz_usr_data"
-    data = pickle.load(open(os.path.join(data_dir, 'data.pkl'), 'rb'))
-    intent_vocab = pickle.load(open(os.path.join(data_dir, 'intent_vocab.pkl'), 'rb'))
-    tag_vocab = pickle.load(open(os.path.join(data_dir, 'tag_vocab.pkl'), 'rb'))
-    dataloader = Dataloader(data, intent_vocab, tag_vocab)

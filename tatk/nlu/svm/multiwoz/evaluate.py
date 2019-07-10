@@ -1,7 +1,7 @@
 """
-Evaluate NLU models on Multiwoz test dataset
+Evaluate SVMNLU models on Multiwoz test dataset
 Metric: dataset level Precision/Recall/F1
-Usage: PYTHONPATH=../../../.. python evaluate.py [OneNetLU|MILU|SVMNLU] [usr|sys|all]
+Usage: PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
 """
 import json
 import random
@@ -11,7 +11,7 @@ import zipfile
 import numpy
 import torch
 
-from tatk.nlu.svm.multiwoz.nlu import SVMNLU
+from tatk.nlu.svm.multiwoz import SVMNLU
 
 seed = 2019
 random.seed(seed)
@@ -35,13 +35,13 @@ if __name__ == '__main__':
         sys.exit()
     mode = sys.argv[1]
     if mode== 'usr':
-        model = SVMNLU(config_file='config/multiwoz_usr.cfg',
+        model = SVMNLU(config_file='configs/multiwoz_usr.cfg',
                        model_file='model/svm_multiwoz_usr.zip')
     elif mode== 'sys':
-        model = SVMNLU(config_file='config/multiwoz_sys.cfg',
+        model = SVMNLU(config_file='configs/multiwoz_sys.cfg',
                        model_file='model/svm_multiwoz_sys.zip')
     elif mode== 'all':
-        model = SVMNLU(config_file='config/multiwoz_all.cfg',
+        model = SVMNLU(config_file='configs/multiwoz_all.cfg',
                        model_file='model/svm_multiwoz_all.zip')
     else:
         raise Exception("Invalid mode")

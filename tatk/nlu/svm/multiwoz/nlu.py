@@ -4,11 +4,13 @@ import zipfile
 
 from tatk.util.file_util import cached_path
 from tatk.nlu.svm import Classifier
-from tatk.nlu.nlu import NLU
+from tatk.nlu import NLU
 
 
 class SVMNLU(NLU):
-    def __init__(self, config_file, model_file):
+    def __init__(self, mode, model_file):
+        assert mode == 'usr' or mode == 'sys' or mode == 'all'
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),'configs/multiwoz_{}.cfg'.format(mode))
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
         self.c = Classifier.classifier(self.config)
@@ -21,7 +23,7 @@ class SVMNLU(NLU):
             print('Load from model_file param')
             archive_file = cached_path(model_file)
             archive = zipfile.ZipFile(archive_file, 'r')
-            archive.extractall(os.path.dirname(os.path.dirname(model_dir)))
+            archive.extractall(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
             archive.close()
         self.c.load(model_path)
 
@@ -57,9 +59,10 @@ class SVMNLU(NLU):
                 dialog_act[intent].append(act['slots'][0])
         return dialog_act
 
+
 if __name__ == "__main__":
-    nlu = SVMNLU(config_file='config/multiwoz_usr.cfg',
-                 model_file='copy_model/svm_multiwoz_usr.zip')
+    nlu = SVMNLU(mode='usr',
+                 model_file='model/svm_multiwoz_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",

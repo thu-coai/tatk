@@ -21,7 +21,7 @@ output processed data on `data/[mode]_data` dir.
 On `svm` dir:
 
 ```sh
-$ PYTHONPATH=../../.. python train.py multiwoz/config/multiwoz_[mode].cfg
+$ PYTHONPATH=../../.. python train.py multiwoz/configs/multiwoz_[mode].cfg
 ```
 
 The model will be saved on `model/svm_multiwoz_[mode].pickle`. Also, it will be zipped as `model/svm_multiwoz_[mode].zip`. 
@@ -36,7 +36,7 @@ $ PYTHONPATH=../../../.. python evaluate.py [mode]
 
 #### Predict
 
-In `nlu.py` , the `SVMNLU` class inherits the NLU interface and adapts to multiwoz dataset. Example usage:
+In `mdbt.py` , the `SVMNLU` class inherits the NLU interface and adapts to multiwoz dataset. Example usage:
 
 ```python
 from tatk.nlu.svm.multiwoz.nlu import SVMNLU
@@ -62,6 +62,7 @@ We use the multiwoz data (`data/multiwoz/[train|val|test].json.zip`).
   year={2009},
   organization={IEEE}
 }
+
 @InProceedings{ultes2017pydial,
   author    = {Ultes, Stefan  and  Rojas Barahona, Lina M.  and  Su, Pei-Hao  and  Vandyke, David  and  Kim, Dongho  and  Casanueva, I\~{n}igo  and  Budzianowski, Pawe{\l}  and  Mrk\v{s}i\'{c}, Nikola  and  Wen, Tsung-Hsien  and  Gasic, Milica  and  Young, Steve},
   title     = {{PyDial: A Multi-domain Statistical Dialogue System Toolkit}},
