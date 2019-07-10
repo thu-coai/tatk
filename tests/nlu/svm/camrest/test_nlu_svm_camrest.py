@@ -1,9 +1,9 @@
 import os
 from tatk.nlu.svm.camrest.nlu import SVMNLU
-from tests.nlu.test_nlu import BaseTestNLU
+from tests.nlu.test_nlu import BaseTestNLUCamrest
 
 
-class TestSVMNLU(BaseTestNLU):
+class TestSVMNLU(BaseTestNLUCamrest):
     def test_usr(self):
         model_file = self.model_urls['svm_camrest_usr']
         project_dir = '.'

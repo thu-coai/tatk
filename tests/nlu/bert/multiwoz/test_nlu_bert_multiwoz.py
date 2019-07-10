@@ -1,10 +1,10 @@
 import os
 import subprocess
 from tatk.nlu.bert.multiwoz.nlu import BERTNLU
-from tests.nlu.test_nlu import BaseTestNLU
+from tests.nlu.test_nlu import BaseTestNLUMultiwoz
 
 
-class TestBERTNLU(BaseTestNLU):
+class TestBERTNLU(BaseTestNLUMultiwoz):
     def test_usr(self):
         assert 0 == subprocess.call("cd tatk/nlu/bert/multiwoz && python preprocess.py {mode}".format(mode='usr'),
                                     shell=True)

@@ -1,10 +1,10 @@
 import os
 import subprocess
 from tatk.nlu.bert.camrest.nlu import BERTNLU
-from tests.nlu.test_nlu import BaseTestNLU
+from tests.nlu.test_nlu import BaseTestNLUCamrest
 
 
-class TestBERTNLU(BaseTestNLU):
+class TestBERTNLU(BaseTestNLUCamrest):
     def test_usr(self):
         assert 0 == subprocess.call('cd tatk/nlu/bert/camrest && python preprocess.py {mode}'.format(mode='usr'),
                                shell=True)
