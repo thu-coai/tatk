@@ -293,9 +293,8 @@ def test_update():
     mdbt.restore()
     # demo state history
     mdbt.state['history'] = [['null', 'I\'m trying to find an expensive restaurant in the centre part of town.'],
-                             [
-                                 'The Cambridge Chop House is an good expensive restaurant in the centre of town. Would you like me to book it for you?',
-                                 'Yes, a table for 1 at 16:15 on sunday.  I need the reference number.']]
+                             ['The Cambridge Chop House is an good expensive restaurant in the centre of town. Would you like me to book it for you?',
+                              'Yes, a table for 1 at 16:15 on sunday.  I need the reference number.']]
     new_state = mdbt.update('hi, this is not good')
     print(json.dumps(new_state, indent=4))
     print('all time: {:.2f} seconds'.format(time.time() - start_time))
