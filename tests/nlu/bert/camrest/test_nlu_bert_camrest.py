@@ -1,4 +1,3 @@
-import os
 import subprocess
 from tatk.nlu.bert.camrest.nlu import BERTNLU
 from tests.nlu.test_nlu import BaseTestNLUCamrest
