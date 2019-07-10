@@ -1,7 +1,7 @@
 import json
 
-from tatk.dst.rule.dst_util import minDistance
 from tatk.dst.mdbt.mdbt import MDBT
+from tatk.dst.rule import minDistance
 
 
 class Word_DST:

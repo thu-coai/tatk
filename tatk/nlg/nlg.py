@@ -1,6 +1,7 @@
 """Natural Language Generation Interface"""
 from abc import ABCMeta, abstractmethod
 
+
 class NLG(metaclass=ABCMeta):
     """Base class for NLG model."""
 

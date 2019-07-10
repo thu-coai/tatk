@@ -4,11 +4,13 @@ import zipfile
 
 from tatk.util.file_util import cached_path
 from tatk.nlu.svm import Classifier
-from tatk.nlu.nlu import NLU
+from tatk.nlu import NLU
 
 
 class SVMNLU(NLU):
-    def __init__(self, config_file, model_file):
+    def __init__(self, mode, model_file):
+        assert mode == 'usr' or mode == 'sys' or mode == 'all'
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs/camrest_{}.cfg'.format(mode))
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
         self.c = Classifier.classifier(self.config)
@@ -58,7 +60,7 @@ class SVMNLU(NLU):
 
 
 if __name__ == "__main__":
-    nlu = SVMNLU(config_file='configs/camrest_usr.cfg',
+    nlu = SVMNLU(mode='usr',
                  model_file='model/svm_camrest_usr.zip')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
