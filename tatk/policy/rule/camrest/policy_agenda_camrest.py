@@ -86,13 +86,15 @@ class UserPolicyAgendaCamrest(Policy):
         # action = self.agenda.get_action(random.randint(1, self.max_initiative))
         action = self.agenda.get_action(self.max_initiative)
 
+        return action
+
+    def is_terminal(self):
         # Is there any action to say?
-        session_over = self.agenda.is_empty()
+        return self.agenda.is_empty()
 
-        # reward
-        reward = self._reward()
+    def get_reward(self):
+        return self._reward()
 
-        return action, session_over
 
     def _reward(self):
         """
@@ -112,12 +114,12 @@ class UserPolicyAgendaCamrest(Policy):
     def _transform_sysact_in(cls, action):
         new_action = {}
         if not isinstance(action, dict):
-            logging.warning(f'illegal da: {action}')
+            logging.warning('illegal da: {}'.format(action))
             return new_action
 
         for act in action.keys():
             if not isinstance(act, str):
-                logging.warning(f'illegal act: {act}')
+                logging.warning('illegal act: {}'.format(act))
                 continue
 
             new_action[act] = action[act]
