@@ -5,12 +5,9 @@ from tests.nlu.test_nlu import BaseTestNLU
 
 
 class TestBERTNLU(BaseTestNLU):
-    # def _test_mode(self, mode):
-    #     assert mode in ("usr", "all", "sys")
-    #     model_file =
     def test_usr(self):
-        assert subprocess.call('cd tatk/nlu/bert/camrest && python preprocess.py {mode}'.format(mode='usr'),
-                               shell=True) == 0
+        assert 0 == subprocess.call('cd tatk/nlu/bert/camrest && python preprocess.py {mode}'.format(mode='usr'),
+                               shell=True)
         model_file = self.model_urls['bert_camrest_usr']
         project_dir = '.'
         config_dir = os.path.join(project_dir, 'tatk/nlu/bert/camrest/configs')
@@ -19,8 +16,8 @@ class TestBERTNLU(BaseTestNLU):
         super()._test_predict(self.usr_utterances)
 
     def test_sys(self):
-        assert subprocess.call('cd tatk/nlu/bert/camrest && python preprocess.py {mode}'.format(mode="sys"),
-                               shell=True) == 0
+        assert 0 == subprocess.call('cd tatk/nlu/bert/camrest && python preprocess.py {mode}'.format(mode="sys"),
+                               shell=True)
         model_file = self.model_urls['bert_camrest_sys']
         project_dir = '.'
         config_dir = os.path.join(project_dir, 'tatk/nlu/bert/camrest/configs')
@@ -29,8 +26,8 @@ class TestBERTNLU(BaseTestNLU):
         super()._test_predict(self.sys_utterances)
 
     def test_all(self):
-        assert subprocess.call('cd tatk/nlu/bert/camrest && python preprocess.py {mode}'.format(mode="all"),
-                               shell=True) == 0
+        assert 0 == subprocess.call('cd tatk/nlu/bert/camrest && python preprocess.py {mode}'.format(mode="all"),
+                               shell=True)
         model_file = self.model_urls['bert_camrest_all']
         project_dir = '.'
         config_dir = os.path.join(project_dir, 'tatk/nlu/bert/camrest/configs')
