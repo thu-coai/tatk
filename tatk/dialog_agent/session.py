@@ -1,6 +1,7 @@
 """Dialog controller classes."""
 from abc import ABCMeta, abstractmethod
 
+
 class Session(metaclass=ABCMeta):
     """Base dialog session controller, which manages the agents to conduct a complete dialog session.
     """
@@ -42,6 +43,7 @@ class BiSession(Session):
         kb_query (KBquery): knowledge base query tool.
         dialog_history (list): The dialog history, formatted as [[user_uttr1, sys_uttr1], [user_uttr2, sys_uttr2], ...]
     """
+
     def __init__(self, sys_agent, user_agent, kb_query):
         """
         Args:
@@ -73,8 +75,8 @@ class BiSession(Session):
         return response
 
     def next_turn(self, last_observation):
-        """
-        Conduct a new turn of dialog, which consists of the system response and user response.
+        """Conduct a new turn of dialog, which consists of the system response and user response.
+
         The variable type of responses can be either 1) str or 2) dialog act, depends on the dialog mode settings of the
         two agents which are supposed to be the same.
         
