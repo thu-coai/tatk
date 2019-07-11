@@ -10,9 +10,11 @@ class Tracker(metaclass=ABCMeta):
         """ Update the internal dialog state variable.
 
         Args:
-            dialog_act (str or dict): The type is str when Tracker is word-level (such as NBT), and dict when it is DA-level.
+            dialog_act (str or dict):
+                The type is str when Tracker is word-level (such as NBT), and dict when it is DA-level.
         Returns:
-            new_state (tuple): Updated dialog state, with the same form of previous state.
+            new_state (tuple):
+                Updated dialog state, with the same form of previous state.
         """
         pass
 

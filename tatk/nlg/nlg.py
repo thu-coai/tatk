@@ -7,12 +7,13 @@ class NLG(metaclass=ABCMeta):
 
     @abstractmethod
     def generate(self, action):
-        """
-        Generate a natural language utterance conditioned on the dialog act.
+        """Generate a natural language utterance conditioned on the dialog act.
         
         Args:
-            action (dict): The dialog action produced by dialog policy module, which is in dialog act format.
+            action (dict):
+                The dialog action produced by dialog policy module, which is in dialog act format.
         Returns:
-            response (str): A natural langauge utterance.
+            response (str):
+                A natural langauge utterance.
         """
         pass
