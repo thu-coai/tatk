@@ -53,7 +53,7 @@ vector_dimension = 300
 max_no_turns = 22
 
 
-# model.py
+# rnnrollout.py
 def get_available_devs():
     local_device_protos = device_lib.list_local_devices()
     return [x.name for x in local_device_protos if x.device_type == 'GPU']

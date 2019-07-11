@@ -35,14 +35,14 @@ if __name__ == '__main__':
         sys.exit()
     mode = sys.argv[1]
     if mode== 'usr':
-        model = SVMNLU(config_file='configs/multiwoz_usr.cfg',
-                       model_file='model/svm_multiwoz_usr.zip')
+        model = SVMNLU(mode='usr',
+                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip')
     elif mode== 'sys':
-        model = SVMNLU(config_file='configs/multiwoz_sys.cfg',
-                       model_file='model/svm_multiwoz_sys.zip')
+        model = SVMNLU(mode='sys',
+                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_sys.zip')
     elif mode== 'all':
-        model = SVMNLU(config_file='configs/multiwoz_all.cfg',
-                       model_file='model/svm_multiwoz_all.zip')
+        model = SVMNLU(mode='all',
+                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_all.zip')
     else:
         raise Exception("Invalid mode")
 

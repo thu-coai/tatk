@@ -26,6 +26,12 @@ $ PYTHONPATH=../../.. python train.py camrest/configs/camrest_[mode].cfg
 
 The model will be saved on `model/svm_camrest_[mode].pickle`. Also, it will be zipped as `model/svm_camrest_[mode].zip`. 
 
+Trained models can be download on: 
+
+- Trained on all data: [mode=all](https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_all.zip)
+- Trained on user utterances only: [mode=usr](https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_usr.zip)
+- Trained on system utterances only: [mode=sys](https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip)
+
 #### Evaluate
 
 On `svm/camrest` dir:
@@ -39,9 +45,9 @@ $ PYTHONPATH=../../../.. python evaluate.py [mode]
 In `nlu.py` , the `SVMNLU` class inherits the NLU interface and adapts to camrest dataset. Example usage:
 
 ```python
-from tatk.nlu.svm.camrest.nlu import SVMNLU
+from tatk.nlu.svm.camrest import SVMNLU
 
-model = SVMNLU(config_file=PATH_TO_CONFIG, model_file=PATH_TO_ZIPPED_MODEL)
+model = SVMNLU(mode, model_file=PATH_TO_ZIPPED_MODEL)
 dialog_act = model.predict(utterance)
 ```
 

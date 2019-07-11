@@ -1,1 +1,1 @@
-from .kb_query import KBquery
+from tatk.util.kb_query import KBquery
