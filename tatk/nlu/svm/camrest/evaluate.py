@@ -35,14 +35,14 @@ if __name__ == '__main__':
         sys.exit()
     mode = sys.argv[1]
     if mode== 'usr':
-        model = SVMNLU(config_file='configs/camrest_usr.cfg',
-                       model_file='model/svm_camrest_usr.zip')
+        model = SVMNLU(mode='usr',
+                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_usr.zip')
     elif mode== 'sys':
-        model = SVMNLU(config_file='configs/camrest_sys.cfg',
-                       model_file='model/svm_camrest_sys.zip')
+        model = SVMNLU(mode='sys',
+                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_sys.zip')
     elif mode== 'all':
-        model = SVMNLU(config_file='configs/camrest_all.cfg',
-                       model_file='model/svm_camrest_all.zip')
+        model = SVMNLU(mode='all',
+                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_all.zip')
     else:
         raise Exception("Invalid mode")
 
