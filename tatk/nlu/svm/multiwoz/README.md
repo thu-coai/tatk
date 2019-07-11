@@ -24,6 +24,8 @@ On `svm` dir:
 $ PYTHONPATH=../../.. python train.py multiwoz/configs/multiwoz_[mode].cfg
 ```
 
+Please refer to `svm/config.md` for how to write config file (`*.cfg`)
+
 The model will be saved on `model/svm_multiwoz_[mode].pickle`. Also, it will be zipped as `model/svm_multiwoz_[mode].zip`. 
 
 Trained models can be download on: 
