@@ -54,7 +54,8 @@ setup(
             "requests-mock",
             "pytest>=3.6.0",
             "pytest-cov==2.4.0",
-            "checksumdir"
+            "checksumdir",
+            "bs4"
         ]
     },
     cmdclass={'test': LibTest},
