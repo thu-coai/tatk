@@ -189,6 +189,7 @@ def lstm_model(text_input, utterance_length, num_hidden, name, net_type, bidir):
 def model_definition(ontology, num_slots, slots, num_hidden=None, net_type=None, bidir=None, test=False, dev=None):
     '''Create neural belief tracker model that is defined in my notes. It consists of encoding the user and system \
     input, then use the ontology to decode the encoder in manner that detects if a domain-slot-value class is mentioned
+    
     :param ontology: numpy array of the embedded vectors of the ontology [num_slots, 3*vector_dimension]
     :param num_slots: number of ontology classes --int--
     :param slots: indices of the values of each slot list of lists of ints
@@ -894,7 +895,7 @@ def process_turn(turn, word_vectors, ontology):
 
 def process_text(text, word_vectors, ontology=None, print_mode=False):
     '''Process a line/sentence converting words to feature vectors
-    
+
     :param text: sentence
     :param word_vectors: word embeddings
     :param ontology: The ontology to do exact matching
