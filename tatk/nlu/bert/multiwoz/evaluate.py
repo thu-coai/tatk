@@ -1,7 +1,11 @@
 """
 Evaluate BertNLU models on multiwoz test dataset
-Metric: dataset level Precision/Recall/F1
-Usage: PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
+
+Metric:
+    dataset level Precision/Recall/F1
+
+Usage:
+    PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
 """
 import argparse
 import pickle
