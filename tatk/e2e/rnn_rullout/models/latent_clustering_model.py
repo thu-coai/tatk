@@ -16,7 +16,7 @@ import torch.nn.init
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-import data
+import tatk.e2e.rnn_rullout.data as data
 import tatk.e2e.rnn_rullout.utils
 from tatk.e2e.rnn_rullout.domain import get_domain
 from tatk.e2e.rnn_rullout.models.ctx_encoder import MlpContextEncoder
