@@ -10,7 +10,7 @@
     "lr_decay": 0.5,
     "vocab_path": "multiwoz/data/vocab.pkl",
     "train": "multiwoz/data/train.json",
-    "dev": "multiwoz/data/val.json",
+    "dev": "multiwoz/data/valid.json",
     "test": "multiwoz/data/test.json",
     "entity": "multiwoz/data/entities.json",
     "db": [
