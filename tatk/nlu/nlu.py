@@ -10,8 +10,11 @@ class NLU(metaclass=ABCMeta):
         Predict the dialog act of a natural language utterance.
         
         Args:
-            utterance (str): A natural language utterance.
+            utterance (str):
+                A natural language utterance.
+
         Returns:
-            output (dict): The dialog act of utterance.
+            output (dict):
+                The dialog act of utterance.
         """
         pass

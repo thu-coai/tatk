@@ -1,14 +1,17 @@
 """
 Preprocess multiwoz data for SVMNLU.
+
 Usage:
     python preprocess [mode=all|usr|sys]
     mode: which side data will be use
+
 Require:
-    - `../../../../data/multiwoz/[train|val|test].json.zip` data file
-    - `../../../../data/multiwoz/db` database dir
+    - ``../../../../data/multiwoz/[train|val|test].json.zip`` data file
+    - ``../../../../data/multiwoz/db`` database dir
+
 Output:
-    - `configs/ontology_multiwoz_[mode].json` ontology file
-    - `data/[mode]_data/` processed data dir
+    - ``configs/ontology_multiwoz_[mode].json`` ontology file
+    - ``data/[mode]_data/`` processed data dir
 """
 import json
 import os
