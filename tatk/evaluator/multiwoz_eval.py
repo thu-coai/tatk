@@ -69,7 +69,8 @@ class MultiWozEvaluator(Evaluator):
         """init goal and array
 
         args:
-            goal: dict[domain] dict['info'/'book'/'reqt'] dict/dict/list[slot]
+            goal:
+                dict[domain] dict['info'/'book'/'reqt'] dict/dict/list[slot]
         """
         self.sys_da_array = []
         self.usr_da_array = []
@@ -81,7 +82,8 @@ class MultiWozEvaluator(Evaluator):
         """add sys_da into array
 
         args:
-            da_turn: dict[domain-intent] list[slot, value]
+            da_turn:
+                dict[domain-intent] list[slot, value]
         """
         for dom_int in da_turn:
             domain = dom_int.split('-')[0].lower()
@@ -107,7 +109,8 @@ class MultiWozEvaluator(Evaluator):
         """add usr_da into array
 
         args:
-            da_turn: dict[domain-intent] list[slot, value]
+            da_turn:
+                dict[domain-intent] list[slot, value]
         """
         for dom_int in da_turn:
             domain = dom_int.split('-')[0].lower()
