@@ -141,8 +141,8 @@ def define_CNN_model(utter, num_filters=300, name="r"):
 
 
 def lstm_model(text_input, utterance_length, num_hidden, name, net_type, bidir):
-    '''
-    Define an Lstm model that will run across the user input and system act
+    '''Define an Lstm model that will run across the user input and system act
+
     :param text_input: [batch_size, max_num_turns, max_utterance_size, vector_dimension]
     :param utterance_length: number words in every utterance [batch_size, max_num_turns, 1]
     :param num_hidden: -- int --
@@ -187,9 +187,8 @@ def lstm_model(text_input, utterance_length, num_hidden, name, net_type, bidir):
 
 
 def model_definition(ontology, num_slots, slots, num_hidden=None, net_type=None, bidir=None, test=False, dev=None):
-    '''
-    Create neural belief tracker model that is defined in my notes. It consists of encoding the user and system input,
-    then use the ontology to decode the encoder in manner that detects if a domain-slot-value class is mentioned
+    '''Create neural belief tracker model that is defined in my notes. It consists of encoding the user and system \
+    input, then use the ontology to decode the encoder in manner that detects if a domain-slot-value class is mentioned
     :param ontology: numpy array of the embedded vectors of the ontology [num_slots, 3*vector_dimension]
     :param num_slots: number of ontology classes --int--
     :param slots: indices of the values of each slot list of lists of ints
@@ -584,8 +583,8 @@ def xavier_vector(word, D=300):
 
 
 def load_ontology(url, word_vectors):
-    '''
-    Load the ontology from a file
+    '''Load the ontology from a file
+
     :param url: to the ontology
     :param word_vectors: dictionary of the word embeddings [words, vector_dimension]
     :return: list([domain-slot-value]), [no_slots, vector_dimension]
@@ -634,8 +633,8 @@ def load_ontology(url, word_vectors):
 
 
 def load_word_vectors(url):
-    '''
-    Load the word embeddings from the url
+    '''Load the word embeddings from the url
+
     :param url: to the word vectors
     :return: dict of word and vector values
     '''
@@ -743,8 +742,8 @@ def process_booking(ontolog_term, usr_input, previous_terms):
 
 
 def process_history(sessions, word_vectors, ontology):
-    '''
-    Load the woz3 data and extract feature vectors
+    '''Load the woz3 data and extract feature vectors
+
     :param data: the data to load
     :param word_vectors: word embeddings
     :param ontology: list of domain-slot-value
@@ -795,8 +794,8 @@ def process_history(sessions, word_vectors, ontology):
 
 
 def load_woz_data(data, word_vectors, ontology, url=True):
-    '''
-    Load the woz3 data and extract feature vectors
+    '''Load the woz3 data and extract feature vectors
+
     :param data: the data to load
     :param word_vectors: word embeddings
     :param ontology: list of domain-slot-value
@@ -846,8 +845,8 @@ def load_woz_data(data, word_vectors, ontology, url=True):
 
 
 def process_turn(turn, word_vectors, ontology):
-    '''
-    Process a single turn extracting and processing user text, system response and labels
+    '''Process a single turn extracting and processing user text, system response and labels
+
     :param turn: dict
     :param word_vectors: word embeddings
     :param ontology: list(domain-slot-value)
@@ -894,8 +893,8 @@ def process_turn(turn, word_vectors, ontology):
 
 
 def process_text(text, word_vectors, ontology=None, print_mode=False):
-    '''
-    Process a line/sentence converting words to feature vectors
+    '''Process a line/sentence converting words to feature vectors
+    
     :param text: sentence
     :param word_vectors: word embeddings
     :param ontology: The ontology to do exact matching
@@ -939,8 +938,8 @@ def process_text(text, word_vectors, ontology=None, print_mode=False):
 
 
 def generate_batch(dialogues, batch_no, batch_size, ontology_size):
-    '''
-    Generate examples for minibatch training
+    '''Generate examples for minibatch training
+
     :param dialogues: list(num of turns, user_input vectors, system_response vectors, labels)
     :param batch_no: where we are in the training data
     :param batch_size: number of dialogues to generate
@@ -971,8 +970,8 @@ def generate_batch(dialogues, batch_no, batch_size, ontology_size):
 
 def evaluate_model(sess, model_variables, val_data, summary, batch_id, i):
 
-    '''
-    Evaluate the model against validation set
+    '''Evaluate the model against validation set
+
     :param sess: training session
     :param model_variables: all model input variables
     :param val_data: validation data
