@@ -38,20 +38,30 @@ class BiSession(Session):
     """The dialog controller which aggregates several agents to conduct a complete dialog session.
 
     Attributes:
-        sys_agent (Agent): system dialog agent.
-        user_agent (Agent): user dialog agent.
-        kb_query (KBquery): knowledge base query tool.
-        dialog_history (list): The dialog history, formatted as [[user_uttr1, sys_uttr1], [user_uttr2, sys_uttr2], ...]
+        sys_agent (Agent):
+            system dialog agent.
+
+        user_agent (Agent):
+            user dialog agent.
+
+        kb_query (KBquery):
+            knowledge base query tool.
+
+        dialog_history (list):
+            The dialog history, formatted as [[user_uttr1, sys_uttr1], [user_uttr2, sys_uttr2], ...]
     """
 
     def __init__(self, sys_agent, user_agent, kb_query):
         """
         Args:
-            sys_agent (Agent): An instance of system agent.
+            sys_agent (Agent):
+                An instance of system agent.
 
-            user_agent (Agent): An instance of user agent.
+            user_agent (Agent):
+                An instance of user agent.
 
-            kb_query (KBquery): An instance of database query tool.
+            kb_query (KBquery):
+                An instance of database query tool.
         """
         self.sys_agent = sys_agent
         self.user_agent = user_agent
@@ -83,15 +93,20 @@ class BiSession(Session):
         two agents which are supposed to be the same.
         
         Args:
-            last_observation: Last agent response.
+            last_observation:
+                Last agent response.
         Returns:
-            sys_response: The response of system.
+            sys_response:
+                The response of system.
 
-            user_response:The response of user simulator.
+            user_response:
+                The response of user simulator.
 
-            session_over (boolean): True if session ends, else session continues.
+            session_over (boolean):
+                True if session ends, else session continues.
 
-            reward (float): The reward given by the user.
+            reward (float):
+                The reward given by the user.
         """
         user_response = self.next_response(last_observation)
         session_over = self.user_agent.is_terminal()
