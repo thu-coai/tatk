@@ -28,3 +28,11 @@ data/mdbt/word-vectors
 
 # save
 **/save/**
+
+# .bak.py
+*.bak.py
+
+# compile files
+build
+dist
+tatk.egg-info

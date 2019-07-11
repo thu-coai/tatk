@@ -1,3 +1,17 @@
+"""
+SVMNLU build a classifier for each semantic tuple (intent-slot-value) based on n-gram features. It's first proposed by Mairesse et al. (2009). We adapt the implementation from pydial.
+For more information, please refer to ``tatk/nlu/svm/multiwoz/README.md``
+
+Trained models can be download on:
+
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_all.zip
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_sys.zip
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip
+
+Reference:
+
+Mairesse, F., Gasic, M., Jurcicek, F., Keizer, S., Thomson, B., Yu, K., & Young, S. (2009, April). Spoken language understanding from unaligned data using discriminative classification models. In 2009 IEEE International Conference on Acoustics, Speech and Signal Processing (pp. 4749-4752). IEEE.
+"""
 import configparser
 import os
 import zipfile
@@ -9,6 +23,19 @@ from tatk.nlu import NLU
 
 class SVMNLU(NLU):
     def __init__(self, mode, model_file):
+        """
+        SVM NLU initialization.
+
+        Args:
+            mode (str):
+                can be either `'usr'`, `'sys'` or `'all'`, representing which side of data the model was trained on.
+
+            model_file (str):
+                trained model path or url, should be coherent with mode.
+
+        Example:
+            nlu = SVMNLU(mode='usr', model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip')
+        """
         assert mode == 'usr' or mode == 'sys' or mode == 'all'
         config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),'configs/multiwoz_{}.cfg'.format(mode))
         self.config = configparser.ConfigParser()
@@ -27,7 +54,18 @@ class SVMNLU(NLU):
             archive.close()
         self.c.load(model_path)
 
-    def predict(self, utterance, context=None, not_empty=True):
+    def predict(self, utterance):
+        """
+        Predict the dialog act of a natural language utterance.
+
+        Args:
+            utterance (str):
+                A natural language utterance.
+
+        Returns:
+            output (dict):
+                The dialog act of utterance.
+        """
         sentinfo = {
             "turn-id": 0,
             "asr-hyps": [
@@ -38,14 +76,11 @@ class SVMNLU(NLU):
                 ]
             }
         slu_hyps = self.c.decode_sent(sentinfo, self.config.get("decode", "output"))
-        if not_empty:
-            act_list = []
-            for hyp in slu_hyps:
-                if hyp['slu-hyp']:
-                    act_list = hyp['slu-hyp']
-                    break
-        else:
-            act_list = slu_hyps[0]['slu-hyp']
+        act_list = []
+        for hyp in slu_hyps:
+            if hyp['slu-hyp']:
+                act_list = hyp['slu-hyp']
+                break
         dialog_act = {}
         for act in act_list:
             intent = act['act']
