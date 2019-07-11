@@ -8,6 +8,7 @@ from collections import defaultdict
 import numpy
 from scipy.sparse import lil_matrix
 from sklearn.linear_model import SGDClassifier
+from sklearn import svm
 
 from tatk.nlu.svm import sutils, Tuples
 from tatk.nlu.svm.Features import cnet as cnet_extractor
@@ -460,7 +461,7 @@ def toSparse(baseX, X, dictionary):
 #  params()
 #  load(params)
 #  X is a sparse matrix, y is a vector of class labels (ints)
-from sklearn import svm
+
 class SVM():
     def __init__(self, config):
         self.C = 1

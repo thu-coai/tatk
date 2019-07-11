@@ -3,6 +3,7 @@ from abc import ABCMeta, abstractmethod
 import random
 import tatk.e2e.rnn_rullout.utils as utils
 
+
 class Session(metaclass=ABCMeta):
     """Base dialog session controller, which manages the agents to conduct a complete dialog session.
     """
@@ -44,11 +45,14 @@ class BiSession(Session):
         kb_query (KBquery): knowledge base query tool.
         dialog_history (list): The dialog history, formatted as [[user_uttr1, sys_uttr1], [user_uttr2, sys_uttr2], ...]
     """
+
     def __init__(self, sys_agent, user_agent, kb_query):
         """
         Args:
             sys_agent (Agent): An instance of system agent.
+
             user_agent (Agent): An instance of user agent.
+
             kb_query (KBquery): An instance of database query tool.
         """
         self.sys_agent = sys_agent
@@ -75,8 +79,8 @@ class BiSession(Session):
         return response
 
     def next_turn(self, last_observation):
-        """
-        Conduct a new turn of dialog, which consists of the system response and user response.
+        """Conduct a new turn of dialog, which consists of the system response and user response.
+
         The variable type of responses can be either 1) str or 2) dialog act, depends on the dialog mode settings of the
         two agents which are supposed to be the same.
         
@@ -84,8 +88,11 @@ class BiSession(Session):
             last_observation: Last agent response.
         Returns:
             sys_response: The response of system.
+
             user_response:The response of user simulator.
+
             session_over (boolean): True if session ends, else session continues.
+
             reward (float): The reward given by the user.
         """
         user_response = self.next_response(last_observation)

@@ -9,7 +9,14 @@ from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA
 
 
 class RuleDST(Tracker):
-    """Rule based DST which trivially updates new values from NLU result to states."""
+    """Rule based DST which trivially updates new values from NLU result to states.
+
+    Attributes:
+        state(dict):
+            Dialog state. Function ``tatk.util.camrest.state.default_state`` returns a default state.
+        value_dict(dict):
+            It helps check whether ``user_act`` has correct content.
+    """
     def __init__(self):
         Tracker.__init__(self)
         self.state = default_state()
@@ -74,4 +81,5 @@ class RuleDST(Tracker):
         return self.state
 
     def init_session(self):
+        """Initialize ``self.state`` with a default state, which ``tatk.util.multiwoz.state.default_state`` returns."""
         self.state = default_state()

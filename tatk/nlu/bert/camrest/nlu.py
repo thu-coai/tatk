@@ -1,3 +1,19 @@
+"""
+Based on pre-trained bert, BERTNLU use a linear layer for slot tagging and another linear layer for intent classification.
+For more information, please refer to ``tatk/nlu/bert/camrest/README.md``
+
+Trained models can be download on:
+
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/bert_camrest_all.zip
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/bert_camrest_sys.zip
+- https://tatk-data.s3-ap-northeast-1.amazonaws.com/bert_camrest_usr.zip
+
+References:
+
+Devlin, J., Chang, M. W., Lee, K., & Toutanova, K. (2019, June). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) (pp. 4171-4186).
+
+Chen, Q., Zhuo, Z., & Wang, W. (2019). BERT for Joint Intent Classification and Slot Filling. arXiv preprint arXiv:1902.10909.
+"""
 import os
 import zipfile
 import json
@@ -13,6 +29,19 @@ from tatk.nlu.bert.camrest.postprocess import recover_intent
 
 class BERTNLU(NLU):
     def __init__(self, mode, model_file):
+        """
+        BERT NLU initialization.
+
+        Args:
+            mode (str):
+                can be either `'usr'`, `'sys'` or `'all'`, representing which side of data the model was trained on.
+
+            model_file (str):
+                trained model path or url, should be coherent with mode.
+
+        Example:
+            nlu = BERTNLU(mode='usr', model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/bert_camrest_usr.zip')
+        """
         assert mode == 'usr' or mode == 'sys' or mode == 'all'
         config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs/camrest_{}.json'.format(mode))
         config = json.load(open(config_file))
@@ -55,6 +84,17 @@ class BERTNLU(NLU):
         print("BERTNLU loaded")
 
     def predict(self, utterance):
+        """
+        Predict the dialog act of a natural language utterance.
+
+        Args:
+            utterance (str):
+                A natural language utterance.
+
+        Returns:
+            output (dict):
+                The dialog act of utterance.
+        """
         ori_word_seq = utterance.split()
         ori_tag_seq = ['O'] * len(ori_word_seq)
         intents = []

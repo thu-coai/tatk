@@ -1,14 +1,17 @@
 """
 Preprocess camrest data for SVMNLU.
+
 Usage:
     python preprocess [mode=all|usr|sys]
     mode: which side data will be use
+
 Require:
-    - `../../../../data/camrest/[train|val|test].json.zip` data file
-    - `../../../../data/camrest/db` database dir
+    - ``../../../../data/camrest/[train|val|test].json.zip`` data file
+    - ``../../../../data/camrest/db`` database dir
+
 Output:
-    - `configs/ontology_camrest_[mode].json` ontology file
-    - `data/[mode]_data/` processed data dir
+    - ``configs/ontology_camrest_[mode].json`` ontology file
+    - ``data/[mode]_data/`` processed data dir
 """
 import json
 import os
