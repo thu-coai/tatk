@@ -53,14 +53,19 @@ class PipelineAgent(Agent):
         """The constructor of PipelineAgent class.
 
         Here are some special combination cases:
-        1. If you use word-level DST (such as Neural Belief Tracker), you should set the nlu_model paramater to None. The
-            agent will combine the modules automitically.
-        2. If you want to aggregate DST and Policy as a single module, set tracker to None.
+
+            1. If you use word-level DST (such as Neural Belief Tracker), you should set the nlu_model paramater \
+             to None. The agent will combine the modules automitically.
+
+            2. If you want to aggregate DST and Policy as a single module, set tracker to None.
 
         Args:
             nlu_model (NLU): The natural langauge understanding module of agent.
+
             tracker (Tracker): The dialog state tracker of agent.
+
             policy (Policy): The dialog policy module of agent.
+
             nlg_model (NLG): The natural langauge generator module of agent.
         """
         super(PipelineAgent, self).__init__()

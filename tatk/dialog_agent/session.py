@@ -48,7 +48,9 @@ class BiSession(Session):
         """
         Args:
             sys_agent (Agent): An instance of system agent.
+
             user_agent (Agent): An instance of user agent.
+
             kb_query (KBquery): An instance of database query tool.
         """
         self.sys_agent = sys_agent
@@ -84,8 +86,11 @@ class BiSession(Session):
             last_observation: Last agent response.
         Returns:
             sys_response: The response of system.
+
             user_response:The response of user simulator.
+
             session_over (boolean): True if session ends, else session continues.
+
             reward (float): The reward given by the user.
         """
         user_response = self.next_response(last_observation)
