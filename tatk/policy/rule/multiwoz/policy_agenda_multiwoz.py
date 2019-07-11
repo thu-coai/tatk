@@ -76,18 +76,18 @@ class UserPolicyAgendaMultiWoz(Policy):
         self.domain_goals = self.goal.domain_goals
         self.agenda = Agenda(self.goal)
 
-    def predict(self, state):
+    def predict(self, dialog_act):
         """
         Predict an user act based on state and preorder system action.
         Args:
-            state (dict): Dialog state.
+            dialog_act (dict): Dialog act.
         Returns:
             action (tuple): User act.
             session_over (boolean): True to terminate session, otherwise session continues.
             reward (float): Reward given by user.
         """
         self.__turn += 2
-        sys_action = state['system_action']
+        sys_action = dialog_act
 
         # At the beginning of a dialog when there is no NLU.
         if sys_action == "null":
@@ -105,16 +105,17 @@ class UserPolicyAgendaMultiWoz(Policy):
         # action = self.agenda.get_action(random.randint(1, self.max_initiative))
         action = self.agenda.get_action(self.max_initiative)
 
-        # Is there any action to say?
-        session_over = self.agenda.is_empty()
-
-        # reward
-        reward = self._reward()
-
         # transform to DA
         action = self._transform_usract_out(action)
 
-        return action, session_over
+        return action
+
+    def is_terminal(self):
+        # Is there any action to say?
+        return self.agenda.is_empty()
+
+    def get_reward(self):
+        return self._reward()
 
     def _reward(self):
         """
@@ -154,12 +155,12 @@ class UserPolicyAgendaMultiWoz(Policy):
     def _transform_sysact_in(cls, action):
         new_action = {}
         if not isinstance(action, dict):
-            logging.warning(f'illegal da: {action}')
+            logging.warning('illegal da: {}'.format(action))
             return new_action
 
         for act in action.keys():
             if not isinstance(act, str) or '-' not in act:
-                logging.warning(f'illegal act: {act}')
+                logging.warning('illegal act: {}'.format(act))
                 continue
 
             if 'general' not in act:
@@ -170,7 +171,7 @@ class UserPolicyAgendaMultiWoz(Policy):
                         if (not isinstance(pairs, list) and not isinstance(pairs, tuple)) or \
                                 (len(pairs) < 2) or \
                                 (not isinstance(pairs[0], str) or (not isinstance(pairs[1], str) and not isinstance(pairs[1], int))):
-                            logging.warning(f'illegal pairs: {pairs}')
+                            logging.warning('illegal pairs: {}'.format(pairs))
                             continue
 
                         if REF_SYS_DA_M[dom].get(pairs[0].lower(), None) is not None:
@@ -524,7 +525,7 @@ class Agenda(object):
                 if domain in ['train', 'restaurant']:
                     slot = 'duration' if domain == 'train' else 'time'
                 else:
-                    logging.warning(f'illegal booking slot: {slot}, domain: {domain}')
+                    logging.warning('illegal booking slot: {}, domain: {}'.format(slot, domain))
                     continue
 
             if slot in g_reqt:

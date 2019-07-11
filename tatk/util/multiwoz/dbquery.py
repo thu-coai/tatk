@@ -56,7 +56,7 @@ def query(domain, constraints, ignore_open=True):
                 except:
                     continue
         else:
-            record['Ref'] = f'{i:08d}'
+            record['Ref'] = '{0:08d}'.format(i)
             found.append(record)
 
     return found

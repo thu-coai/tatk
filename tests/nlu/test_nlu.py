@@ -9,6 +9,10 @@ def test_nlu():
 
 
 class BaseTestNLU:
+    """
+
+    Note:
+        Instance of BaseTestNLU(or its subclass) should have attribute `nlu`."""
     @staticmethod
     def is_iterable(obj):
         try:
@@ -39,7 +43,6 @@ class BaseTestNLU:
         assert isinstance(result, dict)
         for key, value in result.items():
             assert isinstance(key, str)
-            # _ = (_ for _ in value)  # check whether value is Iterable
             assert self.is_iterable(value)
             for item in value:
                 assert self.is_iterable(item)
