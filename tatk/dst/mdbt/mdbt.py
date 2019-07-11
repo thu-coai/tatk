@@ -6,7 +6,8 @@ import tensorflow as tf
 
 from tatk.dst.mdbt.mdbt_util import model_definition, \
     track_dialogue, generate_batch, process_history
-from tatk.dst.rule import init_state, init_belief_state, normalize_value
+from tatk.dst.rule.multiwoz import normalize_value
+from tatk.util.multiwoz.state import default_state
 from tatk.dst.state_tracker import Tracker
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 
@@ -39,7 +40,7 @@ class MDBT(Tracker):
 
         self.model_variables = model_definition(ontology_vectors, len(ontology), slots, num_hidden=None,
                                                 bidir=True, net_type=None, test=True, dev='cpu')
-        self.state = init_state()
+        self.state = default_state()
         _config = tf.ConfigProto()
         _config.gpu_options.allow_growth = True
         _config.allow_soft_placement = True
@@ -54,7 +55,7 @@ class MDBT(Tracker):
         self.value_dict = json.load(open(os.path.join(self.data_dir, '../multiwoz/value_dict.json')))
 
     def init_session(self):
-        self.state = init_state()
+        self.state = default_state()
         if not self.param_restored:
             self.restore()
 
@@ -90,7 +91,7 @@ class MDBT(Tracker):
             turn['system'] = _sys
             fake_user = {}
             fake_user['text'] = _user
-            fake_user['belief_state'] = init_belief_state
+            fake_user['belief_state'] = default_state()['belief_state']
             turn['user'] = fake_user
             key = str(turn_no)
             fake_dialogue[key] = turn
