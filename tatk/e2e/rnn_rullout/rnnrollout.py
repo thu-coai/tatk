@@ -1,42 +1,57 @@
 from tatk.dialog_agent import Agent
-import sys
-from collections import defaultdict
 
-import numpy as np
 import torch
-from torch import optim, autograd
-import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
 from tatk.e2e.rnn_rullout import utils
-import math
-from collections import Counter
+import tatk.e2e.rnn_rullout.domain as domain
 import copy
+import os
 
 class RNNRolloutAgent(Agent):
     """RNN dialog agent with rollout decoding."""
-    def __init__(self, model, args, name='Alice', train=False, diverse=False):
+    def __init__(self, model, sel_model, args, name='Alice', train=False, diverse=False, max_total_len=100):
         """Constructor of RNNRollout model."""
         self.model = model
         self.model.eval()
         self.args = args
         self.name = name
         self.human = False
-        self.domain = utils.get_domain(args.domain)
+        self.domain = domain.get_domain(args.domain)
         self.allow_no_agreement = True
 
-        self.sel_model = utils.load_model(args.selection_model_file)
+        root_path = os.path.dirname(os.path.abspath(__file__))
+        self.sel_model = sel_model
         self.sel_model.eval()
 
         self.ncandidate = 5
         self.nrollout = 3
         self.rollout_len = 100
+        self.max_total_len = max_total_len
 
-    def response(self, observation):
-        pass
+        self.__current_len = self.max_total_len
+
+    def response(self, observation, max_words=20):
+        if observation is not None:
+            self.read(observation)
+
+        model_response = self.write(max_words=max_words)
+        self.__current_len -= len(model_response)
+        self.last_response = model_response
+        return model_response
+
+    def is_terminal(self):
+        if self.__current_len < 0:
+            return True
+        elif utils.is_selection(self.last_response):
+            return True
+        return False
+
+    def get_reward(self):
+        return None
 
     def init_session(self):
-        pass
+        self.__current_len = self.max_total_len
 
     def _encode(self, inpt, dictionary):
         encoded = torch.Tensor(dictionary.w2i(inpt)).long().unsqueeze(1)

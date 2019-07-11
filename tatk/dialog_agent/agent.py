@@ -22,7 +22,6 @@ class Agent(metaclass=ABCMeta):
         """Reset the class variables to prepare for a new session."""
         pass
 
-
 class PipelineAgent(Agent):
     """Pipeline dialog agent base class, including NLU, DST, Policy and NLG.
 

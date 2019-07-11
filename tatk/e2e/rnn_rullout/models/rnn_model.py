@@ -16,7 +16,7 @@ import torch.nn.init
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-import data
+import tatk.e2e.rnn_rullout.data as data
 from tatk.e2e.rnn_rullout.engines.rnn_engine import RnnEngine
 from tatk.e2e.rnn_rullout.domain import get_domain
 from tatk.e2e.rnn_rullout.models.utils import *

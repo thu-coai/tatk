@@ -16,6 +16,12 @@ import torch
 import numpy as np
 
 
+def is_selection(out):
+    """if dialog end"""
+    return len(out) == 1 and (out[0] in ['<selection>', '<no_agreement>'])
+
+
+
 def backward_hook(grad):
     """Hook for backward pass."""
     print(grad)
