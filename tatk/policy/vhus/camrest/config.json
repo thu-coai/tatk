@@ -1,6 +1,6 @@
 {
 	"batchsz": 32,
-	"epoch": 16,
+	"epoch": 32,
 	"lr": 0.01,
 	"save_dir": "save",
 	"log_dir": "log",
