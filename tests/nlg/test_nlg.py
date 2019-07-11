@@ -9,6 +9,12 @@ def test_nlg():
 
 
 class BaseTestNLG:
+    """
+
+    Note:
+        BaseTestNLG or its subclass should have attributes(instance attributes or class attributes):
+            `usr_acts` and `sys_acts`
+    """
     @classmethod
     def setup_class(cls):
         cls.modes = 'auto', 'manual', 'auto_manual'

@@ -86,7 +86,9 @@ class BiSession(Session):
             session_over (boolean): True if session ends, else session continues.
             reward (float): The reward given by the user.
         """
-        user_response, session_over, reward = self.next_response(last_observation)
+        user_response = self.next_response(last_observation)
+        session_over = self.user_agent.is_terminal()
+        reward = self.user_agent.get_reward()
         sys_response = self.next_response(user_response)
 
         return sys_response, user_response, session_over, reward
@@ -98,5 +100,5 @@ class BiSession(Session):
         self.sys_agent.policy.train()
 
     def init_session(self):
-        self.sys_agent.init()
-        self.user_agent.init()
+        self.sys_agent.init_session()
+        self.user_agent.init_session()
