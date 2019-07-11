@@ -19,7 +19,6 @@ class Rule(Policy):
         else:
             raise NotImplementedError('unknown character {}'.format(character))
 
-        
     def predict(self, state):
         """
         Predict an system action given state.
@@ -28,15 +27,20 @@ class Rule(Policy):
         Returns:
             action : System act, with the form of (act_type, {slot_name_1: value_1, slot_name_2, value_2, ...})
         """
-        if self.character == 'sys':
-            action = self.policy.predict(state)
-            return action
-        else:
-            action, terminal = self.policy.predict(state)
-            return action, terminal
+        return self.policy.predict(state)
 
     def init_session(self):
         """
         Restore after one session
         """
-        pass
+        self.policy.init_session()
+
+    def is_terminal(self):
+        if self.character == 'sys':
+            return None
+        return self.policy.is_terminal()
+
+    def get_reward(self):
+        if self.character == 'sys':
+            return None
+        return self.policy.get_reward()
