@@ -37,7 +37,7 @@ setup(
         'future',
         'numpy>=1.15.0',
         'scipy>=0.17.0',
-        'scikit-learn[alldeps]',
+        # 'scikit-learn[alldeps]',
         'torch',
         'pytorch_pretrained_bert',
         'tensorflow==1.14',
