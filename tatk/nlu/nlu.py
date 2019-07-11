@@ -12,6 +12,7 @@ class NLU(metaclass=ABCMeta):
         Args:
             utterance (str):
                 A natural language utterance.
+
         Returns:
             output (dict):
                 The dialog act of utterance.
