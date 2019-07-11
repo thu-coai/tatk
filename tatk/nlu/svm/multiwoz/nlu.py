@@ -1,5 +1,6 @@
 """
-SVM NLU trained on multiwoz dataset
+SVMNLU build a classifier for each semantic tuple (intent-slot-value) based on n-gram features. It's first proposed by Mairesse et al. (2009). We adapt the implementation from pydial.
+For more information, please refer to ``tatk/nlu/svm/multiwoz/README.md``
 Trained models can be download on:
 - https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_all.zip
 - https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_sys.zip
@@ -43,7 +44,7 @@ class SVMNLU(NLU):
             archive.close()
         self.c.load(model_path)
 
-    def predict(self, utterance, context=None, not_empty=True):
+    def predict(self, utterance):
         sentinfo = {
             "turn-id": 0,
             "asr-hyps": [
@@ -54,14 +55,11 @@ class SVMNLU(NLU):
                 ]
             }
         slu_hyps = self.c.decode_sent(sentinfo, self.config.get("decode", "output"))
-        if not_empty:
-            act_list = []
-            for hyp in slu_hyps:
-                if hyp['slu-hyp']:
-                    act_list = hyp['slu-hyp']
-                    break
-        else:
-            act_list = slu_hyps[0]['slu-hyp']
+        act_list = []
+        for hyp in slu_hyps:
+            if hyp['slu-hyp']:
+                act_list = hyp['slu-hyp']
+                break
         dialog_act = {}
         for act in act_list:
             intent = act['act']
