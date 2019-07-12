@@ -7,11 +7,11 @@ from bs4 import BeautifulSoup
 
 
 def main(**kwargs):
-    file = kwargs.get("file") or os.path.join(kwargs.get("doc_dir", ""), "py-modindex.html")
-    if not os.path.isfile(file):
-        raise RuntimeError('`{}` not exists'.format(file))
+    filepath = kwargs.get("file") or os.path.join(kwargs.get("doc_dir", ""), "py-modindex.html")
+    if not os.path.isfile(filepath):
+        raise RuntimeError('`{}` not exists'.format(filepath))
     try:
-        with open(file, 'r', encoding='utf-8') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             soup = BeautifulSoup(f.read(), 'lxml')
         body = soup.find("div", attrs=dict(itemprop="articleBody"))
         assert body.div['class'][0] == "modindex-jumpbox"
@@ -23,7 +23,7 @@ def main(**kwargs):
     except BaseException:
         raise RuntimeError
     else:
-        with open(file, 'w', encoding='utf-8') as f:
+        with open(filepath, 'w', encoding='utf-8') as f:
             f.write(str(soup))
 
 
