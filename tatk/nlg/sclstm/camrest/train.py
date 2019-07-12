@@ -66,7 +66,7 @@ def get_slot_error(dataset, gens, refs, sv_indexes):
 	countPerGen = [ [] for _ in range(batch_size) ]
 	for batch_idx in range(batch_size):
 		for beam_idx in range(beam_size):
-			felements = [dataset.cardinality[x+dataset.dfs[2]] for x in sv_indexes[batch_idx]]
+			felements = [dataset.cardinality[x+dataset.dfs[1]] for x in sv_indexes[batch_idx]]
 
 			# get slot error per sample(beam)
 			total, redunt, miss = score(felements, gens[batch_idx][beam_idx], dataset.template)
@@ -164,7 +164,7 @@ def read(config, args, mode):
 		print('Set batch_size to 1 due to beam search', file=sys.stderr)
 
 	percentage = args.percent
-	dataset = DatasetWoz(config, percentage=percentage, use_cuda=USE_CUDA)
+	dataset = DatasetCam(config, percentage=percentage, use_cuda=USE_CUDA)
 
 	# get model hyper-parameters
 	n_layer = args.n_layer
@@ -255,7 +255,7 @@ def test(config, args):
 
 
 def interact(config, args):
-    dataset = SimpleDatasetWoz(config)
+    dataset = SimpleDatasetCam(config)
 
     # get model hyper-parameters
     n_layer = args.n_layer
