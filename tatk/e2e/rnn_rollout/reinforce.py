@@ -17,12 +17,12 @@ from torch import autograd
 import torch.nn as nn
 
 import data
-import tatk.e2e.rnn_rullout.utils as utils
-from tatk.e2e.rnn_rullout.utils import ContextGenerator
-from tatk.e2e.rnn_rullout.agent import RnnAgent, RnnRolloutAgent, RlAgent, HierarchicalAgent
-from tatk.e2e.rnn_rullout.dialog import Dialog, DialogLogger
-from tatk.e2e.rnn_rullout.selfplay import get_agent_type
-from tatk.e2e.rnn_rullout.domain import get_domain
+import tatk.e2e.rnn_rollout.utils as utils
+from tatk.e2e.rnn_rollout.utils import ContextGenerator
+from tatk.e2e.rnn_rollout.agent import RnnAgent, RnnRolloutAgent, RlAgent, HierarchicalAgent
+from tatk.e2e.rnn_rollout.dialog import Dialog, DialogLogger
+from tatk.e2e.rnn_rollout.selfplay import get_agent_type
+from tatk.e2e.rnn_rollout.domain import get_domain
 
 
 class Reinforce(object):
