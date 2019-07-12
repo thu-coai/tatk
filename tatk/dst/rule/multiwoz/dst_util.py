@@ -39,10 +39,14 @@ def normalize_value(value_set, domain, slot, value):
     """
     Normalized the value produced by NLU module to map it to the ontology value space.
     Args:
-        value_set (dict): The value set of task ontology.
-        domain (str): The domain of the slot-value pairs.
-        slot (str): The slot of the value.
-        value (str): The raw value detected by NLU module.
+        value_set (dict):
+            The value set of task ontology.
+        domain (str):
+            The domain of the slot-value pairs.
+        slot (str):
+            The slot of the value.
+        value (str):
+            The raw value detected by NLU module.
     Returns:
         value (str): The normalized value, which fits with the domain ontology.
     """

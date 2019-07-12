@@ -227,7 +227,8 @@ def session_with_backoff() -> requests.Session:
     possibly because we were making too many requests too quickly.
     This helper function returns a requests session that has retry-with-backoff
     built in.
-    see stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
+
+    see https://stackoverflow.com/questions/23267409/how-to-implement-retry-mechanism-into-python-requests-library
     """
     session = requests.Session()
     retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
