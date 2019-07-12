@@ -12,10 +12,10 @@ from tqdm import tqdm
 
 import numpy as np
 
-from utils import dbPointer
-from utils import delexicalize
+from tatk.policy.mdrg.multiwoz.utils import dbPointer
+from tatk.policy.mdrg.multiwoz.utils import delexicalize
 
-from utils.nlp import normalize
+from tatk.policy.mdrg.multiwoz.utils.nlp import normalize
 
 np.set_printoptions(precision=3)
 
