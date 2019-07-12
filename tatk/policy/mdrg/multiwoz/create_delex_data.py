@@ -1,20 +1,21 @@
+# -*- coding: utf-8 -*-
+import copy
 import json
 import os
 import re
 import shutil
-import urllib.request
+import urllib
 from collections import OrderedDict
 from io import BytesIO
 from zipfile import ZipFile
-
-import numpy as np
 from tqdm import tqdm
 
-# from tatk.policy.mdrg.multiwoz.mdrg.utils import dbPointer, delexicalize
-# from tatk.policy.mdrg.multiwoz.mdrg.utils.nlp import normalize
+import numpy as np
 
-from utils import dbPointer, delexicalize
-from utils.nlp import normalize
+from tatk.policy.mdrg.multiwoz.utils import dbPointer
+from tatk.policy.mdrg.multiwoz.utils import delexicalize
+
+from tatk.policy.mdrg.multiwoz.utils.nlp import normalize
 
 np.set_printoptions(precision=3)
 
@@ -194,7 +195,7 @@ def analyze_dialogue(dialogue, maxlen):
         print('odd # of turns')
         return None  # odd number of turns, wrong dialogue
     d_pp = {}
-    d_pp['goal'] = d['goal']  # for now we just copy the goal
+    # d_pp['goal'] = d['goal']  # for now we just copy the goal
     usr_turns = []
     sys_turns = []
     for i in range(len(d['log'])):
@@ -243,10 +244,10 @@ def get_dial(dialogue):
 
 
 def createDict(word_freqs):
-    words = list(word_freqs.keys())
-    freqs = list(word_freqs.values())
+    words = word_freqs.keys()
+    freqs = word_freqs.values()
 
-    sorted_idx = list(np.argsort(freqs))
+    sorted_idx = np.argsort(freqs)
     sorted_words = [words[ii] for ii in sorted_idx[::-1]]
 
     # Extra vocabulary symbols
@@ -262,27 +263,20 @@ def createDict(word_freqs):
     for ii, ww in enumerate(sorted_words):
         worddict[ww] = ii + len(extra_tokens)
 
-    to_remove = []
     for key, idx in worddict.items():
         if idx >= DICT_SIZE:
-            to_remove.append(key)
-    for key in to_remove:
-        del worddict[key]
+            del worddict[key]
 
     return worddict
 
 
 def loadData():
-    data_path = os.path.join(os.path.abspath(os.path.curdir(os.path.curdir(os.path.curdir(os.path.curdir(os.path.curdir(__file__)))))), "data/multiwoz")
+    data_url = "data/multi-woz/data.json"
+    dataset_url = "https://www.repository.cam.ac.uk/bitstream/handle/1810/280608/MULTIWOZ2.zip?sequence=3&isAllowed=y"
     if not os.path.exists("data"):
         os.makedirs("data")
-        os.makedirs("data/multiwoz")
-        shutil.copy(os.path.join(data_path, 'train.json.zip'), 'data/multiwoz/')
-        shutil.copy(os.path.join(data_path, 'test.json.zip'), 'data/multiwoz/')
-        shutil.copy(os.path.join(data_path, 'val.json.zip'), 'data/multiwoz/')
-        shutil.copy(os.path.join(data_path, 'train.json.zip'), 'data/multiwoz/')
+        os.makedirs("data/multi-woz")
 
-    '''
     if not os.path.exists(data_url):
         print("Downloading and unzipping the MultiWOZ dataset")
         resp = urllib.request.urlopen(dataset_url)
@@ -293,7 +287,6 @@ def loadData():
         shutil.copy('data/multi-woz/MULTIWOZ2 2/valListFile.json', 'data/multi-woz/')
         shutil.copy('data/multi-woz/MULTIWOZ2 2/testListFile.json', 'data/multi-woz/')
         shutil.copy('data/multi-woz/MULTIWOZ2 2/dialogue_acts.json', 'data/multi-woz/')
-    '''
 
 
 def createDelexData():
@@ -311,15 +304,12 @@ def createDelexData():
     dic = delexicalize.prepareSlotValuesIndependent()
     delex_data = {}
 
-    # fin1 = file('data/multi-woz/data.json')
-    fin1 = open('data/multi-woz/data.json')
+    fin1 = open('data/multi-woz/data.json', 'r')
     data = json.load(fin1)
 
-    # fin2 = file('data/multi-woz/dialogue_acts.json')
-    fin2 = open('data/multi-woz/dialogue_acts.json')
+    fin2 = open('data/multi-woz/dialogue_acts.json', 'r')
     data2 = json.load(fin2)
 
-    num = 0
     for dialogue_name in tqdm(data):
         dialogue = data[dialogue_name]
         # print dialogue_name
@@ -357,9 +347,6 @@ def createDelexData():
             idx_acts += 1
 
         delex_data[dialogue_name] = dialogue
-        # num += 1
-        # if num > 100:
-        #     break
 
     with open('data/multi-woz/delex.json', 'w') as outfile:
         json.dump(delex_data, outfile)
@@ -371,13 +358,13 @@ def divideData(data):
     """Given test and validation sets, divide
     the data for three different sets"""
     testListFile = []
-    fin = open('data/multi-woz/testListFile.json')
+    fin = open('data/multi-woz/testListFile.json', 'r')
     for line in fin:
         testListFile.append(line[:-1])
     fin.close()
 
     valListFile = []
-    fin = open('data/multi-woz/valListFile.json')
+    fin = open('data/multi-woz/valListFile.json', 'r')
     for line in fin:
         valListFile.append(line[:-1])
     fin.close()
@@ -431,13 +418,13 @@ def divideData(data):
                     word_freqs_sys[w] += 1
 
     # save all dialogues
-    with open('data/val_dials.json', 'w') as f:
+    with open('data/val_dials.json', 'wb') as f:
         json.dump(val_dials, f, indent=4)
 
-    with open('data/test_dials.json', 'w') as f:
+    with open('data/test_dials.json', 'wb') as f:
         json.dump(test_dials, f, indent=4)
 
-    with open('data/train_dials.json', 'w') as f:
+    with open('data/train_dials.json', 'wb') as f:
         json.dump(train_dials, f, indent=4)
 
     return word_freqs_usr, word_freqs_sys
@@ -460,13 +447,13 @@ def buildDictionaries(word_freqs_usr, word_freqs_sys):
             dic[v] = k
         idx2words.append(dic)
 
-    with open('data/input_lang.index2word.json', 'w') as f:
+    with open('data/input_lang.index2word.json', 'wb') as f:
         json.dump(idx2words[0], f, indent=2)
-    with open('data/input_lang.word2index.json', 'w') as f:
+    with open('data/input_lang.word2index.json', 'wb') as f:
         json.dump(dicts[0], f, indent=2)
-    with open('data/output_lang.index2word.json', 'w') as f:
+    with open('data/output_lang.index2word.json', 'wb') as f:
         json.dump(idx2words[1], f, indent=2)
-    with open('data/output_lang.word2index.json', 'w') as f:
+    with open('data/output_lang.word2index.json', 'wb') as f:
         json.dump(dicts[1], f, indent=2)
 
 

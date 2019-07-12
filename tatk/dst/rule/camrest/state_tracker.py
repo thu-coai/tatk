@@ -4,11 +4,18 @@ import copy
 
 
 class RuleDST(Tracker):
+    """Rule based DST which trivially updates new values from NLU result to states.
+
+    Attributes:
+        state(dict):
+            Dialog state. Function ``tatk.util.camrest.state.default_state`` returns a default state.
+    """
     def __init__(self):
         super().__init__()
         self.state = default_state()
 
     def init_session(self):
+        """Initialize ``self.state`` with a default state, which ``tatk.util.camrest.state.default_state`` returns."""
         self.state = default_state()
 
     def update(self, user_act=None):
