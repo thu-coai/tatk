@@ -4,10 +4,10 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-from tatk.e2e.rnn_rullout.models.latent_clustering_model import LatentClusteringModel, LatentClusteringLanguageModel
-from tatk.e2e.rnn_rullout.models.latent_clustering_model import LatentClusteringPredictionModel, BaselineClusteringModel
-from tatk.e2e.rnn_rullout.models.selection_model import SelectionModel
-from tatk.e2e.rnn_rullout.models.rnn_model import RnnModel
+from tatk.e2e.rnn_rollout.models.latent_clustering_model import LatentClusteringModel, LatentClusteringLanguageModel
+from tatk.e2e.rnn_rollout.models.latent_clustering_model import LatentClusteringPredictionModel, BaselineClusteringModel
+from tatk.e2e.rnn_rollout.models.selection_model import SelectionModel
+from tatk.e2e.rnn_rollout.models.rnn_model import RnnModel
 
 
 MODELS = {

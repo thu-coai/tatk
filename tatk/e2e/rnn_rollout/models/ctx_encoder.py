@@ -15,7 +15,7 @@ import torch.nn.init
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-from tatk.e2e.rnn_rullout.models.utils import *
+from tatk.e2e.rnn_rollout.models.utils import *
 
 
 class MlpContextEncoder(nn.Module):

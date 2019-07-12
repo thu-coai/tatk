@@ -2,9 +2,9 @@ import random
 import sys
 sys.path.append('..')
 
-from utils.dbPointer import queryResultVenues
-from utils.delexicalize import *
-from utils.nlp import *
+from tatk.policy.mdrg.multiwoz.utils.dbPointer import queryResultVenues
+from tatk.policy.mdrg.multiwoz.utils.delexicalize import *
+from tatk.policy.mdrg.multiwoz.utils.nlp import *
 
 domains = ['restaurant', 'hotel', 'attraction', 'train', 'taxi', 'hospital', 'police']
 requestables = ['phone', 'address', 'postcode', 'reference', 'id']

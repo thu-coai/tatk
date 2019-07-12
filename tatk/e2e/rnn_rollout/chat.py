@@ -6,12 +6,12 @@
 
 import argparse
 import itertools
-import tatk.e2e.rnn_rullout.domain as domain
+import tatk.e2e.rnn_rollout.domain as domain
 
-import tatk.e2e.rnn_rullout.utils as utils
-from tatk.e2e.rnn_rullout.utils import ContextGenerator, ManualContextGenerator
-from tatk.e2e.rnn_rullout.agent import RnnAgent, HumanAgent, RnnRolloutAgent, HierarchicalAgent
-from tatk.e2e.rnn_rullout.dialog import Dialog, DialogLogger
+import tatk.e2e.rnn_rollout.utils as utils
+from tatk.e2e.rnn_rollout.utils import ContextGenerator, ManualContextGenerator
+from tatk.e2e.rnn_rollout.agent import RnnAgent, HumanAgent, RnnRolloutAgent, HierarchicalAgent
+from tatk.e2e.rnn_rollout.dialog import Dialog, DialogLogger
 
 
 class Chat(object):

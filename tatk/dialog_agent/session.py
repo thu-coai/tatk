@@ -1,7 +1,7 @@
 """Dialog controller classes."""
 from abc import ABCMeta, abstractmethod
 import random
-import tatk.e2e.rnn_rullout.utils as utils
+import tatk.e2e.rnn_rollout.utils as utils
 
 
 class Session(metaclass=ABCMeta):

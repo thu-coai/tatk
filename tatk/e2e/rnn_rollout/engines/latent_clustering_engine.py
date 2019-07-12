@@ -12,8 +12,8 @@ from torch.autograd import Variable
 import torch.nn.functional as F
 from torch import optim
 
-from tatk.e2e.rnn_rullout.engines import EngineBase, Criterion
-import tatk.e2e.rnn_rullout.utils as utils
+from tatk.e2e.rnn_rollout.engines import EngineBase, Criterion
+import tatk.e2e.rnn_rollout.utils as utils
 
 
 class LatentClusteringEngine(EngineBase):

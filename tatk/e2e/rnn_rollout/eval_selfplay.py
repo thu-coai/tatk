@@ -19,8 +19,8 @@ import pdb
 import numpy as np
 
 import data
-import tatk.e2e.rnn_rullout.utils as utils
-from tatk.e2e.rnn_rullout.domain import get_domain
+import tatk.e2e.rnn_rollout.utils as utils
+from tatk.e2e.rnn_rollout.domain import get_domain
 
 
 def parse_line(line, domain):

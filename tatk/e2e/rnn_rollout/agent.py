@@ -1,57 +1,54 @@
-from tatk.dialog_agent import Agent
+# Copyright 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
 
+import sys
+from collections import defaultdict
+
+import numpy as np
 import torch
+from torch import optim, autograd
+import torch.nn as nn
 from torch.autograd import Variable
 import torch.nn.functional as F
-from tatk.e2e.rnn_rullout import utils
-import tatk.e2e.rnn_rullout.domain as domain
+import tatk.e2e.rnn_rollout.utils as utils
+from tatk.e2e.rnn_rollout.dialog import DialogLogger
+import tatk.e2e.rnn_rollout.vis as vis
+import tatk.e2e.rnn_rollout.domain as domain
+from tatk.e2e.rnn_rollout.engines import Criterion
+import math
+from collections import Counter
 import copy
-import os
 
-class RNNRolloutAgent(Agent):
-    """RNN dialog agent with rollout decoding."""
-    def __init__(self, model, sel_model, args, name='Alice', train=False, diverse=False, max_total_len=100):
-        """Constructor of RNNRollout model."""
+from tatk.dialog_agent import Agent
+
+
+class RnnRolloutAgent(Agent):
+    def __init__(self, model, args, name='Alice', allow_no_agreement=True, train=False, diverse=False, max_dec_len=20):
         self.model = model
         self.model.eval()
         self.args = args
         self.name = name
         self.human = False
         self.domain = domain.get_domain(args.domain)
-        self.allow_no_agreement = True
+        self.allow_no_agreement = allow_no_agreement
+        self.max_dec_len = max_dec_len
 
-        root_path = os.path.dirname(os.path.abspath(__file__))
-        self.sel_model = sel_model
+        self.sel_model = utils.load_model(args.selection_model_file)
         self.sel_model.eval()
-
         self.ncandidate = 5
         self.nrollout = 3
         self.rollout_len = 100
-        self.max_total_len = max_total_len
 
-        self.__current_len = self.max_total_len
-
-    def response(self, observation, max_words=20):
-        if observation is not None:
-            self.read(observation)
-
-        model_response = self.write(max_words=max_words)
-        self.__current_len -= len(model_response)
-        self.last_response = model_response
-        return model_response
-
-    def is_terminal(self):
-        if self.__current_len < 0:
-            return True
-        elif utils.is_selection(self.last_response):
-            return True
-        return False
-
-    def get_reward(self):
-        return None
+    def response(self, observation):
+        self.read(observation)
+        output = self.write(max_words=self.max_dec_len)
+        return output
 
     def init_session(self):
-        self.__current_len = self.max_total_len
+        pass
 
     def _encode(self, inpt, dictionary):
         encoded = torch.Tensor(dictionary.w2i(inpt)).long().unsqueeze(1)
@@ -73,7 +70,7 @@ class RNNRolloutAgent(Agent):
         pass
 
     def update(self, agree, reward, choice=None, partner_choice=None,
-               partner_input=None, partner_reward=None):
+            partner_input=None, partner_reward=None):
         pass
 
     def read(self, inpt):
@@ -162,7 +159,7 @@ class RNNRolloutAgent(Agent):
         return choices[idx.item()][:self.domain.selection_length()], logprob, p_agree.item()
 
     def write(self, max_words=20):
-
+        
         # print('\t\trollout write')
         best_score = -1
         res = None
@@ -174,8 +171,7 @@ class RNNRolloutAgent(Agent):
                 self.lang_h, self.ctx_h, max_words, self.args.temperature)
 
             is_selection = len(move) == 1 and \
-                           self.model.word_dict.get_word(
-                               move.data[0][0]) == '<selection>'  # whether the candidate is a terminal
+                self.model.word_dict.get_word(move.data[0][0]) == '<selection>'  # whether the candidate is a terminal
 
             score = 0
             for _ in range(self.nrollout):
@@ -230,6 +226,3 @@ class RNNRolloutAgent(Agent):
         self.words.append(outs)
         self.sents.append(torch.cat([self.model.word2var('YOU:').unsqueeze(1), outs], 0))
         return self._decode(outs, self.model.word_dict)
-
-    def load_model(self):
-        pass
