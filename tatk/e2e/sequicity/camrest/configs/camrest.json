@@ -1,5 +1,6 @@
 {
   "tsdf_init":{
+    "dataset": "camrest",
     "beam_len_bonus": 0.5,
     "prev_z_method": "separate",
     "vocab_size": 800,

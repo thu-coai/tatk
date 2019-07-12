@@ -1,0 +1,1 @@
+from tatk.e2e.sequicity.camrest.sequicity import Sequicity
