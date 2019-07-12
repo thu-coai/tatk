@@ -95,8 +95,8 @@ class VHUS_Trainer():
             a_loss += loss_a.item()
             t_loss += loss_t.item()
             
-        a_loss /= i
-        t_loss /= i
+        a_loss /= i+1
+        t_loss /= i+1
         logging.debug('<<user simulator>> validation, epoch {}, loss_a:{}, loss_t:{}'.format(epoch, a_loss, t_loss))
         loss = a_loss + t_loss
         if loss < best:
@@ -111,8 +111,8 @@ class VHUS_Trainer():
             a_loss += loss_a.item()
             t_loss += loss_t.item()
             
-        a_loss /= i
-        t_loss /= i
+        a_loss /= i+1
+        t_loss /= i+1
         logging.debug('<<user simulator>> test, epoch {}, loss_a:{}, loss_t:{}'.format(epoch, a_loss, t_loss))
         return best
 		
