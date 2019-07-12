@@ -1,7 +1,11 @@
 """
 Evaluate SVMNLU models on Camrest test dataset
-Metric: dataset level Precision/Recall/F1
-Usage: PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
+
+Metric:
+    dataset level Precision/Recall/F1
+
+Usage:
+    PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
 """
 import json
 import random

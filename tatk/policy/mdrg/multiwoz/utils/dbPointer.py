@@ -1,14 +1,15 @@
 import sqlite3
+import os
 
 import numpy as np
 
-from utils.nlp import normalize
+from tatk.policy.mdrg.multiwoz.utils.nlp import normalize
 
 # loading databases
 domains = ['restaurant', 'hotel', 'attraction', 'train', 'taxi', 'hospital']#, 'police']
 dbs = {}
 for domain in domains:
-    db = 'db/{}-dbase.db'.format(domain)
+    db = os.path.join(os.path.dirname(__file__), os.pardir, 'data/db/{}-dbase.db'.format(domain))
     conn = sqlite3.connect(db)
     c = conn.cursor()
     dbs[domain] = c
@@ -63,7 +64,8 @@ def queryResult(domain, turn):
             if flag:
                 sql_query += " where "
                 val2 = val.replace("'", "''")
-                #val2 = normalize(val2)
+                val2 = normalize(val2)
+                val2 = val2.replace("'", "''")
                 # change query for trains
                 if key == 'leaveAt':
                     sql_query += r" " + key + " > " + r"'" + val2 + r"'"
@@ -74,7 +76,8 @@ def queryResult(domain, turn):
                 flag = False
             else:
                 val2 = val.replace("'", "''")
-                #val2 = normalize(val2)
+                val2 = normalize(val2)
+                val2 = val2.replace("'", "''")
                 if key == 'leaveAt':
                     sql_query += r" and " + key + " > " + r"'" + val2 + r"'"
                 elif key == 'arriveBy':
@@ -114,6 +117,7 @@ def queryResultVenues(domain, turn, real_belief=False):
                     sql_query += " where "
                     val2 = val.replace("'", "''")
                     val2 = normalize(val2)
+                    val2 = val2.replace("'", "''")
                     if key == 'leaveAt':
                         sql_query += key + " > " + r"'" + val2 + r"'"
                     elif key == 'arriveBy':
@@ -124,6 +128,7 @@ def queryResultVenues(domain, turn, real_belief=False):
                 else:
                     val2 = val.replace("'", "''")
                     val2 = normalize(val2)
+                    val2 = val2.replace("'", "''")
                     if key == 'leaveAt':
                         sql_query += r" and " + key + " > " + r"'" + val2 + r"'"
                     elif key == 'arriveBy':
@@ -148,6 +153,7 @@ def queryResultVenues(domain, turn, real_belief=False):
                 sql_query += " where "
                 val2 = val.replace("'", "''")
                 val2 = normalize(val2)
+                val2 = val2.replace("'", "''")
                 if key == 'leaveAt':
                     sql_query += r" " + key + " > " + r"'" + val2 + r"'"
                 elif key == 'arriveBy':
@@ -158,6 +164,7 @@ def queryResultVenues(domain, turn, real_belief=False):
             else:
                 val2 = val.replace("'", "''")
                 val2 = normalize(val2)
+                val2 = val2.replace("'", "''")
                 if key == 'leaveAt':
                     sql_query += r" and " + key + " > " + r"'" + val2 + r"'"
                 elif key == 'arriveBy':

@@ -1,9 +1,9 @@
 import pickle
 import re
-
+import os
 import simplejson as json
 
-from utils.nlp import normalize
+from tatk.policy.mdrg.multiwoz.utils.nlp import normalize
 
 digitpat = re.compile('\d+')
 timepat = re.compile("\d{1,2}[:]\d{1,2}")
@@ -105,7 +105,8 @@ def prepareSlotValuesIndependent():
 
     # add at the end places from trains
     # fin = file('db/' + 'train' + '_db.json')
-    fin = open('db/' + 'train' + '_db.json')
+    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data/db/train_db.json')
+    fin = open(db_path)
     db_json = json.load(fin)
     fin.close()
 
