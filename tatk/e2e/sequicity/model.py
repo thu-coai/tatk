@@ -11,12 +11,8 @@ from torch.autograd import Variable
 from torch.optim import Adam
 
 from tatk.e2e.sequicity.config import global_config as cfg
-# from tatk.e2e.sequicity.metric import CamRestEvaluator, KvretEvaluator, MultiWozEvaluator
-# from tatk.e2e.sequicity.reader import CamRest676Reader, KvretReader, MultiWozReader
-from tatk.e2e.sequicity.multiwoz.metric import MultiWozEvaluator
-from tatk.e2e.sequicity.camrest.metric import CamRestEvaluator
-from tatk.e2e.sequicity.multiwoz.reader import MultiWozReader
-from tatk.e2e.sequicity.camrest.reader import CamRest676Reader
+from tatk.e2e.sequicity.metric import CamRestEvaluator, KvretEvaluator, MultiWozEvaluator
+from tatk.e2e.sequicity.reader import CamRest676Reader, KvretReader, MultiWozReader
 from tatk.e2e.sequicity.reader import get_glove_matrix
 from tatk.e2e.sequicity.reader import pad_sequences
 from tatk.e2e.sequicity.tsd_net import TSD, cuda_
@@ -26,7 +22,7 @@ class Model:
     def __init__(self, dataset):
         reader_dict = {
             'camrest': CamRest676Reader,
-            # 'kvret': KvretReader,
+            'kvret': KvretReader,
             'multiwoz': MultiWozReader
         }
         model_dict = {
@@ -34,7 +30,7 @@ class Model:
         }
         evaluator_dict = {
             'camrest': CamRestEvaluator,
-            # 'kvret': KvretEvaluator,
+            'kvret': KvretEvaluator,
             'multiwoz': MultiWozEvaluator
         }
         self.reader = reader_dict[dataset]()

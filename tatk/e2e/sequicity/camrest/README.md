@@ -31,6 +31,17 @@ $ PYTHONPATH=../../../../.. python model.py -mode rl -model camrest -cfg camrest
 
 Trained model can be download on [here](https://tatk-data.s3-ap-northeast-1.amazonaws.com/sequicity_camrest.pkl). Place it under `sequicity/camrest/output` dir.
 
+
+## Predict
+
+```python
+from tatk.e2e.sequicity.camrest import Sequicity
+
+s = Sequicity(model_file=MODEL_PATH_OR_URL)
+s.response("I want to find a cheap restaurant")
+```
+
+
 ## Data
 
 https://www.repository.cam.ac.uk/handle/1810/260970

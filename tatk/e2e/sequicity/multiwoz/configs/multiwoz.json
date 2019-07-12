@@ -1,5 +1,6 @@
 {
   "tsdf_init":{
+    "dataset": "multiwoz",
     "beam_len_bonus": 0.5,
     "prev_z_method": "separate",
     "vocab_size": 4000,
@@ -14,11 +15,11 @@
     "test": "multiwoz/data/test.json",
     "entity": "multiwoz/data/entities.json",
     "db": [
-      "../../../data/multiwoz/db/attraction_db.json",
-      "../../../data/multiwoz/db/hotel_db.json",
-      "../../../data/multiwoz/db/restaurant_db.json",
-      "../../../data/multiwoz/db/hospital_db.json",
-      "../../../data/multiwoz/db/train_db.json"
+      "multiwoz/data/attraction_db.json",
+      "multiwoz/data/hotel_db.json",
+      "multiwoz/data/restaurant_db.json",
+      "multiwoz/data/hospital_db.json",
+      "multiwoz/data/train_db.json"
     ],
     "glove_path": "multiwoz/data/glove.6B.50d.txt",
     "batch_size": 32,

@@ -18,6 +18,22 @@ class _Config:
   
     def init_handler(self, tsdf_init_config):
         self.__dict__.update(tsdf_init_config)
+        self.vocab_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.vocab_path)
+        self.entity = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.entity)
+        self.glove_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.glove_path)
+        self.model_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.model_path)
+        self.result_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.result_path)
+
+        if tsdf_init_config['dataset']=='multiwoz':
+            self.train = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.train)
+            self.dev = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.dev)
+            self.test = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.test)
+            for i, db in enumerate(self.db):
+                self.db[i] = os.path.join(os.path.dirname(os.path.abspath(__file__)), db)
+        elif tsdf_init_config['dataset']=='camrest':
+            self.data = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.data)
+            self.db = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.db)
+
         # init_method = {
         #     'tsdf-camrest':self._camrest_tsdf_init,
         #     'tsdf-kvret':self._kvret_tsdf_init,
