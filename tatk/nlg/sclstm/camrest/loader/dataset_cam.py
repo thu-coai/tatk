@@ -33,8 +33,8 @@ class DatasetCam(object):
 		
 		# set input feature cardinality
 		self._setCardinality(template_file)
-        self.da_size = self.dfs[1] - self.dfs[0]
-        self.sv_size = self.dfs[2] - self.dfs[1]
+		self.da_size = self.dfs[1] - self.dfs[0]
+		self.sv_size = self.dfs[2] - self.dfs[1]
 		
 		# initialise dataset
 		self._setupData(text_file, feat_file, dataSplit_file)
