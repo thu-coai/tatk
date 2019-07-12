@@ -33,7 +33,7 @@ def padding_data(data):
     # goal & terminal
     for i, l in enumerate(sentence_num):
         goals_length += [len(batch_goals[i])] * l
-        goals_padded = batch_goals[i] + [0] * (max_goal_length - len(batch_goals[i]))
+        goals_padded = list(batch_goals[i]) + [0] * (max_goal_length - len(batch_goals[i]))
         goals += [goals_padded] * l
         terminal += [0] * (l-1) + [1]
         
