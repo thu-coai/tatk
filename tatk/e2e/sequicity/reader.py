@@ -1,6 +1,3 @@
-# Modified by Microsoft Corporation.
-# Licensed under the MIT license.
-
 import csv
 import json
 import logging

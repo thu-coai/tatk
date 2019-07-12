@@ -1,6 +1,3 @@
-# Modified by Microsoft Corporation.
-# Licensed under the MIT license.
-
 import argparse
 import csv
 import functools
