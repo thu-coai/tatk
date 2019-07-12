@@ -16,6 +16,9 @@ script:
   - sphinx-apidoc -o ./source ../tatk/
   - cd source && python gen_rst.py --project tatk && cd ..
   - make html
+  - cd source
+  - python modify_py_modindex.py -d ../build/html/
+  - cd ..
   - mv ./build/html ./build/docs && rm -r ./build/doctrees && mv LICENSE.txt ./build && mv README.md ./build && cd ..
   
 deploy:
