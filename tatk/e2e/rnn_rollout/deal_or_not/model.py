@@ -1,4 +1,4 @@
-from tatk.e2e.rnn_rollout import RNNRolloutAgent
+from tatk.e2e.rnn_rollout.rnnrollout import RNNRolloutAgent
 from tatk.e2e.rnn_rollout.models.rnn_model import RnnModel
 from tatk.e2e.rnn_rollout.models.selection_model import SelectionModel
 import tatk.e2e.rnn_rollout.utils as utils
