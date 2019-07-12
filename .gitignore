@@ -36,3 +36,6 @@ data/mdbt/word-vectors
 build
 dist
 tatk.egg-info
+
+# configs
+configs
