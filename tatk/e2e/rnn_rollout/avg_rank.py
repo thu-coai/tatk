@@ -23,10 +23,10 @@ import torch.optim as optim
 from torch.autograd import Variable
 
 import data
-from tatk.e2e.rnn_rullout.agent import LstmAgent
-from tatk.e2e.rnn_rullout.dialog import DialogLogger
-import tatk.e2e.rnn_rullout.utils as utils
-from tatk.e2e.rnn_rullout.domain import get_domain
+from tatk.e2e.rnn_rollout.agent import LstmAgent
+from tatk.e2e.rnn_rollout.dialog import DialogLogger
+import tatk.e2e.rnn_rollout.utils as utils
+from tatk.e2e.rnn_rollout.domain import get_domain
 
 
 TAGS = ['YOU:', 'THEM:']

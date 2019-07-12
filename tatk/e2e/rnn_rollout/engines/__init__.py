@@ -18,7 +18,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
 
-import tatk.e2e.rnn_rullout.vis as vis
+import tatk.e2e.rnn_rollout.vis as vis
 
 
 class Criterion(object):

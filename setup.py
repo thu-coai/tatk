@@ -34,6 +34,7 @@ setup(
         'nltk>=3.4',
         'tqdm>=4.30',
         'checksumdir>=1.1',
+        'visdom',
         'Pillow',
         'future',
         'torch',

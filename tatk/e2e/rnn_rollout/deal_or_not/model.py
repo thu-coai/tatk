@@ -1,8 +1,8 @@
-from tatk.e2e.rnn_rullout import RNNRolloutAgent
-from tatk.e2e.rnn_rullout.models.rnn_model import RnnModel
-from tatk.e2e.rnn_rullout.models.selection_model import SelectionModel
-import tatk.e2e.rnn_rullout.utils as utils
-from tatk.e2e.rnn_rullout.domain import get_domain
+from tatk.e2e.rnn_rollout.rnnrollout import RNNRolloutAgent
+from tatk.e2e.rnn_rollout.models.rnn_model import RnnModel
+from tatk.e2e.rnn_rollout.models.selection_model import SelectionModel
+import tatk.e2e.rnn_rollout.utils as utils
+from tatk.e2e.rnn_rollout.domain import get_domain
 from tatk import get_root_path
 import os
 

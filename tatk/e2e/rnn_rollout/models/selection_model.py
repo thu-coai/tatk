@@ -16,12 +16,12 @@ import torch.nn.init
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-import tatk.e2e.rnn_rullout.data as data
-from tatk.e2e.rnn_rullout.engines.selection_engine import SelectionEngine
-from tatk.e2e.rnn_rullout.domain import get_domain
-from tatk.e2e.rnn_rullout.models.utils import *
-from tatk.e2e.rnn_rullout.models.ctx_encoder import MlpContextEncoder
-from tatk.e2e.rnn_rullout.models.attn import Attention, HierarchicalAttention
+import tatk.e2e.rnn_rollout.data as data
+from tatk.e2e.rnn_rollout.engines.selection_engine import SelectionEngine
+from tatk.e2e.rnn_rollout.domain import get_domain
+from tatk.e2e.rnn_rollout.models.utils import *
+from tatk.e2e.rnn_rollout.models.ctx_encoder import MlpContextEncoder
+from tatk.e2e.rnn_rollout.models.attn import Attention, HierarchicalAttention
 
 
 class SelectionModule(nn.Module):

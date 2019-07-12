@@ -7,7 +7,7 @@
 import torch
 from torch.autograd import Variable
 
-from tatk.e2e.rnn_rullout.engines import EngineBase, Criterion
+from tatk.e2e.rnn_rollout.engines import EngineBase, Criterion
 
 
 class RnnEngine(EngineBase):

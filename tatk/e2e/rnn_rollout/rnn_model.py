@@ -16,11 +16,10 @@ import torch.nn.init
 from torch.autograd import Variable
 import torch.nn.functional as F
 
-import tatk.e2e.rnn_rullout.data as data
-from tatk.e2e.rnn_rullout.engines.rnn_engine import RnnEngine
-from tatk.e2e.rnn_rullout.domain import get_domain
-from tatk.e2e.rnn_rullout.models.utils import *
-from tatk.e2e.rnn_rullout.models.ctx_encoder import MlpContextEncoder
+import data
+from tatk.e2e.rnn_rollout.engines.rnn_engine import RnnEngine
+from tatk.e2e.rnn_rollout.utils import *
+from tatk.e2e.rnn_rollout.models.ctx_encoder import MlpContextEncoder
 
 
 class RnnModel(nn.Module):

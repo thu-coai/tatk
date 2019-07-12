@@ -22,8 +22,8 @@ import torch.nn as nn
 from torch.autograd import Variable
 import numpy as np
 
-from tatk.e2e.rnn_rullout.data import STOP_TOKENS
-import tatk.e2e.rnn_rullout.vis as vis
+from tatk.e2e.rnn_rollout.data import STOP_TOKENS
+import tatk.e2e.rnn_rollout.vis as vis
 
 class Criterion(object):
     """Weighted CrossEntropyLoss."""
