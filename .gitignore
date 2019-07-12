@@ -19,6 +19,11 @@ data/multiwoz/annotated_user_da_with_span_full.json
 data/mdbt/data
 data/mdbt/models
 data/mdbt/word-vectors
+tatk/nlg/sclstm/**/resource/*
+tatk/nlg/sclstm/**/resource_usr/*
+tatk/nlg/sclstm/**/sclstm.pt
+tatk/nlg/sclstm/**/sclstm.res
+tatk/nlg/sclstm/**/sclstm.log
 
 # test script
 *_test.py
