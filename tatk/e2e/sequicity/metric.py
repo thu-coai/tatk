@@ -7,7 +7,8 @@ import functools
 import json
 import math
 from collections import Counter
-
+import nltk
+nltk.download('stopwords')
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
