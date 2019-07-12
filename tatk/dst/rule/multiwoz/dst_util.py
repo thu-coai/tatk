@@ -58,9 +58,10 @@ def normalize_value(value_set, domain, slot, value):
     except:
         raise Exception('domain <{}> not found in value set'.format(domain))
     if slot not in value_set[domain]:
-        raise Exception(
-            'slot <{}> not found in db_values[{}]'.format(
-                slot, domain))
+        return value
+        # raise Exception(
+        #     'slot <{}> not found in db_values[{}]'.format(
+        #         slot, domain))
     value_list = value_set[domain][slot]
     # exact match or containing match
     v = _match_or_contain(value, value_list)
