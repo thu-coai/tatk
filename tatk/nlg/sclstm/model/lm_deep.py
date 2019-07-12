@@ -4,8 +4,8 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 
-from tatk.nlg.sclstm.multiwoz.model.layers.decoder_deep import DecoderDeep
-from tatk.nlg.sclstm.multiwoz.model.masked_cross_entropy import masked_cross_entropy
+from tatk.nlg.sclstm.model.layers.decoder_deep import DecoderDeep
+from tatk.nlg.sclstm.model.masked_cross_entropy import masked_cross_entropy
 
 
 class LMDeep(nn.Module):

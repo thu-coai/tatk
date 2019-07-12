@@ -8,24 +8,25 @@ unzip [rar](https://drive.google.com/open?id=1cKotyFbff6VkPtJrpqDakiFjiXV34eyr) 
 
 TRAIN
 ```bash
-$ PYTHONPATH=../../../../.. python3 train.py  --mode=train --model_path=sclstm.pt --n_layer=1 --lr=0.005 > sclstm.log
+$ python3 train.py  --mode=train --model_path=sclstm.pt --n_layer=1 --lr=0.005 > sclstm.log
 ```
 
 TEST
 
 ```bash
-$ PYTHONPATH=../../../../.. python3 train.py --mode=test --model_path=sclstm.pt --n_layer=1 --beam_size=10 > sclstm.res
+$ python3 train.py --mode=test --model_path=sclstm.pt --n_layer=1 --beam_size=10 > sclstm.res
 ```
 
 Calculate BLEU
 
 ```bash
-$ PYTHONPATH=../../../../.. python3 bleu.py --res_file=sclstm.res
+$ cd ..
+$ python3 bleu.py --res_file=multiwoz/sclstm.res
 ```
 
 Set *user* to use user NLG，e.g.
 ```bash
-$ PYTHONPATH=../../../../.. python3 train.py  --mode=train --model_path=sclstm_usr.pt --n_layer=1 --lr=0.005 --user True > sclstm_usr.log
+$ python3 train.py  --mode=train --model_path=sclstm_usr.pt --n_layer=1 --lr=0.005 --user True > sclstm_usr.log
 ```
 
 ## Data

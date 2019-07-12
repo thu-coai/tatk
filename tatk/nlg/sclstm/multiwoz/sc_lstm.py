@@ -7,7 +7,7 @@ import torch
 
 from tatk.util.file_util import cached_path
 from tatk.nlg.sclstm.multiwoz.loader.dataset_woz import SimpleDatasetWoz
-from tatk.nlg.sclstm.multiwoz.model.lm_deep import LMDeep
+from tatk.nlg.sclstm.model.lm_deep import LMDeep
 from tatk.nlg.nlg import NLG
 
 DEFAULT_DIRECTORY = "models"

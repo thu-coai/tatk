@@ -7,7 +7,7 @@ root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.pa
 sys.path.append(root_dir)
 import torch
 from tatk.nlg.sclstm.multiwoz.loader.dataset_woz import DatasetWoz, SimpleDatasetWoz
-from tatk.nlg.sclstm.multiwoz.model.lm_deep import LMDeep
+from tatk.nlg.sclstm.model.lm_deep import LMDeep
 
 USE_CUDA = torch.cuda.is_available()
 
