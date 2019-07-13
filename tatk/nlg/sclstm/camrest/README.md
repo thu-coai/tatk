@@ -1,10 +1,10 @@
-# nlg-sclstm-multiwoz
+# nlg-sclstm-camrest
 
 Semantically-conditioned LSTM (SC-LSTM) is an NLG model that generates natural linguistically varied responses based on a deep, semantically controlled LSTM architecture. The code derives from [github](https://github.com/andy194673/nlg-sclstm-multiwoz). We modify it to support user NLG. The original paper can be found at [ACL Anthology](https://aclweb.org/anthology/papers/D/D15/D15-1199/)
 
 ## Run the code
 
-unzip [rar](https://drive.google.com/open?id=1bVle8zF8vTKKp-mlAuo9izqyCft68unR) here
+unzip [rar](https://drive.google.com/open?id=1FGQ--Qk_ioNQCoYJUENs87_JKiDYpET3) here
 
 TRAIN
 ```bash
@@ -31,7 +31,7 @@ $ python3 train.py  --mode=train --model_path=sclstm_usr.pt --n_layer=1 --lr=0.0
 
 ## Data
 
-We use the multiwoz data (./resource/\*, ./resource_usr/\*).
+We use the camrest data (./resource/\*, ./resource_usr/\*).
 
 ## Reference
 
