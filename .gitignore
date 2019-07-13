@@ -44,3 +44,6 @@ tatk/nlg/sclstm/**/sclstm_usr.log
 build
 dist
 tatk.egg-info
+
+# configs
+configs

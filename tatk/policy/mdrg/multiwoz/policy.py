@@ -16,37 +16,37 @@ from tatk.policy.policy import Policy
 from tatk.policy.mdrg.multiwoz.utils import delexicalize, util, dbPointer
 from tatk.policy.mdrg.multiwoz.utils.nlp import normalize
 from tatk.policy.mdrg.multiwoz.evaluator import evaluateModel
-from tatk.policy.mdrg.multiwoz.model import Model
+from tatk.policy.mdrg.multiwoz.mdrg_model import Model
 from tatk.policy.mdrg.multiwoz.create_delex_data import delexicaliseReferenceNumber, get_dial
 
 from tatk.util.multiwoz.state import default_state
 
-parser = argparse.ArgumentParser(description='S2S')
-parser.add_argument('--no_cuda', type=util.str2bool, nargs='?', const=True, default=True, help='enables CUDA training')
-parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
-
-parser.add_argument('--no_models', type=int, default=20, help='how many models to evaluate')
-parser.add_argument('--original', type=str, default='model/model/', help='Original path.')
-
-parser.add_argument('--dropout', type=float, default=0.0)
-parser.add_argument('--use_emb', type=str, default='False')
-
-parser.add_argument('--beam_width', type=int, default=10, help='Beam width used in beamsearch')
-parser.add_argument('--write_n_best', type=util.str2bool, nargs='?', const=True, default=False, help='Write n-best list (n=beam_width)')
-
-parser.add_argument('--model_path', type=str, default='model/model/translate.ckpt', help='Path to a specific model checkpoint.')
-parser.add_argument('--model_dir', type=str, default='data/multi-woz/model/model/')
-parser.add_argument('--model_name', type=str, default='translate.ckpt')
-
-parser.add_argument('--valid_output', type=str, default='model/data/val_dials/', help='Validation Decoding output dir path')
-parser.add_argument('--decode_output', type=str, default='model/data/test_dials/', help='Decoding output dir path')
-
-args = parser.parse_args()
-args.cuda = not args.no_cuda and torch.cuda.is_available()
-
-torch.manual_seed(args.seed)
-
-device = torch.device("cuda" if args.cuda else "cpu")
+# parser = argparse.ArgumentParser(description='S2S')
+# parser.add_argument('--no_cuda', type=util.str2bool, nargs='?', const=True, default=True, help='enables CUDA training')
+# parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
+#
+# parser.add_argument('--no_models', type=int, default=20, help='how many models to evaluate')
+# parser.add_argument('--original', type=str, default='model/model/', help='Original path.')
+#
+# parser.add_argument('--dropout', type=float, default=0.0)
+# parser.add_argument('--use_emb', type=str, default='False')
+#
+# parser.add_argument('--beam_width', type=int, default=10, help='Beam width used in beamsearch')
+# parser.add_argument('--write_n_best', type=util.str2bool, nargs='?', const=True, default=False, help='Write n-best list (n=beam_width)')
+#
+# parser.add_argument('--model_path', type=str, default='model/model/translate.ckpt', help='Path to a specific model checkpoint.')
+# parser.add_argument('--model_dir', type=str, default='data/multi-woz/model/model/')
+# parser.add_argument('--model_name', type=str, default='translate.ckpt')
+#
+# parser.add_argument('--valid_output', type=str, default='model/data/val_dials/', help='Validation Decoding output dir path')
+# parser.add_argument('--decode_output', type=str, default='model/data/test_dials/', help='Decoding output dir path')
+#
+# args = parser.parse_args()
+# args.cuda = not args.no_cuda and torch.cuda.is_available()
+#
+# torch.manual_seed(args.seed)
+#
+# device = torch.device("cuda" if args.cuda else "cpu")
 
 
 def load_config(args):
@@ -61,7 +61,7 @@ def load_config(args):
     return config
 
 
-def loadModelAndData(num):
+def loadModelAndData(num, args):
     # Load dictionaries
     with open('data/input_lang.index2word.json') as f:
         input_lang_index2word = json.load(f)
@@ -150,7 +150,7 @@ def addDBPointer(turn):
     return pointer_vector
 
 
-def decodeWrapper():
+def decodeWrapper(args):
     # Load config file
     with open(args.model_path + '.config') as f:
         add_args = json.load(f)
@@ -246,12 +246,13 @@ def createDelexData(dialogue):
     return delex_data
 
 
-def decode(data, model):
+def decode(data, model, args):
     # model, val_dials, test_dials = loadModelAndData(num)
+    device = torch.device("cuda" if args.cuda else "cpu")
 
     for ii in range(1):
         if ii == 0:
-            print(50 * '-' + 'GREEDY')
+            # print(50 * '-' + 'GREEDY')
             model.beam_search = False
         else:
             print(50 * '-' + 'BEAM')
@@ -278,15 +279,16 @@ def decode(data, model):
             return output_words[-1]
 
 
-def loadModel(num):
+def loadModel(num, args):
     # Load dictionaries
-    with open('data/input_lang.index2word.json') as f:
+    dir_name = os.path.dirname(os.path.abspath(__file__))
+    with open(os.path.join(dir_name, 'data/input_lang.index2word.json')) as f:
         input_lang_index2word = json.load(f)
-    with open('data/input_lang.word2index.json') as f:
+    with open(os.path.join(dir_name, 'data/input_lang.word2index.json')) as f:
         input_lang_word2index = json.load(f)
-    with open('data/output_lang.index2word.json') as f:
+    with open(os.path.join(dir_name, 'data/output_lang.index2word.json')) as f:
         output_lang_index2word = json.load(f)
-    with open('data/output_lang.word2index.json') as f:
+    with open(os.path.join(dir_name, 'data/output_lang.word2index.json')) as f:
         output_lang_word2index = json.load(f)
 
     # Reload existing checkpoint
@@ -303,11 +305,45 @@ def loadModel(num):
 
 class MDRGWordPolicy(Policy):
     def __init__(self, num=1):
+        parser = argparse.ArgumentParser(description='S2S')
+        parser.add_argument('--no_cuda', type=util.str2bool, nargs='?', const=True, default=True,
+                            help='enables CUDA training')
+        parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
+
+        parser.add_argument('--no_models', type=int, default=20, help='how many models to evaluate')
+        parser.add_argument('--original', type=str, default='model/model/', help='Original path.')
+
+        parser.add_argument('--dropout', type=float, default=0.0)
+        parser.add_argument('--use_emb', type=str, default='False')
+
+        parser.add_argument('--beam_width', type=int, default=10, help='Beam width used in beamsearch')
+        parser.add_argument('--write_n_best', type=util.str2bool, nargs='?', const=True, default=False,
+                            help='Write n-best list (n=beam_width)')
+
+        parser.add_argument('--model_path', type=str, default='model/model/translate.ckpt',
+                            help='Path to a specific model checkpoint.')
+        parser.add_argument('--model_dir', type=str, default='data/multi-woz/model/model/')
+        parser.add_argument('--model_name', type=str, default='translate.ckpt')
+
+        parser.add_argument('--valid_output', type=str, default='model/data/val_dials/',
+                            help='Validation Decoding output dir path')
+        parser.add_argument('--decode_output', type=str, default='model/data/test_dials/',
+                            help='Decoding output dir path')
+
+
+        args = parser.parse_args([])
+
+        args.cuda = not args.no_cuda and torch.cuda.is_available()
+
+        torch.manual_seed(args.seed)
+
+        device = torch.device("cuda" if args.cuda else "cpu")
         with open(os.path.join(os.path.dirname(__file__), args.model_path + '.config'), 'r') as f:
             add_args = json.load(f)
+            # print(add_args)
             for k, v in add_args.items():
                 setattr(args, k, v)
-
+            # print(args)
             args.mode = 'test'
             args.load_param = True
             args.dropout = 0.0
@@ -316,8 +352,9 @@ class MDRGWordPolicy(Policy):
         # Start going through models
         args.original = args.model_path
         args.model_path = args.original
-        self.model = loadModel(num)
+        self.model = loadModel(num, args)
         self.dial = {"cur": {"log": []}}
+        self.args = args
 
 
     def predict(self, state):
@@ -329,7 +366,7 @@ class MDRGWordPolicy(Policy):
         # print(self.dial)
 
         self.normalized_dial = createDelexData(self.dial)
-        response = decode(self.normalized_dial, self.model)
+        response = decode(self.normalized_dial, self.model, self.args)
         self.dial['cur']['log'][-1]['text'] = response
 
         return response

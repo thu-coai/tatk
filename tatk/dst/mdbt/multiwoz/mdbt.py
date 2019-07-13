@@ -12,7 +12,7 @@ from tatk.dst.mdbt.mdbt import MDBT
 from tatk.dst.mdbt.mdbt_util import model_definition, load_word_vectors, load_ontology, \
     load_woz_data, \
     track_dialogue, generate_batch, evaluate_model
-
+from tatk import get_root_path
 train_batch_size = 1
 batches_per_eval = 10
 no_epochs = 600
@@ -21,7 +21,7 @@ start_batch = 0
 
 class MultiWozMDBT(MDBT):
     def __init__(self, data_dir='data/mdbt'):
-        self.data_dir = data_dir
+        self.data_dir = os.path.join(get_root_path(), data_dir)
         self.validation_url = os.path.join(self.data_dir, 'data/validate.json')
         self.word_vectors_url = os.path.join(self.data_dir, 'word-vectors/paragram_300_sl999.txt')
         self.training_url = os.path.join(self.data_dir, 'data/train.json')

@@ -36,13 +36,17 @@ def minDistance(word1, word2):
 
 
 def normalize_value(value_set, domain, slot, value):
-    """
-    Normalized the value produced by NLU module to map it to the ontology value space.
+    """Normalized the value produced by NLU module to map it to the ontology value space.
+
     Args:
-        value_set (dict): The value set of task ontology.
-        domain (str): The domain of the slot-value pairs.
-        slot (str): The slot of the value.
-        value (str): The raw value detected by NLU module.
+        value_set (dict):
+            The value set of task ontology.
+        domain (str):
+            The domain of the slot-value pairs.
+        slot (str):
+            The slot of the value.
+        value (str):
+            The raw value detected by NLU module.
     Returns:
         value (str): The normalized value, which fits with the domain ontology.
     """
@@ -54,9 +58,10 @@ def normalize_value(value_set, domain, slot, value):
     except:
         raise Exception('domain <{}> not found in value set'.format(domain))
     if slot not in value_set[domain]:
-        raise Exception(
-            'slot <{}> not found in db_values[{}]'.format(
-                slot, domain))
+        return value
+        # raise Exception(
+        #     'slot <{}> not found in db_values[{}]'.format(
+        #         slot, domain))
     value_list = value_set[domain][slot]
     # exact match or containing match
     v = _match_or_contain(value, value_list)
@@ -165,6 +170,7 @@ def _match_duration(value):
     if mat is not None and len(mat.groups()) > 0:
         return mat.groups()[0]
     return None
+
 
 if __name__ == "__main__":
     # value_set = json.load(open('../../../data/multiwoz/db/db_values.json'))
