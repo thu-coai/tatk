@@ -127,8 +127,10 @@ class BiSession(Session):
         self.sys_agent.init_session()
         self.user_agent.init_session()
 
+
 class DealornotSession(Session):
     """A special session for Deal or Not dataset, which is a object dividing negotiation task."""
+
     def __init__(self, alice, bob):
         self.alice = alice
         self.bob = bob
@@ -159,9 +161,13 @@ class DealornotSession(Session):
 
     def get_rewards(self, ctxs):
         """Return the rewards of alice and bob.
+
         Returns:
-            reward_1 (float): Reward of Alice.
-            reward_2 (float): Reward of Bob.
+            reward_1 (float):
+                Reward of Alice.
+
+            reward_2 (float):
+                Reward of Bob.
         """
         choices = []
         for agent in [self.alice, self.bob]:

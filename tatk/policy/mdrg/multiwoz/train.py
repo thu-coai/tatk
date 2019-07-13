@@ -12,7 +12,7 @@ import torch
 from torch.optim import Adam
 
 from tatk.policy.mdrg.multiwoz.utils import util
-from tatk.policy.mdrg.multiwoz.model import Model
+from tatk.policy.mdrg.multiwoz.mdrg_model import Model
 
 
 parser = argparse.ArgumentParser(description='S2S')

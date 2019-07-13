@@ -426,7 +426,7 @@ class Model:
     def load_model(self, path=None):
         if not path:
             path = cfg.model_path
-        all_state = torch.load(path)
+        all_state = torch.load(path, map_location='cuda' if cfg.cuda else 'cpu')
         self.m.load_state_dict(all_state['lstd'])
         self.base_epoch = all_state.get('epoch', 0)
 
