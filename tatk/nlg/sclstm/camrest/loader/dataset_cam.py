@@ -198,9 +198,9 @@ class DatasetCam(object):
 		feat_container = []
 		da_idx, sv_idx = [], []
 		for da, slots in meta.items():
-			da_idx.append( self.cardinality.index('d-a:'+da) - self.dfs[0] )
+			da_idx.append( self.cardinality.index('a:'+da) - self.dfs[0] )
 			for _slot in slots: # e.g. ('Day', '1', 'Wednesday ')
-				sv_idx.append( self.cardinality.index('d-a-s-v:'+da+'-'+_slot[0]+'-'+_slot[1]) - self.dfs[1] )
+				sv_idx.append( self.cardinality.index('a-s-v:'+da+'-'+_slot[0]+'-'+_slot[1]) - self.dfs[1] )
 				feat_container.append( da+'-'+_slot[0]+'-'+_slot[1] )
 
 		feat_container = sorted(feat_container) # sort SVs across DAs to make sure universal order
