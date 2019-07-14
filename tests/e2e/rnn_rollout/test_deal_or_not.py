@@ -1,9 +1,9 @@
 import argparse
 
-from tatk.e2e.rnn_rullout.deal_or_not import DealornotAgent
-from tatk.e2e.rnn_rullout.deal_or_not.model import get_context_generator
+from tatk.e2e.rnn_rollout.deal_or_not import DealornotAgent
+from tatk.e2e.rnn_rollout.deal_or_not.model import get_context_generator
 from tatk import DealornotSession
-import tatk.e2e.rnn_rullout.utils as utils
+import tatk.e2e.rnn_rollout.utils as utils
 
 session_num = 20
 

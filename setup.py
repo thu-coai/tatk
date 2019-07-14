@@ -34,6 +34,7 @@ setup(
         'nltk>=3.4',
         'tqdm>=4.30',
         'checksumdir>=1.1',
+        'visdom',
         'Pillow',
         'future',
         'torch',
@@ -54,7 +55,9 @@ setup(
             "requests-mock",
             "pytest>=3.6.0",
             "pytest-cov==2.4.0",
-            "checksumdir"
+            "checksumdir",
+            "bs4",
+            "lxml",
         ]
     },
     cmdclass={'test': LibTest},
