@@ -7,6 +7,7 @@ import time
 from random import shuffle
 import numpy as np
 import tensorflow as tf
+from tatk import get_root_path
 
 from tatk.dst.mdbt.mdbt import MDBT
 from tatk.dst.mdbt.mdbt_util import model_definition, load_word_vectors, load_ontology, \
@@ -21,7 +22,7 @@ start_batch = 0
 
 class MultiWozMDBT(MDBT):
     def __init__(self, data_dir='data/mdbt'):
-        self.data_dir = data_dir
+        self.data_dir = os.path.join(get_root_path(), data_dir)
         self.validation_url = os.path.join(self.data_dir, 'data/validate.json')
         self.word_vectors_url = os.path.join(self.data_dir, 'word-vectors/paragram_300_sl999.txt')
         self.training_url = os.path.join(self.data_dir, 'data/train.json')

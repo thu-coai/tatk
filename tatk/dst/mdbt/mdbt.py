@@ -80,6 +80,7 @@ class MDBT(Tracker):
         # generate fake dialogue based on history (this os to reuse the original MDBT code)
         # actual_history = prev_state['history']  # [[sys, user], [sys, user], ...]
         actual_history = copy.deepcopy(prev_state['history'])  # [[sys, user], [sys, user], ...]
+        actual_history = [['null']]
         actual_history[-1].append(user_act)
         actual_history = self.normalize_history(actual_history)
         if len(actual_history) == 0:
