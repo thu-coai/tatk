@@ -61,7 +61,7 @@ class SCLSTM(NLG):
         hidden_size = self.config.getint('MODEL', 'hidden_size')
 
         # get feat size
-        d_size = self.dataset.do_size + self.dataset.da_size + self.dataset.sv_size  # len of 1-hot feat
+        d_size = self.dataset.da_size + self.dataset.sv_size  # len of 1-hot feat
         vocab_size = len(self.dataset.word2index)
 
         self.model = LMDeep('sclstm', vocab_size, vocab_size, hidden_size, d_size, n_layer=self.args['n_layer'], use_cuda=use_cuda)
