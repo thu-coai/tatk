@@ -10,7 +10,7 @@ from tatk.nlg.sclstm.camrest.loader.dataset_cam import SimpleDatasetCam
 from tatk.nlg.sclstm.model.lm_deep import LMDeep
 from tatk.nlg.nlg import NLG
 
-DEFAULT_DIRECTORY = "models"
+DEFAULT_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
 DEFAULT_ARCHIVE_FILE = os.path.join(DEFAULT_DIRECTORY, "nlg-sclstm-camrest.zip")
 
 def parse(is_user):
@@ -42,7 +42,7 @@ class SCLSTM(NLG):
                  archive_file=DEFAULT_ARCHIVE_FILE, 
                  use_cuda=False,
                  is_user=False,
-                 model_file=None):
+                 model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/nlg_sclstm_camrest.zip'):
 
         if not os.path.isfile(archive_file):
             if not model_file:
