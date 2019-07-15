@@ -22,7 +22,7 @@ class MDBT(Tracker):
     """
     A multi-domain belief tracker, adopted from https://github.com/osmanio2/multi-domain-belief-tracking.
     """
-    def __init__(self, ontology_vectors, ontology, slots, data_dir='data/mdbt'):
+    def __init__(self, ontology_vectors, ontology, slots, data_dir):
         Tracker.__init__(self)
         # data profile
         self.data_dir = data_dir
