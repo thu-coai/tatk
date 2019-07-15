@@ -8,17 +8,15 @@ import sys
 import re
 import time
 
-import numpy as np
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.nn.init
 from torch.autograd import Variable
 import torch.nn.functional as F
+from tatk.e2e.rnn_rollout.domain import get_domain
 
-import data
+import tatk.e2e.rnn_rollout.data as data
 from tatk.e2e.rnn_rollout.engines.rnn_engine import RnnEngine
-from tatk.e2e.rnn_rollout.utils import *
+from tatk.e2e.rnn_rollout.models.utils import *
 from tatk.e2e.rnn_rollout.models.ctx_encoder import MlpContextEncoder
 
 
