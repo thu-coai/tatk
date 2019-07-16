@@ -46,7 +46,7 @@ class UserPolicyVHUS(Policy):
             session_over (boolean):
                 True to terminate session, otherwise session continues.
         """
-        sys_action = state['system_action']
+        sys_action = state
         sys_seq_turn = self.manager.sysda2seq(self.manager.ref_data2stand(sys_action), self.goal)
         self.sys_da_id_stack += self.manager.get_sysda_id([sys_seq_turn])
         sys_seq_len = torch.LongTensor([max(len(sen), 1) for sen in self.sys_da_id_stack])
