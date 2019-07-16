@@ -11,7 +11,6 @@ import numpy as np
 
 from tatk.e2e.rnn_rollout.metric import MetricsContainer
 import data
-import tatk.e2e.rnn_rollout.utils as utils
 import tatk.e2e.rnn_rollout.domain as domain
 
 
