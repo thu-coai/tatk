@@ -11,7 +11,7 @@ DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class PG(Policy):
     
-    def __init__(self, cfg, is_train=False):
+    def __init__(self, is_train=False):
         self.is_train = is_train
         
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
