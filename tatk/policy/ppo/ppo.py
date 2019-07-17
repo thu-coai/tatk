@@ -6,16 +6,25 @@ import os
 import json
 from tatk.policy.policy import Policy
 from tatk.policy.rlmodule import MultiDiscretePolicy, Value
+from tatk.util.train_util import init_logging_handler
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class PPO(Policy):
     
     def __init__(self, is_train=False):
-        self.is_train = is_train
         
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
             cfg = json.load(f)
+        self.save_dir = cfg['save_dir']
+        self.save_per_epoch = cfg['save_per_epoch']
+        self.update_round = cfg['update_round']
+        self.optim_batchsz = cfg['optim_batchsz']
+        self.gamma = cfg['gamma']
+        self.epsilon = cfg['epsilon']
+        self.tau = cfg['tau']
+        if is_train:
+            init_logging_handler(cfg['log_dir'])
         
         # construct policy and value network
         self.policy = MultiDiscretePolicy(self.vector.state_dim, cfg['h_dim'], self.vector.da_dim).to(device=DEVICE)
@@ -158,3 +167,17 @@ class PPO(Policy):
         
         if (epoch+1) % self.save_per_epoch == 0:
             self.save(self.save_dir, epoch)
+    
+    def save(self, directory, epoch):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        torch.save(self.policy.state_dict(), directory + '/' + str(epoch) + '_mle.pol.mdl')
+
+        logging.info('<<dialog policy>> epoch {}: saved network to mdl'.format(epoch))
+    
+    def load(self, filename):
+        policy_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_mle.pol.mdl')
+        if os.path.exists(policy_mdl):
+            self.policy.load_state_dict(torch.load(policy_mdl))
+            print('<<dialog policy>> loaded checkpoint from file: {}'.format(policy_mdl))

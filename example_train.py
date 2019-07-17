@@ -63,7 +63,7 @@ def sampler(pid, queue, evt, env, policy, batchsz):
             next_s_vec = torch.Tensor(policy.vector.state_vectorize(next_s))
             
             # save to queue
-            buff.push(s_vec.numpy(), a.numpy(), mask, next_s_vec.numpy())
+            buff.push(s_vec.numpy(), a.numpy(), r, mask, next_s_vec.numpy())
 
             # update per step
             s = next_s
@@ -146,7 +146,7 @@ if __name__ == '__main__':
     # simple rule DST
     dst_sys = RuleDST()
     # rule policy
-    policy_sys = PPO()
+    policy_sys = PPO(True)
     # template NLG
     nlg_sys = TemplateNLG(is_user=False)    
     
