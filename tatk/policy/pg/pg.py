@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import torch
+from torch import optim
 import numpy as np
 import logging
 import os
@@ -18,12 +19,14 @@ class PG(Policy):
         self.save_dir = cfg['save_dir']
         self.save_per_epoch = cfg['save_per_epoch']
         self.update_round = cfg['update_round']
-        self.optim_batchsz = cfg['optim_batchsz']
+        self.optim_batchsz = cfg['batchsz']
         self.gamma = cfg['gamma']
         if is_train:
             init_logging_handler(cfg['log_dir'])
         
         self.policy = MultiDiscretePolicy(self.vector.state_dim, cfg['h_dim'], self.vector.da_dim).to(device=DEVICE)
+        if is_train:
+            self.policy_optim = optim.RMSprop(self.policy.parameters(), lr=cfg['lr'])
         
     def predict(self, state):
         """
