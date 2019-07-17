@@ -1,22 +1,88 @@
 # Task-oriented Dialog System Toolkits
-[![CodeFactor](https://www.codefactor.io/repository/github/thu-coai/tatk/badge)](https://www.codefactor.io/repository/github/thu-coai/tatk) [![Coverage Status](https://coveralls.io/repos/github/thu-coai/tatk/badge.svg?branch=master)](https://coveralls.io/github/thu-coai/tatk?branch=master) [![Build Status](https://travis-ci.com/thu-coai/tatk.svg?branch=master)](https://travis-ci.com/thu-coai/tatk) [![codebeat badge](https://codebeat.co/badges/4b47f311-3337-48a8-869c-1c7a060a2f0d)](https://codebeat.co/projects/github-com-thu-coai-tatk-master)
+[![Build Status](https://travis-ci.com/thu-coai/tatk.svg?branch=master)](https://travis-ci.com/thu-coai/tatk) 
 
-TaTk is an open-source task-oriented dialog system toolkits developed by Tsinghua University Conversational AI group (THU-coai). We provide implementations for each module in dialog system, as well as some joint models and end-to-end models. Further more, user simulator is provided for dialog policy training. It's easy to combine the modules to build a dialog system and replace some modules with yours to evaluate them in system level.
+TaTk is an open-source task-oriented dialog system toolkits developed by Tsinghua University Conversational AI group (THU-coai). We provide several models for each module in dialog system, as well as some joint models and end-to-end models. It's easy to combine the modules to build a dialog system and replace some modules with yours to evaluate them in system level. Further more, user simulator (policy for user agent) is provided for system policy training. Our unified agent definition also supports symmetric agents for negotiation dialog and multiple agents for multiparty dialog.
 
-Main Features:
+Features included:
 
 - Complete and configurable framework for task-oriented dialog system.
-- Easy to follow interfaces for implementing your modules.
-- Pre-trained models on Multiwoz dataset.
-- Smooth interaction with user simulator. 
+- Pre-trained models on Multiwoz, Camrest, Dealornot dataset.
+- Simple interfaces for adapting your models.
+- Rule simulators on Multiwoz and Camrest dataset for RL policy training.
+- Unified agent definition which allows customized dialog scene such as multiparty dialog.
 
-## Environment
+This project is a part of ``thutk`` (Toolkits for Dialog System by Tsinghua University), you can follow [thutk](http://coai.cs.tsinghua.edu.cn/thutk/) or 
+[tatk](http://coai.cs.tsinghua.edu.cn/thutk/tatk/) on our home page. Some code are shared with [Convlab](https://github.com/ConvLab/ConvLab).
 
+- [Installation](#installation)
+- [Tutorials](#tutorials)
+- [Documents](#documents)
+- [Models](#models)
+- [Supported Dataset](#Supported Dataset)
+- [Issues](#issues)
+- [Contributions](#contributions)
+- [Team](#team)
+- [License](#license)
 
+## Installation
 
-## Document
+Clone this repository:
+```bash
+git clone https://github.com/thu-coai/tatk.git
+```
 
+Install tatk via pip:
 
+```bash
+cd tatk
+pip install -e .
+```
+
+## Tutorials
+
+Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tutorials) directory. You can also view it on [thutk/tatk](http://coai.cs.tsinghua.edu.cn/thutk/tatk/):
+
+- [Getting Started](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Getting%20Started)
+- [Add New Model](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Add%20New%20Model)
+
+## Documents
+
+Our documents are on https://thu-coai.github.io/tatk_docs/.
+
+## Models
+
+We provide following models:
+
+- NLU: SVMNLU, BERTNLU
+- DST: rule, MDBT
+- Policy: rule, Imitation, REINFORCE, PPO, MDRG
+- Simulator policy: Agenda
+- NLG: Template, SCLSTM
+- End2End: Sequicity, RNN_rollout
+
+For  more details about these models, You can refer to `README.md` under `tatk/$module/$model/$dataset` dir such as [tatk/nlu/bert/multiwoz/README.md](https://github.com/thu-coai/tatk/blob/master/tatk/nlu/bert/multiwoz/README.md).
+
+## Supported Dataset
+
+- [Multiwoz](https://www.repository.cam.ac.uk/handle/1810/280608): We add some annotation and place it under `data/multiwoz` dir.
+- [Camrest](https://www.repository.cam.ac.uk/handle/1810/260970): We add some annotation and place it under `data/camrest` dir.
+- [Dealornot](https://github.com/facebookresearch/end-to-end-negotiator/tree/master/src/data/negotiate)
+
+## Issues
+
+You are welcome to create an issue if you want to request a feature, report a bug or ask a general question.
+
+## Contributions
+
+We welcome contributions from community.
+
+- If you want to make a big change, we recommend first creating an issue with your design.
+- Small contributions can be directly made by a pull request.
+- If you like make contributions for our library, see issues to find what we need.
+
+## Team
+
+`tatk` is maintained and developed by Tsinghua university conversational AI group (THU-coai). Check our [main pages](http://coai.cs.tsinghua.edu.cn/) (In Chinese).
 
 ## License
 
