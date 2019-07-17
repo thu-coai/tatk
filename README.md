@@ -68,9 +68,12 @@ For  more details about these models, You can refer to `README.md` under `tatk/$
 
 - [Multiwoz](https://www.repository.cam.ac.uk/handle/1810/280608)
   - We add some annotation and place it under `data/multiwoz` dir.
-  - LICENSE: http://creativecommons.org/licenses/by/4.0/
-- [Camrest](https://www.repository.cam.ac.uk/handle/1810/260970): We add some annotation and place it under `data/camrest` dir.
+  - LICENSE: Attribution 4.0 International, url: http://creativecommons.org/licenses/by/4.0/
+- [Camrest](https://www.repository.cam.ac.uk/handle/1810/260970)
+  - We add some annotation and place it under `data/camrest` dir.
+  - LICENSE: Attribution 4.0 International, url: http://creativecommons.org/licenses/by/4.0/
 - [Dealornot](https://github.com/facebookresearch/end-to-end-negotiator/tree/master/src/data/negotiate)
+  - LICENSE: Attribution-NonCommercial 4.0 International, url: https://creativecommons.org/licenses/by-nc/4.0/
 
 ## Issues
 
