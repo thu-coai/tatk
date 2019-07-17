@@ -18,7 +18,7 @@ This project is a part of ``thutk`` (Toolkits for Dialog System by Tsinghua Univ
 - [Tutorials](#tutorials)
 - [Documents](#documents)
 - [Models](#models)
-- [Supported Dataset](#Supported Dataset)
+- [Supported Dataset](#Supported-Dataset)
 - [Issues](#issues)
 - [Contributions](#contributions)
 - [Team](#team)
