@@ -172,12 +172,18 @@ class PPO(Policy):
         if not os.path.exists(directory):
             os.makedirs(directory)
 
-        torch.save(self.policy.state_dict(), directory + '/' + str(epoch) + '_mle.pol.mdl')
+        torch.save(self.value.state_dict(), directory + '/' + str(epoch) + '_ppo.val.mdl')
+        torch.save(self.policy.state_dict(), directory + '/' + str(epoch) + '_ppo.pol.mdl')
 
         logging.info('<<dialog policy>> epoch {}: saved network to mdl'.format(epoch))
     
     def load(self, filename):
-        policy_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_mle.pol.mdl')
+        value_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_ppo.val.mdl')
+        if os.path.exists(value_mdl):
+            self.value.load_state_dict(torch.load(value_mdl))
+            print('<<dialog policy>> loaded checkpoint from file: {}'.format(value_mdl))
+        
+        policy_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_ppo.pol.mdl')
         if os.path.exists(policy_mdl):
             self.policy.load_state_dict(torch.load(policy_mdl))
             print('<<dialog policy>> loaded checkpoint from file: {}'.format(policy_mdl))
