@@ -26,6 +26,8 @@ This project is a part of ``thutk`` (Toolkits for Dialog System by Tsinghua Univ
 
 ## Installation
 
+Require python 3.6.
+
 Clone this repository:
 ```bash
 git clone https://github.com/thu-coai/tatk.git
@@ -64,7 +66,9 @@ For  more details about these models, You can refer to `README.md` under `tatk/$
 
 ## Supported Dataset
 
-- [Multiwoz](https://www.repository.cam.ac.uk/handle/1810/280608): We add some annotation and place it under `data/multiwoz` dir.
+- [Multiwoz](https://www.repository.cam.ac.uk/handle/1810/280608)
+  - We add some annotation and place it under `data/multiwoz` dir.
+  - LICENSE: http://creativecommons.org/licenses/by/4.0/
 - [Camrest](https://www.repository.cam.ac.uk/handle/1810/260970): We add some annotation and place it under `data/camrest` dir.
 - [Dealornot](https://github.com/facebookresearch/end-to-end-negotiator/tree/master/src/data/negotiate)
 
