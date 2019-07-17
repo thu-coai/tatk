@@ -8,7 +8,8 @@ Created on Sun Jul 14 16:14:07 2019
 import numpy as np
 import torch
 from torch import multiprocessing as mp
-from tatk.dialog_agent import PipelineAgent, BiSession
+from tatk.dialog_agent.agent import PipelineAgent
+from tatk.dialog_agent.env import Environment
 from tatk.nlu.bert.multiwoz import BERTNLU
 from tatk.dst.rule.multiwoz import RuleDST
 from tatk.policy.rule.multiwoz import Rule
@@ -18,7 +19,7 @@ from tatk.nlg.template_nlg.multiwoz import TemplateNLG
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def sampler(pid, queue, evt, env, sys, batchsz):
+def sampler(pid, queue, evt, env, policy, batchsz):
     """
     This is a sampler function, and it will be called by multiprocess.Process to sample data from environment by multiple
     processes.
@@ -26,7 +27,7 @@ def sampler(pid, queue, evt, env, sys, batchsz):
     :param queue: multiprocessing.Queue, to collect sampled data
     :param evt: multiprocessing.Event, to keep the process alive
     :param env: environment instance
-    :param sys: system instance
+    :param policy: policy network, to generate action from current policy
     :param batchsz: total sampled items
     :return:
     """
@@ -41,9 +42,6 @@ def sampler(pid, queue, evt, env, sys, batchsz):
     sampled_traj_num = 0
     traj_len = 50
     real_traj_len = 0
-    
-    # policy network, to generate action from current policy
-    policy = sys.policy
 
     while sampled_num < batchsz:
         # for each trajectory, we reset the env and get initial state
@@ -56,7 +54,7 @@ def sampler(pid, queue, evt, env, sys, batchsz):
             a = policy.predict(s).cpu()
 
             # interact with env
-            next_s, done = env.step(s, a)
+            next_s, r, done = env.step(a)
 
             # a flag indicates ending or not
             mask = 0 if done else 1
@@ -84,7 +82,7 @@ def sampler(pid, queue, evt, env, sys, batchsz):
     queue.put([pid, buff])
     evt.wait()
 
-def sample(batchsz, process_num):
+def sample(env, policy, batchsz, process_num):
     """
     Given batchsz number of task, the batchsz will be splited equally to each processes
     and when processes return, it merge all data and return
@@ -108,7 +106,7 @@ def sample(batchsz, process_num):
     evt = mp.Event()
     processes = []
     for i in range(process_num):
-        process_args = (i, queue, evt, simulator, sys_agent, process_batchsz)
+        process_args = (i, queue, evt, env, policy, process_batchsz)
         processes.append(mp.Process(target=sampler, args=process_args))
     for p in processes:
         # set the process as daemon, and it will be killed once the main process is stoped.
@@ -127,9 +125,9 @@ def sample(batchsz, process_num):
 
     return buff.get_batch()
 
-def update(batchsz, epoch, process_num):
+def update(env, policy, batchsz, epoch, process_num):
     # sample data asynchronously
-    batch = sample(batchsz, process_num)
+    batch = sample(env, policy, batchsz, process_num)
 
     # data in batch is : batch.state: ([1, s_dim], [1, s_dim]...)
     # batch.action: ([1, a_dim], [1, a_dim]...)
@@ -140,7 +138,7 @@ def update(batchsz, epoch, process_num):
     mask = torch.Tensor(np.stack(batch.mask)).to(device=DEVICE)
     batchsz_real = s.size(0)
     
-    policy_sys.update(epoch, batchsz_real, s, a, r, mask)    
+    policy.update(epoch, batchsz_real, s, a, r, mask)    
 
 if __name__ == '__main__':
     # svm nlu trained on usr sentence of multiwoz
@@ -150,10 +148,7 @@ if __name__ == '__main__':
     # rule policy
     policy_sys = PPO()
     # template NLG
-    nlg_sys = TemplateNLG(is_user=False)
-    # assemble
-    sys_agent = PipelineAgent(nlu_sys, dst_sys, policy_sys, nlg_sys)
-    
+    nlg_sys = TemplateNLG(is_user=False)    
     
     # svm nlu trained on sys sentence of multiwoz
     nlu_usr = BERTNLU('sys', model_file="https://tatk-data.s3-ap-northeast-1.amazonaws.com/bert_multiwoz_sys.zip")
@@ -166,5 +161,7 @@ if __name__ == '__main__':
     # assemble
     simulator = PipelineAgent(nlu_usr, dst_usr, policy_usr, nlg_usr)
     
-    sess = BiSession(sys_agent, simulator, None)
+    env = Environment(nlg_sys, simulator, nlu_sys, dst_sys)
+    
+    update(env, policy_sys, 1024, 20, 16)
 
