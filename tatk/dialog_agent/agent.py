@@ -93,9 +93,9 @@ class PipelineAgent(Agent):
         # get action
         if self.tracker is not None:
             state = self.tracker.update(dialog_act)
-            action = self.policy.predict(state)
         else:
-            action = self.policy.predict(dialog_act)
+            state = dialog_act
+        action = self.policy.predict(state)
 
         # get model response
         if self.nlg_model is not None:

@@ -12,7 +12,6 @@ class MLP(Policy):
     
     def __init__(self, is_train=False):
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-        self.is_train = is_train
         
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
             cfg = json.load(f)
