@@ -61,14 +61,13 @@ class UserPolicyAgendaCamrest(Policy):
         Predict an user act based on state and preorder system action.
         Args:
             state (tuple): Dialog state.
-            sys_action (tuple): Preorder system action.s
         Returns:
             action (tuple): User act.
             session_over (boolean): True to terminate session, otherwise session continues.
             reward (float): Reward given by user.
         """
         self.__turn += 2
-        sys_action = state['system_action']
+        sys_action = state
 
         # At the beginning of a dialog when there is no NLU.
         if sys_action == "null":
