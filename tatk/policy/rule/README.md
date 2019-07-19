@@ -1,5 +1,7 @@
 # Rule/Agenda
 
+Rule based policies for both system side and user side (Agenda) that use heuristics and adopt domain expertise.
+
 ## Reference
 
 ```

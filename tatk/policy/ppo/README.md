@@ -1,8 +1,12 @@
 # PPO
 
+A policy optimization method in policy based reinforcement learning that uses
+multiple epochs of stochastic gradient ascent and a constant
+clipping mechanism as the soft constraint to perform each policy update. We adapt PPO to the dialog policy.
+
 ## Train
 
-Refer to example_train.py under the root directory and *Train RL Policies* in the tutorial
+Refer to example_train.py under the root directory and *Train RL Policies* in the tutorial.
 
 ## Reference
 

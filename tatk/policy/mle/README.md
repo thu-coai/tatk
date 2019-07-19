@@ -4,3 +4,10 @@ Vanilla MLE Policy employs a multi-class classification via Imitation Learning w
 
 ## Train
 
+```python
+cd [dataset]
+python train.py
+```
+
+You can modify *config.json* to change the setting.
+

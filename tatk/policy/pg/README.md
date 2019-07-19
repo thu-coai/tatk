@@ -1,8 +1,10 @@
 # REINFORCE
 
+A simple stochastic gradient algorithm for policy gradient reinforcement learning. We adapt REINFORCE to the dialog policy.
+
 ## Train
 
-Refer to example_train.py under the root directory and *Train RL Policies* in the tutorial
+Refer to example_train.py under the root directory and *Train RL Policies* in the tutorial.
 
 ## Reference
 
@@ -18,4 +20,3 @@ Refer to example_train.py under the root directory and *Train RL Policies* in th
   publisher={Springer}
 }
 ```
-
