@@ -47,3 +47,5 @@ tatk.egg-info
 
 # configs
 configs
+
+.ipynb_checkpoints
