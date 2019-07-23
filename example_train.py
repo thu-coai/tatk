@@ -86,7 +86,10 @@ def sample(env, policy, batchsz, process_num):
     """
     Given batchsz number of task, the batchsz will be splited equally to each processes
     and when processes return, it merge all data and return
+	:param env:
+	:param policy:
     :param batchsz:
+	:param process_num:
     :return: batch
     """
 

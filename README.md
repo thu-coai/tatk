@@ -58,7 +58,7 @@ We provide following models:
 - NLU: SVMNLU, BERTNLU
 - DST: rule, MDBT
 - Policy: rule, Imitation, REINFORCE, PPO, MDRG
-- Simulator policy: Agenda
+- Simulator policy: Agenda, VHUS
 - NLG: Template, SCLSTM
 - End2End: Sequicity, RNN_rollout
 
