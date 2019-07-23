@@ -11,14 +11,14 @@ from tatk.policy.vector.vector_multiwoz import MultiWozVector
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 DEFAULT_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
-DEFAULT_ARCHIVE_FILE = os.path.join(DEFAULT_DIRECTORY, "multiwoz_mle.pol.zip")
+DEFAULT_ARCHIVE_FILE = os.path.join(DEFAULT_DIRECTORY, "mle_policy_multiwoz.zip")
 
 class MLE(Policy):
     
     def __init__(self,
                  archive_file=DEFAULT_ARCHIVE_FILE,
-                 model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/multiwoz_mle.pol.zip'):
-        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+                 model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/mle_policy_multiwoz.zip'):
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
         
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
             cfg = json.load(f)
