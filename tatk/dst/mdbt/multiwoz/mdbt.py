@@ -23,7 +23,7 @@ class MultiWozMDBT(MDBT):
         Args:
             data_dir (str): The path of data dir, where the root path is tatk/dst/mdbt/multiwoz.
         """
-        local_path = os.path.abspath(__file__)
+        local_path = os.path.dirname(os.path.abspath(__file__))
         self.data_dir = os.path.join(local_path, data_dir)  # abstract data path
         self.validation_url = os.path.join(self.data_dir, 'data/validate.json')
         self.word_vectors_url = os.path.join(self.data_dir, 'word-vectors/paragram_300_sl999.txt')
