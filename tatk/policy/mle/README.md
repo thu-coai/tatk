@@ -11,3 +11,6 @@ python train.py
 
 You can modify *config.json* to change the setting.
 
+## Data
+
+data/[dataset]/[train|val|test].json.zip
