@@ -11,6 +11,12 @@ python train.py
 
 You can modify *config.json* to change the setting.
 
+## Data
+
+data/camrest/CamRest676_v2.json
+
+data/multiwoz/annotated_user_da_with_span_full.json
+
 ## Reference
 
 ```
