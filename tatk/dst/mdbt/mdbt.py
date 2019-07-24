@@ -11,6 +11,8 @@ from tatk.util.multiwoz.state import default_state
 from tatk.dst.state_tracker import Tracker
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 
+from os.path import dirname
+
 train_batch_size = 1
 batches_per_eval = 10
 no_epochs = 600
@@ -52,7 +54,13 @@ class MDBT(Tracker):
                 assert '-' not in key
                 self.det_dic[key.lower()] = key + '-' + domain
                 self.det_dic[value.lower()] = key + '-' + domain
-        self.value_dict = json.load(open(os.path.join(self.data_dir, '../multiwoz/value_dict.json')))
+
+        def parent_dir(path, time=1):
+            for _ in range(time):
+                path = os.path.dirname(path)
+            return path
+        root_dir = parent_dir(os.path.abspath(__file__), 4)
+        self.value_dict = json.load(open(os.path.join(root_dir, 'data/multiwoz/value_dict.json')))
 
     def init_session(self):
         self.state = default_state()
