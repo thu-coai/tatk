@@ -25,6 +25,7 @@ from tatk.nlu import NLU
 from tatk.nlu.bert.dataloader import Dataloader
 from tatk.nlu.bert.model import BertNLU
 from tatk.nlu.bert.camrest.postprocess import recover_intent
+from tatk.nlu.bert.multiwoz.preprocess import preprocess
 
 
 class BERTNLU(NLU):
@@ -49,6 +50,9 @@ class BERTNLU(NLU):
         root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         data_dir = os.path.join(root_dir, config['data_dir'])
         output_dir = os.path.join(root_dir, config['output_dir'])
+
+        if not os.path.exists(os.path.join(data_dir, 'data.pkl')):
+            preprocess(mode)
 
         data = pickle.load(open(os.path.join(data_dir, 'data.pkl'), 'rb'))
         intent_vocab = pickle.load(open(os.path.join(data_dir, 'intent_vocab.pkl'), 'rb'))
