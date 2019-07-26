@@ -25,7 +25,7 @@ from tatk.nlu import NLU
 from tatk.nlu.bert.dataloader import Dataloader
 from tatk.nlu.bert.model import BertNLU
 from tatk.nlu.bert.camrest.postprocess import recover_intent
-from tatk.nlu.bert.multiwoz.preprocess import preprocess
+from tatk.nlu.bert.camrest.preprocess import preprocess
 
 
 class BERTNLU(NLU):

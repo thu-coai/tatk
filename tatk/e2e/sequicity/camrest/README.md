@@ -46,6 +46,12 @@ s.response("I want to find a cheap restaurant")
 
 https://www.repository.cam.ac.uk/handle/1810/260970
 
+## Performance
+
+bleu_metric bleu        0.21597761121051318
+match_metric match      (0.9272727271884297, 0.0)
+success_f1_metric success       (0.8365018961271989, 0.870712401032435, 0.8048780487608567)
+
 ## Reference
 
    ```
