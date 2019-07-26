@@ -28,17 +28,17 @@ def read_zipped_json(filepath, filename):
     return json.load(archive.open(filename))
 
 
-if __name__ == '__main__':
-    mode = sys.argv[1]
-    assert mode=='all' or mode=='usr' or mode=='sys'
-    data_dir = '../../../../data/multiwoz'
-    processed_data_dir = 'data/{}_data'.format(mode)
+def preprocess(mode):
+    assert mode == 'all' or mode == 'usr' or mode == 'sys'
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(cur_dir, '../../../../data/multiwoz')
+    processed_data_dir = os.path.join(cur_dir, 'data/{}_data'.format(mode))
     if not os.path.exists(processed_data_dir):
         os.makedirs(processed_data_dir)
     data_key = ['train', 'val', 'test']
     data = {}
     for key in data_key:
-        data[key] = read_zipped_json(os.path.join(data_dir,key+'.json.zip'), key+'.json')
+        data[key] = read_zipped_json(os.path.join(data_dir, key + '.json.zip'), key + '.json')
         print('load {}, size {}'.format(key, len(data[key])))
 
     processed_data = {}
@@ -105,3 +105,8 @@ if __name__ == '__main__':
     pickle.dump(processed_data, open(os.path.join(processed_data_dir, 'data.pkl'), 'wb'))
     pickle.dump(all_intent, open(os.path.join(processed_data_dir, 'intent_vocab.pkl'), 'wb'))
     pickle.dump(all_tag, open(os.path.join(processed_data_dir, 'tag_vocab.pkl'), 'wb'))
+
+
+if __name__ == '__main__':
+    mode = sys.argv[1]
+    preprocess(mode)

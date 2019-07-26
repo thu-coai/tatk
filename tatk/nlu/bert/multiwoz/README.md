@@ -60,6 +60,14 @@ You can refer to `evaluate.py` for specific usage.
 
 We use the multiwoz data (`data/multiwoz/[train|val|test].json.zip`).
 
+## Performance
+
+| mode | Precision | Recall | F1    |
+| ---- | --------- | ------ | ----- |
+| usr  | 77.96     | 65.86  | 71.40 |
+| sys  | 72.42     | 61.18  | 66.33 |
+| all  | 73.10     | 58.34  | 64.89 |
+
 ## References
 
 ```
