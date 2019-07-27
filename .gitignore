@@ -24,6 +24,9 @@ tatk/nlg/sclstm/**/resource_usr/*
 tatk/nlg/sclstm/**/sclstm.pt
 tatk/nlg/sclstm/**/sclstm.res
 tatk/nlg/sclstm/**/sclstm.log
+tatk/nlg/sclstm/**/sclstm_usr.pt
+tatk/nlg/sclstm/**/sclstm_usr.res
+tatk/nlg/sclstm/**/sclstm_usr.log
 
 # test script
 *_test.py
@@ -44,3 +47,5 @@ tatk.egg-info
 
 # configs
 configs
+
+.ipynb_checkpoints

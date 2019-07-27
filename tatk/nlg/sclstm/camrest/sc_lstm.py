@@ -10,7 +10,7 @@ from tatk.nlg.sclstm.camrest.loader.dataset_cam import SimpleDatasetCam
 from tatk.nlg.sclstm.model.lm_deep import LMDeep
 from tatk.nlg.nlg import NLG
 
-DEFAULT_DIRECTORY = "models"
+DEFAULT_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
 DEFAULT_ARCHIVE_FILE = os.path.join(DEFAULT_DIRECTORY, "nlg-sclstm-camrest.zip")
 
 def parse(is_user):
@@ -42,7 +42,7 @@ class SCLSTM(NLG):
                  archive_file=DEFAULT_ARCHIVE_FILE, 
                  use_cuda=False,
                  is_user=False,
-                 model_file=None):
+                 model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/nlg_sclstm_camrest.zip'):
 
         if not os.path.isfile(archive_file):
             if not model_file:
@@ -61,7 +61,7 @@ class SCLSTM(NLG):
         hidden_size = self.config.getint('MODEL', 'hidden_size')
 
         # get feat size
-        d_size = self.dataset.do_size + self.dataset.da_size + self.dataset.sv_size  # len of 1-hot feat
+        d_size = self.dataset.da_size + self.dataset.sv_size  # len of 1-hot feat
         vocab_size = len(self.dataset.word2index)
 
         self.model = LMDeep('sclstm', vocab_size, vocab_size, hidden_size, d_size, n_layer=self.args['n_layer'], use_cuda=use_cuda)

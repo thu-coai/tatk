@@ -76,18 +76,18 @@ class UserPolicyAgendaMultiWoz(Policy):
         self.domain_goals = self.goal.domain_goals
         self.agenda = Agenda(self.goal)
 
-    def predict(self, dialog_act):
+    def predict(self, state):
         """
         Predict an user act based on state and preorder system action.
         Args:
-            dialog_act (dict): Dialog act.
+            state (tuple): Dialog state.
         Returns:
             action (tuple): User act.
             session_over (boolean): True to terminate session, otherwise session continues.
             reward (float): Reward given by user.
         """
         self.__turn += 2
-        sys_action = dialog_act
+        sys_action = state
 
         # At the beginning of a dialog when there is no NLU.
         if sys_action == "null":

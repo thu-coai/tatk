@@ -5,11 +5,24 @@ import tatk.e2e.rnn_rollout.utils as utils
 from tatk.e2e.rnn_rollout.domain import get_domain
 from tatk import get_root_path
 import os
+import zipfile
+from tatk.util.file_util import cached_path
 
 class DealornotAgent(RNNRolloutAgent):
     """The Rnn Rollout model for DealorNot dataset."""
-    def __init__(self, name, args, sel_args, train=False, diverse=False, max_total_len=100):
+    def __init__(self, name, args, sel_args, train=False, diverse=False, max_total_len=100,
+                 model_url='https://tatk-data.s3-ap-northeast-1.amazonaws.com/rnnrollout_dealornot.zip'):
         self.config_path = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'configs')
+
+        if not os.path.exists(self.config_path):
+            os.mkdir(self.config_path)
+        _model_path = os.path.join(self.config_path, 'models')
+        if not os.path.exists(_model_path):
+            os.mkdir(_model_path)
+        if not os.path.exists(os.path.join(_model_path, 'rnn_model_state_dict.th')):
+            # download and unzip pretrained models
+            dir = cached_path(model_url, _model_path)
+            print(dir)
         self.data_path = os.path.join(get_root_path(), args.data)
         domain = get_domain(args.domain)
         corpus = RnnModel.corpus_ty(domain, self.data_path, freq_cutoff=args.unk_threshold, verbose=True,

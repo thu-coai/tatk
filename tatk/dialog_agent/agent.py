@@ -81,6 +81,9 @@ class PipelineAgent(Agent):
 
     def response(self, observation):
         """Generate agent response using the agent modules."""
+        # TODO: history for mdbt
+        self.tracker.state['history'].append(['null', observation])
+
         # get dialog act
         if self.nlu_model is not None:
             dialog_act = self.nlu_model.predict(observation)
@@ -90,15 +93,17 @@ class PipelineAgent(Agent):
         # get action
         if self.tracker is not None:
             state = self.tracker.update(dialog_act)
-            action = self.policy.predict(state)
         else:
-            action = self.policy.predict(dialog_act)
+            state = dialog_act
+        action = self.policy.predict(state)
 
         # get model response
         if self.nlg_model is not None:
             model_response = self.nlg_model.generate(action)
         else:
             model_response = action
+
+        self.tracker.state['history'].append(['null', model_response])
 
         return model_response
 
