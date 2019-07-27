@@ -31,9 +31,13 @@ Please refer to `[dataset]` subdirectory for details.
 
 ## Evaluation Metrics
 
-- BLEU
-- Match rate : determines if a system can generate all correct constraints (belief span) to search the indicated entities of the user
-- Success F1: F1 score of requested slots answered in the current dialogue
+- **BLEU4**
+
+- **Match rate** : determines if a system can generate all correct constraints (belief span) to search the indicated entities of the user
+
+- **Success F1**: F1 score of requested slots answered in the current dialogue
+
+Please refer to `[dataset]` subdirectory for performance result. In terms of `success F1`,  Sequicity by order shows the (F1, Precision, Recall) score.
 
 ## Predict
 

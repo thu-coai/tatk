@@ -37,4 +37,19 @@ batchsz_real = s.size(0)
 policy.update(epoch, batchsz_real, s, a, r, mask)
 ```
 
-Please refer to [example_train.py](https://github.com/truthless11/tatk/blob/master/example_train.py) under the root directory for details.
+## Run
+
+Please refer to [example_train.py](https://github.com/truthless11/tatk/blob/master/example_train.py) for details.
+
+```bash
+$ PYTHONPATH=../.. python example_train.py
+```
+
+You can change the following arguments in [example_train.py](https://github.com/truthless11/tatk/blob/master/example_train.py) as you want.
+
+```python
+batchsz = 1024
+epoch = 20
+process_num = 8
+```
+
