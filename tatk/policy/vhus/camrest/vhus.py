@@ -2,8 +2,12 @@
 import os
 import json
 import torch
+<<<<<<< HEAD
 import zipfile
 from tatk.util.file_util import cached_path
+=======
+
+>>>>>>> vhus for camrest
 from tatk.policy.policy import Policy
 from tatk.policy.vhus.util import padding
 from tatk.task.camrest.goal_generator import GoalGenerator
@@ -11,6 +15,7 @@ from tatk.policy.vhus.camrest.usermanager import UserDataManager
 from tatk.policy.vhus.usermodule import VHUS
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+<<<<<<< HEAD
 
 DEFAULT_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
 DEFAULT_ARCHIVE_FILE = os.path.join(DEFAULT_DIRECTORY, "vhus_simulator_camrest.zip")
@@ -20,6 +25,12 @@ class UserPolicyVHUS(Policy):
     def __init__(self,
                  archive_file=DEFAULT_ARCHIVE_FILE,
                  model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/vhus_simulator_camrest.zip'):
+=======
+    
+class UserPolicyVHUS(Policy):
+    
+    def __init__(self):
+>>>>>>> vhus for camrest
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
             config = json.load(f)
         manager = UserDataManager()
@@ -28,6 +39,7 @@ class UserPolicyVHUS(Policy):
         self.goal_gen = GoalGenerator()
         self.manager = manager
         self.user.eval()
+<<<<<<< HEAD
 
         if not os.path.isfile(archive_file):
             if not model_file:
@@ -41,12 +53,18 @@ class UserPolicyVHUS(Policy):
             archive.extractall(model_dir)
         self.load(config['load'])
 
+=======
+        
+        self.load(config['load'])
+        
+>>>>>>> vhus for camrest
     def init_session(self):
         self.time_step = -1
         self.topic = 'NONE'
         self.goal = self.goal_gen.get_user_goal()
         self.goal_input = torch.LongTensor(self.manager.get_goal_id(self.manager.usrgoal2seq(self.goal)))
         self.goal_len_input = torch.LongTensor([len(self.goal_input)]).squeeze()
+<<<<<<< HEAD
         self.sys_da_id_stack = []  # to save sys da history
 
     def predict(self, state):
@@ -62,6 +80,20 @@ class UserPolicyVHUS(Policy):
                 True to terminate session, otherwise session continues.
         """
         sys_action = state
+=======
+        self.sys_da_id_stack = [] # to save sys da history
+
+    def predict(self, state):
+        """
+        Predict an user act based on state and preorder system action.
+        Args:
+            state (tuple): Dialog state.
+        Returns:
+            usr_action (tuple): User act.
+            session_over (boolean): True to terminate session, otherwise session continues.
+        """
+        sys_action = state['system_action']
+>>>>>>> vhus for camrest
         sys_seq_turn = self.manager.sysda2seq(self.manager.ref_data2stand(sys_action), self.goal)
         self.sys_da_id_stack += self.manager.get_sysda_id([sys_seq_turn])
         sys_seq_len = torch.LongTensor([max(len(sen), 1) for sen in self.sys_da_id_stack])
@@ -69,11 +101,21 @@ class UserPolicyVHUS(Policy):
         sys_seq = torch.LongTensor(padding(self.sys_da_id_stack, max_sen_len))
         usr_a, terminal = self.user.select_action(self.goal_input, self.goal_len_input, sys_seq, sys_seq_len)
         usr_action = self.manager.usrseq2da(self.manager.id2sentence(usr_a), self.goal)
+<<<<<<< HEAD
 
         return usr_action, terminal
 
+=======
+        
+        return usr_action, terminal
+    
+>>>>>>> vhus for camrest
     def load(self, filename):
         user_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_simulator.mdl')
         if os.path.exists(user_mdl):
             self.user.load_state_dict(torch.load(user_mdl))
+<<<<<<< HEAD
             print('<<user simulator>> loaded checkpoint from file: {}'.format(user_mdl))
+=======
+            print('<<user simulator>> loaded checkpoint from file: {}'.format(user_mdl))
+>>>>>>> vhus for camrest

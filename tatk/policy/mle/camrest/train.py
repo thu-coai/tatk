@@ -85,6 +85,36 @@ class MLE_Trainer():
         a_loss /= len(self.data_test)
         logging.debug('<<dialog policy>> test, epoch {}, loss_a:{}'.format(epoch, a_loss))
         return best
+        
+    def test(self):
+        def f1(a, target):
+            TP, FP, FN = 0, 0, 0
+            real = target.nonzero().tolist()
+            predict = a.nonzero().tolist()
+            for item in real:
+                if item in predict:
+                    TP += 1
+                else:
+                    FN += 1
+            for item in predict:
+                if item not in real:
+                    FP += 1
+            return TP, FP, FN
+    
+        a_TP, a_FP, a_FN = 0, 0, 0
+        for i, data in enumerate(self.data_test):
+            s, target_a = to_device(data)
+            a_weights = self.policy(s)
+            a = a_weights.ge(0)
+            TP, FP, FN = f1(a, target_a)
+            a_TP += TP
+            a_FP += FP
+            a_FN += FN
+            
+        prec = a_TP / (a_TP + a_FP)
+        rec = a_TP / (a_TP + a_FN)
+        F1 = 2 * prec * rec / (prec + rec)
+        print(a_TP, a_FP, a_FN, F1)
 
     def save(self, directory, epoch):
         if not os.path.exists(directory):

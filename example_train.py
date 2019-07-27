@@ -10,7 +10,7 @@ import torch
 from torch import multiprocessing as mp
 from tatk.dialog_agent.agent import PipelineAgent
 from tatk.dialog_agent.env import Environment
-from tatk.nlu.bert.multiwoz import SVMNLU
+from tatk.nlu.svm.multiwoz import SVMNLU
 from tatk.dst.rule.multiwoz import RuleDST
 from tatk.policy.rule.multiwoz import Rule
 from tatk.policy.ppo import PPO
