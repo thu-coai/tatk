@@ -45,7 +45,7 @@ Please refer to [example_train.py](https://github.com/truthless11/tatk/blob/mast
 $ PYTHONPATH=../.. python example_train.py
 ```
 
-You can change the following arguments in [example_train.py](https://github.com/truthless11/tatk/blob/master/example_train.py) as you want.
+You can change the following arguments in [example_train.py](https://github.com/truthless11/tatk/blob/master/example_train.py),
 
 ```python
 batchsz = 1024
@@ -53,3 +53,4 @@ epoch = 20
 process_num = 8
 ```
 
+or `config.json` of corresponding RL policy during the training.
