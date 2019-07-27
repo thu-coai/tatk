@@ -7,3 +7,4 @@ unzip [zip](https://tatk-data.s3-ap-northeast-1.amazonaws.com/nlg_sclstm_multiwo
 ## Data
 
 We use the multiwoz data (./resource/\*, ./resource_usr/\*).
+
