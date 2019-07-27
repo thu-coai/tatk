@@ -2,7 +2,7 @@
 
 ## Prepare the data
 
-unzip [rar](https://tatk-data.s3-ap-northeast-1.amazonaws.com/nlg_sclstm_camrest.zip) here
+unzip [zip](https://tatk-data.s3-ap-northeast-1.amazonaws.com/nlg_sclstm_camrest.zip) here
 
 ## Data
 
