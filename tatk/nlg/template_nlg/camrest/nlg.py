@@ -8,11 +8,17 @@ from tatk.nlg import NLG
 class TemplateNLG(NLG):
     def __init__(self, is_user, mode="manual"):
         """
-        :param is_user: if dialog_act from user or system
-        :param mode:    `auto`: templates extracted from data without manual modification, may have no match;
-                        `manual`: templates with manual modification, sometimes verbose;
-                        `auto_manual`: use auto templates first. When fails, use manual templates.
-        both template are dict, *_template[dialog_act][slot] is a list of templates.
+        Args:
+            is_user:
+                if dialog_act from user or system
+            mode:
+                - `auto`: templates extracted from data without manual modification, may have no match;
+
+                - `manual`: templates with manual modification, sometimes verbose;
+
+                - `auto_manual`: use auto templates first. When fails, use manual templates.
+
+                both template are dict, *_template[dialog_act][slot] is a list of templates.
         """
         super().__init__()
         self.is_user = is_user
@@ -24,10 +30,13 @@ class TemplateNLG(NLG):
         self.manual_system_template = self.read_json(os.path.join(template_dir, 'manual_system_template_nlg.json'))
 
     def generate(self, dialog_acts):
-        """
-        NLG for Multiwoz dataset
-        :param dialog_acts: {da1:[[slot1,value1],...], da2:...}
-        :return: generated sentence
+        """NLG for Multiwoz dataset
+
+        Args:
+            dialog_acts:
+                {da1:[[slot1,value1],...], da2:...}
+        Returns:
+            generated sentence
         """
         mode = self.mode
         try:

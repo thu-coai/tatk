@@ -24,6 +24,8 @@ On `svm` dir:
 $ PYTHONPATH=../../.. python train.py multiwoz/configs/multiwoz_[mode].cfg
 ```
 
+Please refer to `svm/config.md` for how to write config file (`*.cfg`)
+
 The model will be saved on `model/svm_multiwoz_[mode].pickle`. Also, it will be zipped as `model/svm_multiwoz_[mode].zip`. 
 
 Trained models can be download on: 
@@ -56,6 +58,16 @@ You can refer to `evaluate.py` for specific usage.
 ## Data
 
 We use the multiwoz data (`data/multiwoz/[train|val|test].json.zip`).
+
+## Performance
+
+| mode | Precision | Recall | F1    |
+| ---- | --------- | ------ | ----- |
+| usr  | 71.88     | 61.86  | 66.49 |
+| sys  | 68.14     | 40.88  | 51.10 |
+| all  | 68.16     | 46.98  | 55.62 |
+
+
 
 ## References
 

@@ -1,9 +1,12 @@
 """
 Evaluate BertNLU models on camrest test dataset
-Metric: dataset level Precision/Recall/F1
-Usage: PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
+
+Metric:
+    dataset level Precision/Recall/F1
+
+Usage:
+    PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
 """
-import argparse
 import pickle
 import os
 import json
@@ -15,25 +18,26 @@ from tatk.util.file_util import cached_path
 import torch
 import random
 import numpy as np
+import sys
+from tatk.nlu.bert.camrest.preprocess import preprocess
 
 torch.manual_seed(9102)
 random.seed(9102)
 np.random.seed(9102)
 
 
-parser = argparse.ArgumentParser(description="Test a model.")
-parser.add_argument('--config_path',
-                    help='path to config file')
-
-
 if __name__ == '__main__':
-    args = parser.parse_args()
-    config = json.load(open(args.config_path))
+    mode = sys.argv[1]
+    config_path = 'configs/camrest_{}.json'.format(mode)
+    config = json.load(open(config_path))
     DEVICE = config['DEVICE']
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_dir = os.path.join(root_dir, config['data_dir'])
     output_dir = os.path.join(root_dir, config['output_dir'])
     log_dir = os.path.join(root_dir, config['log_dir'])
+
+    if not os.path.exists(os.path.join(data_dir, 'data.pkl')):
+        preprocess(mode)
 
     data = pickle.load(open(os.path.join(data_dir,'data.pkl'),'rb'))
     intent_vocab = pickle.load(open(os.path.join(data_dir,'intent_vocab.pkl'),'rb'))
@@ -104,7 +108,7 @@ if __name__ == '__main__':
     precision = 1.0 * TP / (TP + FP)
     recall = 1.0 * TP / (TP + FN)
     F1 = 2.0 * precision * recall / (precision + recall)
-    print('Model on {} sentences '.format(len(dataloader.data['test'])))
+    print('Model on {} sentences data_key={}'.format(len(dataloader.data['test']), mode))
     print('\t Precision: %.2f' % (100 * precision))
     print('\t Recall: %.2f' % (100 * recall))
     print('\t F1: %.2f' % (100 * F1))

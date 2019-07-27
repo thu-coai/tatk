@@ -24,6 +24,8 @@ On `svm` dir:
 $ PYTHONPATH=../../.. python train.py camrest/configs/camrest_[mode].cfg
 ```
 
+Please refer to `svm/config.md` for how to write config file (`*.cfg`)
+
 The model will be saved on `model/svm_camrest_[mode].pickle`. Also, it will be zipped as `model/svm_camrest_[mode].zip`. 
 
 Trained models can be download on: 
@@ -56,6 +58,14 @@ You can refer to `evaluate.py` for specific usage.
 ## Data
 
 We use the multiwoz data (`data/camrest/[train|val|test].json.zip`).
+
+## Performance
+
+| mode | Precision | Recall | F1    |
+| ---- | --------- | ------ | ----- |
+| usr  | 64.53     | 74.52  | 69.16 |
+| sys  | 47.20     | 45.57  | 46.37 |
+| all  | 55.95     | 59.03  | 57.45 |
 
 ## References
 

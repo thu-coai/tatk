@@ -1,16 +1,19 @@
 """
 Preprocess camrest data for BertNLU.
+
 Usage:
     python preprocess [mode=all|usr|sys]
     mode: which side data will be use
+
 Require:
-    - `../../../../data/camrest/[train|val|test].json.zip` data file
+    - ``../../../../data/camrest/[train|val|test].json.zip`` data file
+
 Output:
-    - `data/[mode]_data/` processed data dir
-        - `data.pkl`: data[data_key=train|val|test] is a list of [tokens,tags,intents],
+    - ``data/[mode]_data/``: processed data dir
+        - ``data.pkl``: data[data_key=train|val|test] is a list of [tokens,tags,intents],
             tokens: list of words; tags: list of BIO tags(e.g. B-domain-intent+slot); intent: list of 'domain-intent+slot*value'.
-        - `intent_vocab.pkl`: list of all intents (format: 'domain-intent+slot*value')
-        - `tag_vocab.pkl`: list of all tags (format: 'O'|'B-domain-intent+slot'|'B-domain-intent+slot')
+        - ``intent_vocab.pkl``: list of all intents (format: 'domain-intent+slot*value')
+        - ``tag_vocab.pkl``: list of all tags (format: 'O'|'B-domain-intent+slot'|'B-domain-intent+slot')
 """
 import json
 import os
@@ -92,11 +95,11 @@ def das2tags(sen, das, all_tag=None):
     return tokens, tags, intents, new_das
 
 
-if __name__ == '__main__':
-    mode = sys.argv[1]
+def preprocess(mode):
     assert mode == 'all' or mode == 'usr' or mode == 'sys'
-    data_dir = '../../../../data/camrest'
-    processed_data_dir = 'data/{}_data'.format(mode)
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(cur_dir, '../../../../data/camrest')
+    processed_data_dir = os.path.join(cur_dir, 'data/{}_data'.format(mode))
     if not os.path.exists(processed_data_dir):
         os.makedirs(processed_data_dir)
     data_key = ['train', 'val', 'test']
@@ -118,7 +121,8 @@ if __name__ == '__main__':
                     if key == 'train':
                         tokens, tags, intents, new_das = das2tags(turn['usr']['transcript'], turn['usr']['dialog_act'])
                     else:
-                        tokens, tags, intents, new_das = das2tags(turn['usr']['transcript'], turn['usr']['dialog_act'], all_tag)
+                        tokens, tags, intents, new_das = das2tags(turn['usr']['transcript'], turn['usr']['dialog_act'],
+                                                                  all_tag)
                     processed_data[key].append([tokens, tags, intents, new_das])
                     if key == 'train':
                         all_da += [da for da in turn['usr']['dialog_act']]
@@ -128,7 +132,8 @@ if __name__ == '__main__':
                     if key == 'train':
                         tokens, tags, intents, new_das = das2tags(turn['sys']['sent'], turn['sys']['dialog_act'])
                     else:
-                        tokens, tags, intents, new_das = das2tags(turn['sys']['sent'], turn['sys']['dialog_act'], all_tag)
+                        tokens, tags, intents, new_das = das2tags(turn['sys']['sent'], turn['sys']['dialog_act'],
+                                                                  all_tag)
 
                     processed_data[key].append([tokens, tags, intents, new_das])
                     if key == 'train':
@@ -149,3 +154,8 @@ if __name__ == '__main__':
     pickle.dump(processed_data, open(os.path.join(processed_data_dir, 'data.pkl'), 'wb'))
     pickle.dump(all_intent, open(os.path.join(processed_data_dir, 'intent_vocab.pkl'), 'wb'))
     pickle.dump(all_tag, open(os.path.join(processed_data_dir, 'tag_vocab.pkl'), 'wb'))
+
+
+if __name__ == '__main__':
+    mode = sys.argv[1]
+    preprocess(mode)

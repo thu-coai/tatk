@@ -366,7 +366,7 @@ class classifier(object):
         rootpath=os.path.dirname(os.path.abspath(__file__))
         fname = os.path.join(rootpath, fname)
         print("loading saved Classifier")
-        print(fname)
+        # print(fname)
         obj = pickle.load(open(fname,'rb'))
         print("loaded.")
         classifier_params = obj["classifier_params"]

@@ -1,16 +1,19 @@
 """
 Preprocess multiwoz data for BertNLU.
+
 Usage:
     python preprocess [mode=all|usr|sys]
     mode: which side data will be use
+
 Require:
-    - `../../../../data/multiwoz/[train|val|test].json.zip` data file
+    - ``../../../../data/multiwoz/[train|val|test].json.zip`` data file
+
 Output:
-    - `data/[mode]_data/` processed data dir
-        - `data.pkl`: data[data_key=train|val|test] is a list of [tokens,tags,intents],
+    - ``data/[mode]_data/``: processed data dir
+        - ``data.pkl``: data[data_key=train|val|test] is a list of [tokens,tags,intents],
             tokens: list of words; tags: list of BIO tags(e.g. B-domain-intent+slot); intent: list of 'domain-intent+slot*value'.
-        - `intent_vocab.pkl`: list of all intents (format: 'domain-intent+slot*value')
-        - `tag_vocab.pkl`: list of all tags (format: 'O'|'B-domain-intent+slot'|'B-domain-intent+slot')
+        - ``intent_vocab.pkl``: list of all intents (format: 'domain-intent+slot*value')
+        - ``tag_vocab.pkl``: list of all tags (format: 'O'|'B-domain-intent+slot'|'B-domain-intent+slot')
 """
 import json
 import os
@@ -25,17 +28,17 @@ def read_zipped_json(filepath, filename):
     return json.load(archive.open(filename))
 
 
-if __name__ == '__main__':
-    mode = sys.argv[1]
-    assert mode=='all' or mode=='usr' or mode=='sys'
-    data_dir = '../../../../data/multiwoz'
-    processed_data_dir = 'data/{}_data'.format(mode)
+def preprocess(mode):
+    assert mode == 'all' or mode == 'usr' or mode == 'sys'
+    cur_dir = os.path.dirname(os.path.abspath(__file__))
+    data_dir = os.path.join(cur_dir, '../../../../data/multiwoz')
+    processed_data_dir = os.path.join(cur_dir, 'data/{}_data'.format(mode))
     if not os.path.exists(processed_data_dir):
         os.makedirs(processed_data_dir)
     data_key = ['train', 'val', 'test']
     data = {}
     for key in data_key:
-        data[key] = read_zipped_json(os.path.join(data_dir,key+'.json.zip'), key+'.json')
+        data[key] = read_zipped_json(os.path.join(data_dir, key + '.json.zip'), key + '.json')
         print('load {}, size {}'.format(key, len(data[key])))
 
     processed_data = {}
@@ -102,3 +105,8 @@ if __name__ == '__main__':
     pickle.dump(processed_data, open(os.path.join(processed_data_dir, 'data.pkl'), 'wb'))
     pickle.dump(all_intent, open(os.path.join(processed_data_dir, 'intent_vocab.pkl'), 'wb'))
     pickle.dump(all_tag, open(os.path.join(processed_data_dir, 'tag_vocab.pkl'), 'wb'))
+
+
+if __name__ == '__main__':
+    mode = sys.argv[1]
+    preprocess(mode)
