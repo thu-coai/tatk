@@ -187,7 +187,7 @@ class MultiWozVector(Vector):
         entities = {}
         for domint in action:
             domain, intent = domint.split('-')
-            if domain not in entities and domain not in ['general', 'booking']:
+            if domain not in entities and domain.lower() not in ['general', 'booking']:
                 constraint = []
                 for k, v in self.state[domain.lower()]['semi'].items():
                     if k in mapping[domain.lower()]:
