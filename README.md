@@ -46,6 +46,8 @@ Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tut
 
 - [Getting Started](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Getting%20Started)
 - [Add New Model](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Add%20New%20Model)
+- [RNN rollout - deal or not]([http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#RNN%20rollout%20-%20deal%20or%20not](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#RNN rollout - deal or not))
+- [Train RL Policies]([http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Train%20RL%20Policies](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Train RL Policies))
 
 ## Documents
 
