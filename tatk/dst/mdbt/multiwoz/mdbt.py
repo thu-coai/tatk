@@ -6,11 +6,14 @@ import time
 from random import shuffle
 import numpy as np
 import tensorflow as tf
+import shutil
+import zipfile
 
 from tatk.dst.mdbt.mdbt import MDBT
 from tatk.dst.mdbt.mdbt_util import model_definition, load_word_vectors, load_ontology, \
-    load_woz_data, \
-    track_dialogue, generate_batch, evaluate_model
+    load_woz_data, track_dialogue, generate_batch, evaluate_model
+from tatk.util.file_util import cached_path
+
 train_batch_size = 1
 batches_per_eval = 10
 no_epochs = 600
@@ -48,6 +51,33 @@ class MultiWozMDBT(MDBT):
         self.no_dialogues = len(self.dialogues)
 
         super(MultiWozMDBT, self).__init__(self.ontology_vectors, self.ontology, self.slots, self.data_dir)
+
+        self.file_url = 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/mdbt_multiwoz_sys.zip'
+
+        self.auto_download()
+
+    def auto_download(self):
+        """Automatically download the pretrained model and necessary data."""
+        if os.path.exists(os.path.join(self.data_dir, 'models')) and \
+            os.path.exists(os.path.join(self.data_dir, 'data')) and \
+            os.path.exists(os.path.join(self.data_dir, 'word-vectors')):
+            return
+        cached_path(self.file_url, self.data_dir)
+        files = os.listdir(self.data_dir)
+        target_file = ''
+        for name in files:
+            if name.endswith('.json'):
+                target_file = name[:-5]
+        try:
+            assert target_file in files
+        except Exception as e:
+            print('allennlp download file error: MDBT Multiwoz data download failed.')
+            raise e
+        zip_file_path = os.path.join(self.data_dir, target_file+'.zip')
+        shutil.copyfile(os.path.join(self.data_dir, target_file), zip_file_path)
+        with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+            zip_ref.extractall(self.data_dir)
+
 
     def train(self):
         """
@@ -313,4 +343,25 @@ def test_model():
     saver = tf.train.Saver()
     mdbt.restore()
     mdbt.test(mdbt.sess)
+
+
+# if __name__ == '__main__':
+#     if not os.path.exists('./configs'):
+#         os.makedirs('./configs')
+#     # cached_path('https://tatk-data.s3-ap-northeast-1.amazonaws.com/rnnrollout_dealornot.zip', './configs')
+#     data_dir = './configs'
+#     files = os.listdir('./configs')
+#     target_file = ''
+#     for name in files:
+#         if name.endswith('.json'):
+#             target_file = name[:-5]
+#     try:
+#         assert target_file in files
+#     except Exception as e:
+#         print('allennlp download file error: MDBT Multiwoz data download failed.')
+#         raise e
+#     zip_file_path = os.path.join(data_dir, target_file + '.zip')
+#     shutil.copyfile(os.path.join(data_dir, target_file), zip_file_path)
+#     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
+#         zip_ref.extractall(data_dir)
 
