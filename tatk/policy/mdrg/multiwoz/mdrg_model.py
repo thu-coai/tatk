@@ -14,7 +14,7 @@ from torch import optim
 
 import functools
 
-import tatk.policy.mdrg.multiwoz.default_policy as policy
+from tatk.policy.mdrg.multiwoz.default_policy import DefaultPolicy
 
 SOS_token = 0
 EOS_token = 1
@@ -316,7 +316,7 @@ class Model(nn.Module):
         self.encoder = EncoderRNN(len(self.input_lang_index2word), self.emb_size, self.hid_size_enc,
                                   self.cell_type, self.depth, self.dropout).to(self.device)
 
-        self.policy = policy.DefaultPolicy(self.hid_size_pol, self.hid_size_enc, self.db_size, self.bs_size).to(self.device)
+        self.policy = DefaultPolicy(self.hid_size_pol, self.hid_size_enc, self.db_size, self.bs_size).to(self.device)
 
         if self.use_attn:
             if self.attn_type == 'bahdanau':

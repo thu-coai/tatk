@@ -75,8 +75,7 @@ class SCLSTM(NLG):
 
     def generate_delex(self, meta):
         """
-        meta = {"Attraction-Inform": [["Choice","many"],["Area","centre of town"]],
-                "Attraction-Select": [["Type","church"],["Type"," swimming"],["Type"," park"]]}
+        meta = {"inform": [["area","centre of town"]]}
         """
         # add placeholder value
         for k, v in meta.items():
