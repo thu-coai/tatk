@@ -73,7 +73,7 @@ For  more details about these models, You can refer to `README.md` under `tatk/$
 - [Camrest](https://www.repository.cam.ac.uk/handle/1810/260970)
   - We add some annotation and place it under `data/camrest` dir.
     - Add system dialog act (*inform*, *request*, *nooffer*)
-    - LICENSE: Attribution 4.0 International, url: http://creativecommons.org/licenses/by/4.0/
+  - LICENSE: Attribution 4.0 International, url: http://creativecommons.org/licenses/by/4.0/
 - [Dealornot](https://github.com/facebookresearch/end-to-end-negotiator/tree/master/src/data/negotiate)
   - LICENSE: Attribution-NonCommercial 4.0 International, url: https://creativecommons.org/licenses/by-nc/4.0/
 
