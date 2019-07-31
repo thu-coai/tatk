@@ -137,17 +137,19 @@ class Encoder(nn.Module):
         self.rnn = self.rnn_cell(embed_size, hidden_size, n_layers, batch_first=True, dropout=dropout_p)
 
     def forward(self, input_var, input_lengths=None):
-        """
-        Applies a multi-layer RNN to an input sequence.
+        """Applies a multi-layer RNN to an input sequence.
+
         Args:
-            input_var (batch, seq_len): tensor containing the features of the input sequence.
-            input_lengths (list of int, optional): A list that contains the lengths of sequences
+            input_var (batch, seq_len):
+                tensor containing the features of the input sequence.
+            input_lengths (list of int, optional):
+                A list that contains the lengths of sequences
               in the mini-batch
         Returns: output, hidden
-            - **output** (batch, seq_len, hidden_size): variable containing the encoded features of
-              the input sequence
-            - **hidden** (num_layers * num_directions, batch, hidden_size): variable containing the
-              features in the hidden state h
+            - **output** (batch, seq_len, hidden_size):
+                variable containing the encoded features of the input sequence
+            - **hidden** (num_layers * num_directions, batch, hidden_size):
+                variable containing the features in the hidden state h
         """
         embedded = self.embedding(input_var)
         embedded = self.input_dropout(embedded)

@@ -205,8 +205,8 @@ class CamRestEvaluator(GenericEvaluator):
         self.entity_dict = {}
 
     def run_metrics(self):
-        raw_json = open('./data/CamRest676/CamRest676.json')
-        raw_entities = open('./data/CamRest676/CamRestOTGY.json')
+        raw_json = open('camrest/data/CamRest676.json')
+        raw_entities = open('camrest/data/CamRestOTGY.json')
         raw_data = json.loads(raw_json.read().lower())
         raw_entities = json.loads(raw_entities.read().lower())
         self.get_entities(raw_entities)
@@ -498,9 +498,9 @@ class MultiWozEvaluator(GenericEvaluator):
         self.entity_dict = {}
 
     def run_metrics(self):
-        with open('./data/MultiWoz/test.json') as f:
+        with open('multiwoz/data/test.json') as f:
             raw_data = json.loads(f.read().lower())
-        with open('./data/MultiWoz/entities.json') as f:
+        with open('multiwoz/data/entities.json') as f:
             raw_entities = json.loads(f.read().lower())
         self.get_entities(raw_entities)
         data = self.read_result_data()

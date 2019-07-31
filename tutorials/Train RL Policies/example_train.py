@@ -10,7 +10,7 @@ import torch
 from torch import multiprocessing as mp
 from tatk.dialog_agent.agent import PipelineAgent
 from tatk.dialog_agent.env import Environment
-from tatk.nlu.bert.multiwoz import BERTNLU
+from tatk.nlu.svm.multiwoz import SVMNLU
 from tatk.dst.rule.multiwoz import RuleDST
 from tatk.policy.rule.multiwoz import Rule
 from tatk.policy.ppo import PPO
@@ -145,7 +145,7 @@ def update(env, policy, batchsz, epoch, process_num):
 
 if __name__ == '__main__':
     # svm nlu trained on usr sentence of multiwoz
-    nlu_sys = BERTNLU('usr', model_file="https://tatk-data.s3-ap-northeast-1.amazonaws.com/bert_multiwoz_usr.zip")
+    nlu_sys = SVMNLU('usr', model_file="https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip")
     # simple rule DST
     dst_sys = RuleDST()
     # rule policy
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     nlg_sys = TemplateNLG(is_user=False)    
     
     # svm nlu trained on sys sentence of multiwoz
-    nlu_usr = BERTNLU('sys', model_file="https://tatk-data.s3-ap-northeast-1.amazonaws.com/bert_multiwoz_sys.zip")
+    nlu_usr = SVMNLU('sys', model_file="https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_sys.zip")
     # not use dst
     dst_usr = None
     # rule policy
@@ -166,5 +166,8 @@ if __name__ == '__main__':
     
     env = Environment(nlg_sys, simulator, nlu_sys, dst_sys)
     
-    update(env, policy_sys, 1024, 20, 16)
+    batchsz = 1024
+    epoch = 20
+    process_num = 8
+    update(env, policy_sys, batchsz, epoch, process_num)
 
