@@ -193,13 +193,18 @@ class TemplateNLG(NLG):
 
 def example():
     # dialog act
-    dialog_acts = {}
-    # whether from user or system
-    is_user = False
+    dialog_acts = {'Train-Inform': [['Day', 'wednesday'], ['Leave', '10:15']]}
+    print(dialog_acts)
 
-    multiwoz_template_nlg = TemplateNLG(is_user)
-    # print(dialog_acts)
-    print(multiwoz_template_nlg.generate(dialog_acts))
+    # system model for manual, auto, auto_manual
+    nlg_sys_manual = TemplateNLG(is_user=False, mode='manual')
+    nlg_sys_auto = TemplateNLG(is_user=False, mode='auto')
+    nlg_sys_auto_manual = TemplateNLG(is_user=False, mode='auto_manual')
+
+    # generate
+    print('manual      : ', nlg_sys_manual.generate(dialog_acts))
+    print('auto        : ', nlg_sys_auto.generate(dialog_acts))
+    print('auto_manual : ', nlg_sys_auto_manual.generate(dialog_acts))
 
 
 if __name__ == '__main__':
