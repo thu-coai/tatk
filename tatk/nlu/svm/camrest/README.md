@@ -59,6 +59,14 @@ You can refer to `evaluate.py` for specific usage.
 
 We use the multiwoz data (`data/camrest/[train|val|test].json.zip`).
 
+## Performance
+
+| mode | Precision | Recall | F1    |
+| ---- | --------- | ------ | ----- |
+| usr  | 64.53     | 74.52  | 69.16 |
+| sys  | 47.20     | 45.57  | 46.37 |
+| all  | 55.95     | 59.03  | 57.45 |
+
 ## References
 
 ```

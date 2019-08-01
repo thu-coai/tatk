@@ -21,6 +21,7 @@ class PG(Policy):
         self.update_round = cfg['update_round']
         self.optim_batchsz = cfg['batchsz']
         self.gamma = cfg['gamma']
+        self.is_train = is_train
         if is_train:
             init_logging_handler(cfg['log_dir'])
         
@@ -37,7 +38,7 @@ class PG(Policy):
             action : System act, with the form of (act_type, {slot_name_1: value_1, slot_name_2, value_2, ...})
         """
         s_vec = torch.Tensor(self.vector.state_vectorize(state))
-        a = self.policy.select_action(s_vec.to(device=DEVICE)).cpu()
+        a = self.policy.select_action(s_vec.to(device=DEVICE), self.is_train).cpu()
         action = self.vector.action_devectorize(a.numpy())
         
         return action
