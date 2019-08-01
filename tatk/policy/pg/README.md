@@ -4,7 +4,7 @@ A simple stochastic gradient algorithm for policy gradient reinforcement learnin
 
 ## Train
 
-Refer to example_train.py under the root directory and *Train RL Policies* in the tutorial.
+Refer to example_train.py and *Train RL Policies* in the tutorial.
 
 ## Reference
 
