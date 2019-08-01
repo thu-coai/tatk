@@ -123,7 +123,7 @@ class VHUS_Trainer():
             for word in da_seq:
                 if word in ['<PAD>', '<UNK>', '<SOS>', '<EOS>', '(', ')']:
                     continue
-                if '-' in word:
+                if word in ['inform', 'request']:
                     cur_act = word
                 else:
                     if cur_act is None:
