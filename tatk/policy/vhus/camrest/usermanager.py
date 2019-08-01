@@ -158,10 +158,7 @@ class UserDataManager(object):
                             ret.append(slot + '=' + m_val)
 
             ret.append(')')
-        try:
-            assert len(ret) > 0, str(usr_da)
-        except:
-            print(len(ret), str(usr_da))
+
         return ret
 
     @staticmethod
@@ -228,8 +225,6 @@ class UserDataManager(object):
                     sys_da = self.ref_data2stand(logs[turn]['sys'].get('dialog_act', {}))
                     usr_das.append(usr_da)
                     sys_das.append(sys_da)
-                    if len(usr_das[-1]) <= 0 or len(sys_das[-1]) <= 0:
-                        break
                 else:
                     goals.append(goal)
                     usr_dass.append(usr_das)
