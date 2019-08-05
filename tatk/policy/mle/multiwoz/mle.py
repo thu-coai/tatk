@@ -50,7 +50,7 @@ class MLE(Policy):
             action : System act, with the form of (act_type, {slot_name_1: value_1, slot_name_2, value_2, ...})
         """
         s_vec = torch.Tensor(self.vector.state_vectorize(state))
-        a = self.policy.select_action(s_vec.to(device=DEVICE)).cpu()
+        a = self.policy.select_action(s_vec.to(device=DEVICE), False).cpu()
         action = self.vector.action_devectorize(a.numpy())
         
         return action
