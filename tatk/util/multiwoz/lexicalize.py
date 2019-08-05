@@ -45,7 +45,9 @@ def lexicalize_da(meta, entities, state, requestable):
     
     for k, v in meta.items():
         domain, intent = k.split('-')
-        if intent in requestable:
+        if domain.lower() in ['general', 'booking']:
+            continue
+        elif intent in requestable:
             for pair in v:
                 pair[1] = '?'
         elif intent.lower() in ['nooffer', 'nobook']:
