@@ -6,7 +6,7 @@ clipping mechanism as the soft constraint to perform each policy update. We adap
 
 ## Train
 
-Refer to example_train.py under the root directory and *Train RL Policies* in the tutorial.
+Refer to example_train.py and *Train RL Policies* in the tutorial.
 
 ## Reference
 
