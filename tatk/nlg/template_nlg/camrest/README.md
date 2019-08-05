@@ -37,6 +37,16 @@ auto        :  Both are in the west and in the cheap price range .
 auto_manual :  Yes , it is cheap and in the west .
 ```
 
+## Performance on Camrest
+
+run `python evaluate.py [usr|sys|all]`
+
+|       | usr    | sys    | all    |
+| ----- | ------ | ------ | ------ |
+| BLEU4 | 0.3131 | 0.2174 | 0.2538 |
+
+
+
 ## Templates
 
 The camrest template set consists of two sources.
