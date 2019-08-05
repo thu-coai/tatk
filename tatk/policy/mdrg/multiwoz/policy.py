@@ -551,7 +551,6 @@ class MDRGWordPolicy(Policy):
 
         self.normalized_dial = createDelexData(self.dial)
 
-        pprint.pprint(self.normalized_dial)
         response = decode(self.normalized_dial, self.model)
 
         active_domain = None
