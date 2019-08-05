@@ -11,7 +11,7 @@ urls =  {model_path: 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/mdrg_mod
 for path in [model_path, data_path, db_path]:
     if not os.path.exists(path):
         file_url = urls[path]
-        print("Downloading from %d", file_url)
+        print("Downloading from ", file_url)
         r = requests.get(file_url)
         with open('tmp.zip', 'wb') as file:
             file.write(r.content)

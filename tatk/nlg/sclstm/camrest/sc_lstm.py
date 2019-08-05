@@ -80,7 +80,7 @@ class SCLSTM(NLG):
         # add placeholder value
         for k, v in meta.items():
             intent = k
-            if intent == "Request":
+            if intent == "request":
                 for pair in v:
                     if type(pair[1]) != str:
                         pair[1] = str(pair[1])
