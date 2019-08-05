@@ -58,20 +58,20 @@ def unicode_to_utf8(d):
 
 def load_dict(filename):
     try:
-        with open(filename, 'rb') as f:
+        with open(os.path.join(os.path.curdir(__file__), filename), 'rb') as f:
             return unicode_to_utf8(json.load(f))
     except:
-        with open(filename, 'rb') as f:
+        with open(os.path.join(os.path.curdir(__file__), filename), 'rb') as f:
             return pkl.load(f)
 
 
 def load_config(basename):
     try:
-        with open('%s.json' % basename, 'rb') as f:
+        with open(os.path.join(os.path.curdir(__file__), basename + '.json'), 'rb') as f:
             return json.load(f)
     except:
         try:
-            with open('%s.pkl' % basename, 'rb') as f:
+            with open(os.path.join(os.path.curdir(__file__), basename + '.pkl'), 'rb') as f:
                 return pkl.load(f)
         except:
             sys.stderr.write('Error: config file {0}.json is missing\n'.format(basename))
