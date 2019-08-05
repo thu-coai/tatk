@@ -9,7 +9,7 @@ from tatk.policy.mdrg.multiwoz.utils.nlp import normalize
 domains = ['restaurant', 'hotel', 'attraction', 'train', 'taxi', 'hospital']#, 'police']
 dbs = {}
 for domain in domains:
-    db = os.path.join(os.path.dirname(__file__), os.pardir, 'data/db/{}-dbase.db'.format(domain))
+    db = os.path.join(os.path.dirname(__file__), os.pardir, 'db/{}-dbase.db'.format(domain))
     conn = sqlite3.connect(db)
     c = conn.cursor()
     dbs[domain] = c
