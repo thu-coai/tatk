@@ -1,6 +1,7 @@
 import pickle
 import re
 import os
+
 import simplejson as json
 
 from tatk.policy.mdrg.multiwoz.utils.nlp import normalize
@@ -29,7 +30,7 @@ def prepareSlotValuesIndependent():
     # read databases
     for domain in domains:
         try:
-            fin = open('db/' + domain + '_db.json')
+            fin = open(os.path.join(os.path.dirname(__file__), os.pardir, 'db', domain + '_db.json'))
             db_json = json.load(fin)
             fin.close()
 
@@ -104,9 +105,7 @@ def prepareSlotValuesIndependent():
             dic.append((normalize('Parkside Police Station'), '[' + domain + '_' + 'name' + ']'))
 
     # add at the end places from trains
-    # fin = file('db/' + 'train' + '_db.json')
-    db_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data/db/train_db.json')
-    fin = open(db_path)
+    fin = open(os.path.join(os.path.dirname(__file__), os.path.pardir, 'db', 'train_db.json'), 'r')
     db_json = json.load(fin)
     fin.close()
 
