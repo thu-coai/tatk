@@ -18,7 +18,7 @@ After you've trained your own policy, you can use it in your own dialog system:
 
 ```python
 from tatk.policy.mdrg.multiwoz.policy import MDRGWordPolicy
-policy - MDRGWordPolicy(num)
+policy = MDRGWordPolicy(num)
 ```
 You can choose different model parameter by changing num, default set to `num=1`, which uses parameter from `model/model/translate.ckpt-1`
 
