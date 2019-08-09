@@ -68,12 +68,12 @@ if __name__ == '__main__':
     test_loss = 0
     test_intent_loss = 0
     test_tag_loss = 0
-    for batched_data, real_batch_size in dataloader.yield_batches(batch_size, data_key='test'):
+    for batched_data, real_batch_size in dataloader.yield_batches(batch_size, data_key='val'):
         intent_loss, tag_loss, total_loss = model.eval_batch(*batched_data)
         test_intent_loss += intent_loss * real_batch_size
         test_tag_loss += tag_loss * real_batch_size
         test_loss += total_loss * real_batch_size
-    total = len(dataloader.data['test'])
+    total = len(dataloader.data['val'])
     test_loss /= total
     test_intent_loss /= total
     test_tag_loss /= total
