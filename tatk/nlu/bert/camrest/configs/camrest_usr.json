@@ -1,8 +1,8 @@
 {
   "data_dir": "camrest/data/usr_data",
-  "output_dir": "camrest/output2/usr",
+  "output_dir": "camrest/output/usr",
   "zipped_model_path": "camrest/output/usr/bert_camrest_usr.zip",
-  "log_dir": "camrest/log2/usr",
+  "log_dir": "camrest/log/usr",
   "DEVICE": "cuda:0",
   "model": {
     "pre-trained": "bert-base-uncased",
