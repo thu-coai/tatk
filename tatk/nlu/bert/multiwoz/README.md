@@ -64,9 +64,9 @@ We use the multiwoz data (`data/multiwoz/[train|val|test].json.zip`).
 
 | mode | Precision | Recall | F1    |
 | ---- | --------- | ------ | ----- |
-| usr  | 77.96     | 65.86  | 71.40 |
-| sys  | 72.42     | 61.18  | 66.33 |
-| all  | 73.10     | 58.34  | 64.89 |
+| usr  | 78.30     | 66.12  | 71.69 |
+| sys  | 73.06     | 62.71  | 67.49 |
+| all  | 71.92     | 60.30  | 65.60 |
 
 ## References
 
