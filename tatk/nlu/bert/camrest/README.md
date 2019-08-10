@@ -64,9 +64,9 @@ We use the multiwoz data (`data/camrest/[train|val|test].json.zip`).
 
 | mode | Precision | Recall | F1    |
 | ---- | --------- | ------ | ----- |
-| usr  | 78.44     | 69.73  | 73.83 |
-| sys  | 90.04     | 87.47  | 88.74 |
-| all  | 84.53     | 80.79  | 82.62 |
+| usr  | 79.51     | 73.11  | 76.17 |
+| sys  | 90.14     | 86.56  | 88.31 |
+| all  | 84.61     | 81.97  | 83.27 |
 
 ## References
 
