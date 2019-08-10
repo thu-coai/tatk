@@ -9,6 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 import random
 import numpy as np
 import zipfile
+from copy import deepcopy
 
 torch.manual_seed(9102)
 random.seed(9102)
@@ -49,11 +50,20 @@ if __name__ == '__main__':
                     DEVICE=DEVICE,
                     intent_weight=dataloader.intent_weight)
     model.to(DEVICE)
-    save_params = []
+    intent_save_params = []
+    tag_save_params = []
     for name, param in model.named_parameters():
         if param.requires_grad:
             print(name, param.shape, param.device)
-            save_params.append(name)
+            if 'intent' in name:
+                intent_save_params.append(name)
+            elif 'tag' in name:
+                tag_save_params.append(name)
+            else:
+                # Not support finetune bert params yet
+                assert 0
+    print('intent params:',intent_save_params)
+    print('tag params:',tag_save_params)
 
     max_step = config['max_step']
     check_step = config['check_step']
@@ -61,9 +71,10 @@ if __name__ == '__main__':
     train_loss = 0
     train_intent_loss = 0
     train_tag_loss = 0
-    best_val_loss = np.inf
     best_val_intent_loss = np.inf
     best_val_tag_loss = np.inf
+    best_intent_params = None
+    best_tag_params = None
 
     for step in range(1,max_step+1):
         # batched_data = word_seq_tensor, tag_seq_tensor, intent_tensor, word_mask_tensor, tag_mask_tensor, word_seq_len
@@ -115,23 +126,34 @@ if __name__ == '__main__':
             print('\t intent loss:', test_intent_loss)
             print('\t tag loss:', test_tag_loss)
 
-            if val_loss < best_val_loss:
-                best_val_tag_loss = val_tag_loss
+            update_flag = False
+            if val_intent_loss < best_val_intent_loss:
                 best_val_intent_loss = val_intent_loss
-                best_val_loss = val_loss
+                best_intent_params = deepcopy({k: v for k, v in model.state_dict().items() if k in intent_save_params})
+                update_flag = True
+                print('best_val_intent_loss', best_val_intent_loss)
+            if val_tag_loss < best_val_tag_loss:
+                best_val_tag_loss = val_tag_loss
+                best_tag_params = deepcopy({k: v for k, v in model.state_dict().items() if k in tag_save_params})
+                update_flag = True
+                print('best_val_tag_loss', best_val_tag_loss)
+
+            if update_flag:
                 print("Update best checkpoint")
-                model_state_dict = {k: v for k, v in model.state_dict().items() if k in save_params}
+                model_state_dict = {}
+                model_state_dict.update(best_intent_params)
+                model_state_dict.update(best_tag_params)
                 best_model_path = os.path.join(output_dir, 'bestcheckpoint_step-{}.tar'.format(step))
                 torch.save({
                     'step': step,
                     'model_state_dict': model_state_dict,
-                    'optimizer_state_dict': model.optim.state_dict(),
+                    # 'optimizer_state_dict': model.optim.state_dict(),
                 }, best_model_path)
                 best_model_path = os.path.join(output_dir, 'bestcheckpoint.tar')
                 torch.save({
                     'step': step,
                     'model_state_dict': model_state_dict,
-                    'optimizer_state_dict': model.optim.state_dict(),
+                    # 'optimizer_state_dict': model.optim.state_dict(),
                 }, best_model_path)
 
             writer.add_scalars('total loss', {
