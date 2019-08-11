@@ -22,34 +22,6 @@ from tatk.policy.mdrg.multiwoz.create_delex_data import delexicaliseReferenceNum
 from tatk.util.multiwoz.state import default_state
 
 
-parser = argparse.ArgumentParser(description='S2S')
-parser.add_argument('--no_cuda', type=util.str2bool, nargs='?', const=True, default=True, help='enables CUDA training')
-parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
-
-parser.add_argument('--no_models', type=int, default=20, help='how many models to evaluate')
-parser.add_argument('--original', type=str, default='model/model/', help='Original path.')
-
-parser.add_argument('--dropout', type=float, default=0.0)
-parser.add_argument('--use_emb', type=str, default='False')
-
-parser.add_argument('--beam_width', type=int, default=10, help='Beam width used in beamsearch')
-parser.add_argument('--write_n_best', type=util.str2bool, nargs='?', const=True, default=False, help='Write n-best list (n=beam_width)')
-
-parser.add_argument('--model_path', type=str, default='model/model/translate.ckpt', help='Path to a specific model checkpoint.')
-parser.add_argument('--model_dir', type=str, default='data/multi-woz/model/model/')
-parser.add_argument('--model_name', type=str, default='translate.ckpt')
-
-parser.add_argument('--valid_output', type=str, default='model/data/val_dials/', help='Validation Decoding output dir path')
-parser.add_argument('--decode_output', type=str, default='model/data/test_dials/', help='Decoding output dir path')
-
-args = parser.parse_args()
-args.cuda = not args.no_cuda and torch.cuda.is_available()
-
-torch.manual_seed(args.seed)
-
-device = torch.device("cuda" if args.cuda else "cpu")
-
-
 def load_config(args):
     config = util.unicode_to_utf8(
         json.load(open(os.path.join(os.path.dirname(__file__), args.model_path + '.json'), 'rb')))
@@ -421,9 +393,9 @@ def populate_template(template, top_results, num_results, state):
     response = response.replace(' ?', '?')
     return response
 
-def decode(data, model):
+def decode(data, model, device):
     # model, val_dials, test_dials = loadModelAndData(num)
-    device = torch.device("cuda" if args.cuda else "cpu")
+    # device = torch.device("cuda" if args.cuda else "cpu")
 
     for ii in range(1):
         if ii == 0:
@@ -508,7 +480,7 @@ class MDRGWordPolicy(Policy):
 
         torch.manual_seed(args.seed)
 
-        device = torch.device("cuda" if args.cuda else "cpu")
+        self.device = torch.device("cuda" if args.cuda else "cpu")
         with open(os.path.join(os.path.dirname(__file__), args.model_path + '.config'), 'r') as f:
             add_args = json.load(f)
             # print(add_args)
@@ -545,7 +517,7 @@ class MDRGWordPolicy(Policy):
 
         self.normalized_dial = createDelexData(self.dial)
 
-        response = decode(self.normalized_dial, self.model)
+        response = decode(self.normalized_dial, self.model, self.device)
 
         active_domain = None
         domains = ['restaurant', 'hotel', 'taxi', 'train', 'police', 'hospital', 'attraction']
