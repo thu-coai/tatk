@@ -1,16 +1,13 @@
-#!/usr/bin/env python
-# coding: utf-8
-from __future__ import division, print_function, unicode_literals
-
+import requests
+import zipfile
 import argparse
 import json
 import os
-import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir))
 import shutil
 import time
 import re
-import pprint
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir))
 
 import numpy as np
 import torch
@@ -458,6 +455,7 @@ def decode(data, model):
 
 
 def loadModel(num, args):
+
     # Load dictionaries
     with open(os.path.join(os.path.dirname(__file__), 'data','input_lang.index2word.json')) as f:
         input_lang_index2word = json.load(f)
@@ -470,39 +468,14 @@ def loadModel(num, args):
 
     # Reload existing checkpoint
     model = Model(args, input_lang_index2word, output_lang_index2word, input_lang_word2index, output_lang_word2index)
-    # print(model.model_name)
-    # print(model.model_dir)
+
     if args.load_param:
         model.loadModel(iter=num)
-
     return model
-
-
-def autoDownload():
-    model_path = os.path.join(os.path.dirname(__file__), 'model')
-    data_path = os.path.join(os.path.dirname(__file__), 'data')
-    db_path = os.path.join(os.path.dirname(__file__), 'db')
-
-    urls = {model_path: 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/mdrg_model.zip',
-            data_path: 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/mdrg_data.zip',
-            db_path: 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/mdrg_db.zip'}
-
-    for path in [model_path, data_path, db_path]:
-        if not os.path.exists(path):
-            file_url = urls[path]
-            print("Downloading from ", file_url)
-            r = requests.get(file_url)
-            with open('tmp.zip', 'wb') as file:
-                file.write(r.content)
-            zip_file = zipfile.ZipFile('tmp.zip')
-            for names in zip_file.namelist():
-                zip_file.extract(names)
-            zip_file.close()
 
 
 class MDRGWordPolicy(Policy):
     def __init__(self, num=1):
-        autoDownload()
         parser = argparse.ArgumentParser(description='S2S')
         parser.add_argument('--no_cuda', type=util.str2bool, nargs='?', const=True, default=True,
                             help='enables CUDA training')
@@ -596,8 +569,7 @@ class MDRGWordPolicy(Policy):
         # response = populate_template(output_words[0], top_results, num_results, state)
         # return response, active_domain
 
-        print(top_results)
-        print(response)
+        # print(response)
         response = populate_template(response, top_results, num_results, state['belief_state'])
         response = response.split(' ')
         if '_UNK' in response:
@@ -619,7 +591,7 @@ def main():
     # s['belief_state']['attraction']['semi']['area'] = 'centre'
     s['belief_state']['restaurant']['semi']['area'] = 'south'
     s['belief_state']['restaurant']['semi']['food'] = 'mexican'
-    testPolicy = MDRGWordPolicy(15)
+    testPolicy = MDRGWordPolicy()
     print(s)
     print(testPolicy.predict(s))
 
