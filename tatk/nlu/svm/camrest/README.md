@@ -61,6 +61,10 @@ We use the multiwoz data (`data/camrest/[train|val|test].json.zip`).
 
 ## Performance
 
+`mode` determines the data we use: if mode=`usr`, use user utterances to train; if mode=`sys`, use system utterances to train; if mode=`all`, use both user and system utterances to train.
+
+We evaluate the precision/recall/f1 of predicted dialog act.
+
 | mode | Precision | Recall | F1    |
 | ---- | --------- | ------ | ----- |
 | usr  | 64.53     | 74.52  | 69.16 |
