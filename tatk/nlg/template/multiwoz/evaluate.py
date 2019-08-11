@@ -12,7 +12,7 @@ import numpy as np
 import torch
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 
-from tatk.nlg.template_nlg.multiwoz import TemplateNLG
+from tatk.nlg.template.multiwoz import TemplateNLG
 
 seed = 2019
 random.seed(seed)

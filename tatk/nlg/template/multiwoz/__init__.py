@@ -1,1 +1,1 @@
-from tatk.nlg.template_nlg.multiwoz.nlg import TemplateNLG
+from tatk.nlg.template.multiwoz.nlg import TemplateNLG
