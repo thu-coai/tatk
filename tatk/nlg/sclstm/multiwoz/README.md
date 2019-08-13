@@ -8,9 +8,15 @@ unzip [zip](https://tatk-data.s3-ap-northeast-1.amazonaws.com/nlg_sclstm_multiwo
 
 We use the multiwoz data (./resource/\*, ./resource_usr/\*).
 
-## Performance on Multiwoz
+## Evaluate
 
 run `python evaluate.py [usr|sys|all]`
+
+## Performance on Multiwoz
+
+`mode` determines the data we use: if mode=`usr`, use user utterances to train; if mode=`sys`, use system utterances to train; if mode=`all`, use both user and system utterances to train.
+
+We evaluate the BLEU4 of delexicalized utterance. The references of a generated sentence are all the golden sentences that have the same dialog act.
 
 |       | usr    | sys    | all    |
 | ----- | ------ | ------ | ------ |
