@@ -6,6 +6,7 @@ data/camrest/CamRest676_v2.json
 
 ## Performance
 
-Dialog Act F1: 0.3414
+|Dialog act F1| Terminal accuracy |
+|-|-|
+|0.3414|0.6238|
 
-Terminal Accuracy: 0.6238
