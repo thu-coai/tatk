@@ -5,7 +5,6 @@
   "log_dir": "camrest/log/usr",
   "DEVICE": "cpu",
   "model": {
-    "train_bert": false,
     "pre-trained": "bert-base-uncased",
     "lr": 0.001,
     "dropout": 0.3,

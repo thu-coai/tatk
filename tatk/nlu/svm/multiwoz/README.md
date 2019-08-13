@@ -61,6 +61,10 @@ We use the multiwoz data (`data/multiwoz/[train|val|test].json.zip`).
 
 ## Performance
 
+`mode` determines the data we use: if mode=`usr`, use user utterances to train; if mode=`sys`, use system utterances to train; if mode=`all`, use both user and system utterances to train.
+
+We evaluate the precision/recall/f1 of predicted dialog act.
+
 | mode | Precision | Recall | F1    |
 | ---- | --------- | ------ | ----- |
 | usr  | 71.88     | 61.86  | 66.49 |
