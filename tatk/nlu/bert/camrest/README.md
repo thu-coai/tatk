@@ -2,8 +2,8 @@
 
 Based on pre-trained bert, BERTNLU use a linear layer for slot tagging and another linear layer for intent classification. Dialog acts are split into two groups, depending on whether the value is in the utterance. 
 
-- For those dialog acts that the value appears in the utterance, they are translated to BIO tags. For example, `"Find me a cheap restaurant"`, its dialog act is `{"inform":[["pricerange", "cheap"]]}`, and translated tag sequence is `["O", "O", "O", "B-inform+pricerange", "O"]`. A linear layer takes pre-trained bert word embeddings as input and classify the tag label.
-- For each of the other dialog acts, such as `(request, address, ?)`, another linear layer takes pre-trained bert embeddings of `[CLS]` as input and do the classification.
+- For those dialog acts that the value appears in the utterance, they are translated to BIO tags. For example, `"Find me a cheap hotel"`, its dialog act is `{"Hotel-Inform":[["Price", "cheap"]]}`, and translated tag sequence is `["O", "O", "O", "B-Hotel-Inform+Price", "O"]`. A linear layer takes pre-trained bert word embeddings as input and classify the tag label.
+- For each of the other dialog acts, such as `(Hotel-Request, Address, ?)`, another linear layer takes pre-trained bert embeddings of `[CLS]` as input and do the binary classification.
 
 ## Example usage
 
