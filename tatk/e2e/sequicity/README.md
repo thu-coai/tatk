@@ -1,6 +1,11 @@
 # Sequicity
 
-Sequicity is an end-to-end task-oriented dialog system based on a single sequence-to-sequence model that uses *belief span* to track dialog believes. We adapt the code from [github](https://github.com/WING-NUS/sequicity) to work in multiwoz corpus. The original paper can be found at [ACL Anthology](https://aclweb.org/anthology/papers/P/P18/P18-1133).
+Sequicity is an end-to-end task-oriented dialog system based on a single sequence-to-sequence model that uses *belief span* to track dialog believes. 
+
+- It formulates the DST task into a generation problem (rather than the classification problem)
+- It tracks the dialog history using *two-state copynet* mechanism, one for *belief span*, the other for response generation.
+
+We adapt the code from [github](https://github.com/WING-NUS/sequicity) to work in multiwoz corpus. The original paper can be found at [ACL Anthology](https://aclweb.org/anthology/papers/P/P18/P18-1133).
 
 ## Prepare data
 
