@@ -14,7 +14,7 @@ Trained model can be download on [here](https://tatk-data.s3-ap-northeast-1.amaz
 
 ## Performance
 
-BLEU | Match | Success (F1, Prec., Rec.) 
-- | - | - 
-0.2160 | 0.9273 |(0.8365, 0.8707, 0.8049)
+|BLEU | Match | Success (F1, Prec., Rec.) |
+| - | - | - |
+|0.2160 | 0.9273 |(0.8365, 0.8707, 0.8049)|
 
