@@ -14,8 +14,6 @@ Trained model can be download on [here](https://tatk-data.s3-ap-northeast-1.amaz
 
 ## Performance
 
-bleu_metric bleu        0.21597761121051318
-
-match_metric match      (0.9272727271884297, 0.0)
-
-success_f1_metric success       (0.8365018961271989, 0.870712401032435, 0.8048780487608567)
+| BLEU | Match | Success (F1, Prec., Rec.) |
+| - | - | - |
+| 0.2160 | 0.9273 |(0.8365, 0.8707, 0.8049)|
