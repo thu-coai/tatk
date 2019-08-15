@@ -87,22 +87,24 @@ class PipelineAgent(Agent):
 
         # get dialog act
         if self.nlu_model is not None:
-            dialog_act = self.nlu_model.predict(observation)
+            self.dialog_act = self.nlu_model.predict(observation)
         else:
-            dialog_act = observation
+            self.dialog_act = observation
+
+        # get state
+        if self.tracker is not None:
+            state = self.tracker.update(self.dialog_act)
+        else:
+            state = self.dialog_act
 
         # get action
-        if self.tracker is not None:
-            state = self.tracker.update(dialog_act)
-        else:
-            state = dialog_act
-        action = self.policy.predict(state)
+        self.action = self.policy.predict(state)
 
         # get model response
         if self.nlg_model is not None:
-            model_response = self.nlg_model.generate(action)
+            model_response = self.nlg_model.generate(self.action)
         else:
-            model_response = action
+            model_response = self.action
 
         if self.tracker is not None:
             self.tracker.state['history'].append(['self', model_response])
@@ -125,3 +127,9 @@ class PipelineAgent(Agent):
             self.tracker.init_session()
         if self.policy is not None:
             self.policy.init_session()
+
+    def get_in_da(self):
+        return self.dialog_act
+
+    def get_out_da(self):
+        return self.action
