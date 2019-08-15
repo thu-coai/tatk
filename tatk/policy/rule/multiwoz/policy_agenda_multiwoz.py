@@ -114,6 +114,9 @@ class UserPolicyAgendaMultiWoz(Policy):
         # Is there any action to say?
         return self.agenda.is_empty()
 
+    def get_goal(self):
+        return self.domain_goals
+
     def get_reward(self):
         return self._reward()
 

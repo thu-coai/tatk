@@ -78,3 +78,6 @@ class UserPolicyVHUS(Policy):
         if os.path.exists(user_mdl):
             self.user.load_state_dict(torch.load(user_mdl))
             print('<<user simulator>> loaded checkpoint from file: {}'.format(user_mdl))
+
+    def get_goal(self):
+        return self.goal
