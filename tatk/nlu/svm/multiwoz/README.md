@@ -5,7 +5,7 @@ SVMNLU build a classifier for each semantic tuple (intent-slot-value) based on n
 - For each semantic tuple (intent-slot-value) that has limited value, such as `(Hotel-Request, Addr, ?)` and `(Hotel-Inform, Internet, [yes|no])`, an SVM classifier is applied directly.
 - If the semantic tuple (intent-slot-value) may have many value, such as Hotel-Name and Hotel-Addr, we use an SVM classifier `(INTENT, SLOT, GENERAL)` for all tuples that have same intent and slot but different value. When a new sentence come, we identify these value using the ontology.
 
-## Example usage
+## Usage
 
 Determine which data you want to use: if **mode**='usr', use user utterances to train; if **mode**='sys', use system utterances to train; if **mode**='all', use both user and system utterances to train.
 
