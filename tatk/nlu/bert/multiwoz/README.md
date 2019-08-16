@@ -24,7 +24,7 @@ output processed data on `data/[mode]_data/` dir.
 On `bert` dir:
 
 ```sh
-$ PYTHONPATH=../../.. python train.py --config_path multiwoz/configs/multiwoz_[mode].json
+$ python train.py --config_path multiwoz/configs/multiwoz_[mode].json
 ```
 
 The model will be saved on `output/[mode]/bestcheckpoint.tar`. Also, it will be zipped as `output/[mode]/bert_multiwoz_[mode].zip`. 
@@ -40,7 +40,7 @@ Trained models can be download on:
 On `bert/multiwoz` dir:
 
 ```sh
-$ PYTHONPATH=../../../.. python evaluate.py [mode]
+$ python evaluate.py [mode]
 ```
 
 #### Predict
@@ -68,9 +68,9 @@ We evaluate the precision/recall/f1 of predicted dialog act.
 
 | mode | Precision | Recall | F1    |
 | ---- | --------- | ------ | ----- |
-| usr  | 78.30     | 66.12  | 71.69 |
-| sys  | 73.06     | 62.71  | 67.49 |
-| all  | 71.92     | 60.30  | 65.60 |
+| usr  | 75.83     | 68.63  | 72.05 |
+| sys  | 70.26     | 66.53  | 68.34 |
+| all  | 69.24     | 63.86  | 66.44 |
 
 ## References
 
