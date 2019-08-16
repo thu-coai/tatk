@@ -40,7 +40,7 @@ def recover_intent(dataloader, intent_logits, tag_logits, tag_mask_tensor, ori_w
     max_seq_len = tag_logits.size(0)
     intents = []
     for j in range(dataloader.intent_dim):
-        if intent_logits[j] > 0.5:
+        if intent_logits[j] > 0:
             intent, slot, value = re.split('[+*]', dataloader.id2intent[j])
             intents.append((intent, slot, value))
     tags = []

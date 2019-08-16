@@ -24,7 +24,7 @@ output processed data on `data/[mode]_data/` dir.
 On `bert` dir:
 
 ```sh
-$ PYTHONPATH=../../.. python train.py --config_path camrest/configs/camrest_[mode].json
+$ python train.py --config_path camrest/configs/camrest_[mode].json
 ```
 
 The model will be saved on `output/[mode]/bestcheckpoint.tar`. Also, it will be zipped as `output/[mode]/bert_camrest_[mode].zip`. 
@@ -40,7 +40,7 @@ Trained models can be download on:
 On `bert/camrest` dir:
 
 ```sh
-$ PYTHONPATH=../../../.. python evaluate.py [mode]
+$ python evaluate.py [mode]
 ```
 
 #### Predict
@@ -68,9 +68,9 @@ We evaluate the precision/recall/f1 of predicted dialog act.
 
 | mode | Precision | Recall | F1    |
 | ---- | --------- | ------ | ----- |
-| usr  | 79.51     | 73.11  | 76.17 |
-| sys  | 90.14     | 86.56  | 88.31 |
-| all  | 84.61     | 81.97  | 83.27 |
+| usr  | 76.57     | 78.42  | 77.49 |
+| sys  | 88.50     | 87.78  | 88.14 |
+| all  | 82.41     | 84.52  | 83.45 |
 
 ## References
 
