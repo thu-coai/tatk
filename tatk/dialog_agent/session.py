@@ -117,7 +117,7 @@ class BiSession(Session):
         user_response = self.next_response(last_observation)
         self.evaluator.add_sys_da(self.user_agent.get_in_da())
         self.evaluator.add_usr_da(self.user_agent.get_out_da())
-        session_over = self.user_agent.is_terminal()
+        session_over = self.user_agent.is_terminated()
         if session_over:
             prec, rec, f1 = self.evaluator.inform_F1()
             print('inform prec. {} rec. {} F1 {}'.format(prec, rec, f1))
@@ -167,8 +167,8 @@ class DealornotSession(Session):
         self.dialog_history.append(model_response)
         return model_response
 
-    def is_terminal(self):
-        if self.current_agent.is_terminal():
+    def is_terminated(self):
+        if self.current_agent.is_terminated():
             return True
 
     def get_rewards(self, ctxs):

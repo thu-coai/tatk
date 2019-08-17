@@ -111,9 +111,9 @@ class PipelineAgent(Agent):
 
         return model_response
 
-    def is_terminal(self):
-        if hasattr(self.policy, 'is_terminal'):
-            return self.policy.is_terminal()
+    def is_terminated(self):
+        if hasattr(self.policy, 'is_terminated'):
+            return self.policy.is_terminated()
         return None
 
     def get_reward(self):
