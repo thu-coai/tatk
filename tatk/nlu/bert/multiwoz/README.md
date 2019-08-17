@@ -68,9 +68,9 @@ We evaluate the precision/recall/f1 of predicted dialog act.
 
 | mode | Precision | Recall | F1    |
 | ---- | --------- | ------ | ----- |
-| usr  | 75.83     | 68.63  | 72.05 |
-| sys  | 70.26     | 66.53  | 68.34 |
-| all  | 69.24     | 63.86  | 66.44 |
+| usr  | 72.55     | 76.33  | 74.40 |
+| sys  | 69.45     | 72.59  | 70.99 |
+| all  | 67.71     | 71.92  | 69.75 |
 
 ## References
 
