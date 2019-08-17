@@ -40,7 +40,7 @@ class RNNRolloutAgent(Agent):
         self.last_response = model_response
         return model_response
 
-    def is_terminal(self):
+    def is_terminated(self):
         if self.__current_len < 0:
             return True
         elif utils.is_selection(self.last_response):

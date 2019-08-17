@@ -87,7 +87,7 @@ class UserPolicyAgendaCamrest(Policy):
 
         return action
 
-    def is_terminal(self):
+    def is_terminated(self):
         # Is there any action to say?
         return self.agenda.is_empty()
 
