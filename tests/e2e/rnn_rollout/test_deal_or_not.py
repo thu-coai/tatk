@@ -215,7 +215,7 @@ for ctxs in context_generator.iter():
     while True:
         response = session.next_response(last_observation)
         print('\t', response)
-        session_over = session.is_terminal()
+        session_over = session.is_terminated()
         if session_over:
             break
         last_observation = response

@@ -24,6 +24,6 @@ class Environment():
         state = self.sys_dst.update(dialog_act)
         
         reward = self.usr.get_reward()
-        terminal = self.usr.is_terminal()
+        terminal = self.usr.is_terminated()
         
         return state, reward, terminal

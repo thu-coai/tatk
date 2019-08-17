@@ -51,7 +51,8 @@ if __name__ == '__main__':
         archive.close()
     print('Load from',best_model_path)
     checkpoint = torch.load(best_model_path, map_location=DEVICE)
-    print('train step', checkpoint['step'])
+    print('best_intent_step', checkpoint['best_intent_step'])
+    print('best_tag_step', checkpoint['best_tag_step'])
 
     model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
                     DEVICE=DEVICE,
@@ -80,4 +81,5 @@ if __name__ == '__main__':
     print('\t intent loss:', test_intent_loss)
     print('\t tag loss:', test_tag_loss)
     print('Load from', best_model_path)
-    print('train step', checkpoint['step'])
+    print('best_intent_step', checkpoint['best_intent_step'])
+    print('best_tag_step', checkpoint['best_tag_step'])
