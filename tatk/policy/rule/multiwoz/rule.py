@@ -44,3 +44,8 @@ class Rule(Policy):
         if self.character == 'sys':
             return None
         return self.policy.get_reward()
+
+    def get_goal(self):
+        if hasattr(self.policy, 'get_goal'):
+            return self.policy.get_goal()
+        return None

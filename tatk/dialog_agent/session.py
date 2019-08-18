@@ -53,7 +53,7 @@ class BiSession(Session):
             The dialog history, formatted as [[user_uttr1, sys_uttr1], [user_uttr2, sys_uttr2], ...]
     """
 
-    def __init__(self, sys_agent, user_agent, kb_query, evaluator):
+    def __init__(self, sys_agent, user_agent, kb_query=None, evaluator=None):
         """
         Args:
             sys_agent (Agent):
@@ -115,10 +115,11 @@ class BiSession(Session):
                 The reward given by the user.
         """
         user_response = self.next_response(last_observation)
-        self.evaluator.add_sys_da(self.user_agent.get_in_da())
-        self.evaluator.add_usr_da(self.user_agent.get_out_da())
+        if self.evaluator:
+            self.evaluator.add_sys_da(self.user_agent.get_in_da())
+            self.evaluator.add_usr_da(self.user_agent.get_out_da())
         session_over = self.user_agent.is_terminated()
-        if session_over:
+        if session_over and self.evaluator:
             prec, rec, f1 = self.evaluator.inform_F1()
             print('inform prec. {} rec. {} F1 {}'.format(prec, rec, f1))
             print('book rate {}'.format(self.evaluator.book_rate()))
@@ -137,7 +138,8 @@ class BiSession(Session):
     def init_session(self):
         self.sys_agent.init_session()
         self.user_agent.init_session()
-        self.evaluator.add_goal(self.user_agent.policy.get_goal())
+        if self.evaluator:
+            self.evaluator.add_goal(self.user_agent.policy.get_goal())
 
 
 class DealornotSession(Session):
