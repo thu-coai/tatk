@@ -1,5 +1,5 @@
 from tests.nlg.test_nlg import BaseTestNLGMultiwoz
-from tatk.nlg.template_nlg.multiwoz.nlg import TemplateNLG
+from tatk.nlg.template.multiwoz.nlg import TemplateNLG
 
 
 class TestNLGMultiwoz(BaseTestNLGMultiwoz):

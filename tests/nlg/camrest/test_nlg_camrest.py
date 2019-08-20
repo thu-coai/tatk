@@ -1,5 +1,5 @@
 from tests.nlg.test_nlg import BaseTestNLGCamrest
-from tatk.nlg.template_nlg.camrest.nlg import TemplateNLG
+from tatk.nlg.template.camrest.nlg import TemplateNLG
 
 
 class TestNLGCamrest(BaseTestNLGCamrest):
