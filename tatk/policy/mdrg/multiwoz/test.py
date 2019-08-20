@@ -13,7 +13,7 @@ import torch
 
 from tatk.policy.mdrg.multiwoz.utils import util
 from tatk.policy.mdrg.multiwoz.evaluator import evaluateModel
-from tatk.policy.mdrg.multiwoz.mdrg_model import Model
+from tatk.policy.mdrg.multiwoz.model  import Model
 
 parser = argparse.ArgumentParser(description='S2S')
 parser.add_argument('--no_cuda', type=util.str2bool, nargs='?', const=True, default=True, help='enables CUDA training')
@@ -185,6 +185,8 @@ def decodeWrapper():
         decode(ii)
 
         args.model_path = args.original
+
+
 
 
 if __name__ == '__main__':

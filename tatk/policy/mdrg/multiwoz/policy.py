@@ -1,19 +1,19 @@
-#!/usr/bin/env python
-# coding: utf-8
-from __future__ import division, print_function, unicode_literals
-
+import requests
+import zipfile
 import argparse
 import json
 import os
 import shutil
 import time
 import re
+import sys
+sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir))
 
 import numpy as np
 import torch
 
 from tatk.policy.policy import Policy
-from tatk.policy.mdrg.multiwoz.utils import delexicalize, util, dbPointer
+from tatk.policy.mdrg.multiwoz.utils import delexicalize, util, dbquery, dbPointer
 from tatk.policy.mdrg.multiwoz.utils.nlp import normalize
 from tatk.policy.mdrg.multiwoz.evaluator import evaluateModel
 from tatk.policy.mdrg.multiwoz.mdrg_model import Model
@@ -21,37 +21,10 @@ from tatk.policy.mdrg.multiwoz.create_delex_data import delexicaliseReferenceNum
 
 from tatk.util.multiwoz.state import default_state
 
-# parser = argparse.ArgumentParser(description='S2S')
-# parser.add_argument('--no_cuda', type=util.str2bool, nargs='?', const=True, default=True, help='enables CUDA training')
-# parser.add_argument('--seed', type=int, default=1, metavar='S', help='random seed (default: 1)')
-#
-# parser.add_argument('--no_models', type=int, default=20, help='how many models to evaluate')
-# parser.add_argument('--original', type=str, default='model/model/', help='Original path.')
-#
-# parser.add_argument('--dropout', type=float, default=0.0)
-# parser.add_argument('--use_emb', type=str, default='False')
-#
-# parser.add_argument('--beam_width', type=int, default=10, help='Beam width used in beamsearch')
-# parser.add_argument('--write_n_best', type=util.str2bool, nargs='?', const=True, default=False, help='Write n-best list (n=beam_width)')
-#
-# parser.add_argument('--model_path', type=str, default='model/model/translate.ckpt', help='Path to a specific model checkpoint.')
-# parser.add_argument('--model_dir', type=str, default='data/multi-woz/model/model/')
-# parser.add_argument('--model_name', type=str, default='translate.ckpt')
-#
-# parser.add_argument('--valid_output', type=str, default='model/data/val_dials/', help='Validation Decoding output dir path')
-# parser.add_argument('--decode_output', type=str, default='model/data/test_dials/', help='Decoding output dir path')
-#
-# args = parser.parse_args()
-# args.cuda = not args.no_cuda and torch.cuda.is_available()
-#
-# torch.manual_seed(args.seed)
-#
-# device = torch.device("cuda" if args.cuda else "cpu")
-
 
 def load_config(args):
     config = util.unicode_to_utf8(
-        json.load(open('%s.json' % args.model_path, 'rb')))
+        json.load(open(os.path.join(os.path.dirname(__file__), args.model_path + '.json'), 'rb')))
     for key, value in args.__args.items():
         try:
             config[key] = value.value
@@ -63,13 +36,13 @@ def load_config(args):
 
 def loadModelAndData(num, args):
     # Load dictionaries
-    with open('data/input_lang.index2word.json') as f:
+    with open(os.path.join(os.path.curdir(__file__),'data/input_lang.index2word.json')) as f:
         input_lang_index2word = json.load(f)
-    with open('data/input_lang.word2index.json') as f:
+    with open(os.path.join(os.path.curdir(__file__),'data/input_lang.word2index.json')) as f:
         input_lang_word2index = json.load(f)
-    with open('data/output_lang.index2word.json') as f:
+    with open(os.path.join(os.path.curdir(__file__),'data/output_lang.index2word.json')) as f:
         output_lang_index2word = json.load(f)
-    with open('data/output_lang.word2index.json') as f:
+    with open(os.path.join(os.path.curdir(__file__),'data/output_lang.word2index.json')) as f:
         output_lang_word2index = json.load(f)
 
     # Reload existing checkpoint
@@ -91,11 +64,11 @@ def loadModelAndData(num, args):
         os.makedirs(args.valid_output)
 
     # Load validation file list:
-    with open('data/val_dials.json') as outfile:
+    with open(os.path.join(os.path.curdir(__file__), 'data/val_dials.json')) as outfile:
         val_dials = json.load(outfile)
 
     # Load test file list:
-    with open('data/test_dials.json') as outfile:
+    with open(os.path.join(os.path.curdir(__file__), 'data/test_dials.json')) as outfile:
         test_dials = json.load(outfile)
     return model, val_dials, test_dials
 
@@ -139,8 +112,8 @@ def addBookingPointer(task, turn, pointer_vector):
 
     return pointer_vector
 
-def addDBPointer(turn):
-    """Create database pointer for all related domains."""
+def addDBPointer(state):
+    '''Create database pointer for all related domains.
     domains = ['restaurant', 'hotel', 'attraction', 'train']
     pointer_vector = np.zeros(6 * len(domains))
     for domain in domains:
@@ -148,11 +121,31 @@ def addDBPointer(turn):
         pointer_vector = dbPointer.oneHotVector(num_entities, domain, pointer_vector)
 
     return pointer_vector
+    '''
+    domains = ['restaurant', 'hotel', 'attraction', 'train']
+    pointer_vector = np.zeros(6 * len(domains))
+    db_results = {}
+    num_entities = {}
+    for domain in domains:
+        # entities = dbPointer.queryResultVenues(domain, {'metadata': state})
+        try:
+            entities = dbquery.query(domain, state['metadata'][domain]['semi'].items())
+        except:
+            entities = dbquery.query(domain, state['belief_state'][domain]['semi'].items())
+        num_entities[domain] = len(entities)
+        if len(entities) > 0:
+            # fields = dbPointer.table_schema(domain)
+            # db_results[domain] = dict(zip(fields, entities[0]))
+            db_results[domain] = entities[0]
+        # pointer_vector = dbPointer.oneHotVector(len(entities), domain, pointer_vector)
+        pointer_vector = dbPointer.oneHotVector(len(entities), domain, pointer_vector)
+
+    return pointer_vector, db_results, num_entities
 
 
 def decodeWrapper(args):
     # Load config file
-    with open(args.model_path + '.config') as f:
+    with open(os.path.join(os.path.curdir(__file__), args.model_path + '.config')) as f:
         add_args = json.load(f)
         for k, v in add_args.items():
             setattr(args, k, v)
@@ -173,6 +166,24 @@ def decodeWrapper(args):
             print('cannot decode')
 
         args.model_path = args.original
+
+
+def get_active_domain(prev_active_domain, prev_state, state):
+    domains = ['hotel', 'restaurant', 'attraction', 'train', 'taxi', 'hospital', 'police']
+    active_domain = None
+    # print('get_active_domain')
+    for domain in domains:
+        if domain not in prev_state and domain not in state:
+            continue
+        if domain in prev_state and domain not in state:
+            return domain
+        elif domain not in prev_state and domain in state:
+            return domain
+        elif prev_state[domain] != state[domain]:
+            active_domain = domain
+    if active_domain is None:
+        active_domain = prev_active_domain
+    return active_domain
 
 
 def createDelexData(dialogue):
@@ -217,7 +228,7 @@ def createDelexData(dialogue):
 
         if idx % 2 == 1:  # if it's a system turn
             # add database pointer
-            pointer_vector = addDBPointer(turn)
+            pointer_vector, db_results, num_entities = addDBPointer(turn)
             # add booking pointer
             pointer_vector = addBookingPointer(dial, turn, pointer_vector)
 
@@ -225,7 +236,6 @@ def createDelexData(dialogue):
             dial['log'][idx - 1]['db_pointer'] = pointer_vector.tolist()
 
         idx_acts += 1
-
     dial = get_dial(dial)
 
     if dial:
@@ -246,9 +256,146 @@ def createDelexData(dialogue):
     return delex_data
 
 
-def decode(data, model, args):
+def populate_template(template, top_results, num_results, state):
+    active_domain = None if len(top_results.keys()) == 0 else list(top_results.keys())[0]
+    template = template.replace('book [value_count] of them', 'book one of them')
+    tokens = template.split()
+    response = []
+    for token in tokens:
+        if token.startswith('[') and token.endswith(']'):
+            domain = token[1:-1].split('_')[0]
+            slot = token[1:-1].split('_')[1]
+            if domain == 'train' and slot == 'id':
+                slot = 'trainID'
+            if domain in top_results and len(top_results[domain]) > 0 and slot in top_results[domain]:
+                # print('{} -> {}'.format(token, top_results[domain][slot]))
+                response.append(top_results[domain][slot])
+            elif domain == 'value':
+                if slot == 'count':
+                    response.append(str(num_results))
+                elif slot == 'place':
+                    if 'arrive' in response:
+                        for d in state:
+                            if d == 'history':
+                                continue
+                            if 'destination' in state[d]['semi']:
+                                response.append(state[d]['semi']['destination'])
+                                break
+                    elif 'leave' in response:
+                        for d in state:
+                            if d == 'history':
+                                continue
+                            if 'departure' in state[d]['semi']:
+                                response.append(state[d]['semi']['departure'])
+                                break
+                    else:
+                        try:
+                            for d in state:
+                                if d == 'history':
+                                    continue
+                                for s in ['destination', 'departure']:
+                                    if s in state[d]['semi']:
+                                        response.append(state[d]['semi'][s])
+                                        raise
+                        except:
+                            pass
+                        else:
+                            response.append(token)
+                elif slot == 'time':
+                    if 'arrive' in ' '.join(response[-3:]):
+                        if active_domain is not None and 'arriveBy' in top_results[active_domain]:
+                            # print('{} -> {}'.format(token, top_results[active_domain]['arriveBy']))
+                            response.append(top_results[active_domain]['arriveBy'])
+                            continue
+                        for d in state:
+                            if d == 'history':
+                                continue
+                            if 'arriveBy' in state[d]['semi']:
+                                response.append(state[d]['semi']['arriveBy'])
+                                break
+                    elif 'leave' in ' '.join(response[-3:]):
+                        if active_domain is not None and 'leaveAt' in top_results[active_domain]:
+                            # print('{} -> {}'.format(token, top_results[active_domain]['leaveAt']))
+                            response.append(top_results[active_domain]['leaveAt'])
+                            continue
+                        for d in state:
+                            if d == 'history':
+                                continue
+                            if 'leaveAt' in state[d]['semi']:
+                                response.append(state[d]['semi']['leaveAt'])
+                                break
+                    elif 'book' in response:
+                        if state['restaurant']['book']['time'] != "":
+                            response.append(state['restaurant']['book']['time'])
+                    else:
+                        try:
+                            for d in state:
+                                if d == 'history':
+                                    continue
+                                for s in ['arriveBy', 'leaveAt']:
+                                    if s in state[d]['semi']:
+                                        response.append(state[d]['semi'][s])
+                                        raise
+                        except:
+                            pass
+                        else:
+                            response.append(token)
+                else:
+                    # slot-filling based on query results
+                    for d in top_results:
+                        if slot in top_results[d]:
+                            response.append(top_results[d][slot])
+                            break
+                    else:
+                        # slot-filling based on belief state
+                        for d in state:
+                            if d == 'history':
+                                continue
+                            if slot in state[d]['semi']:
+                                response.append(state[d]['semi'][slot])
+                                break
+                        else:
+                            response.append(token)
+            else:
+                if domain == 'hospital':
+                    if slot == 'phone':
+                        response.append('01223216297')
+                    elif slot == 'department':
+                        response.append('neurosciences critical care unit')
+                elif domain == 'police':
+                    if slot == 'phone':
+                        response.append('01223358966')
+                    elif slot == 'name':
+                        response.append('Parkside Police Station')
+                    elif slot == 'address':
+                        response.append('Parkside, Cambridge')
+                elif domain == 'taxi':
+                    if slot == 'phone':
+                        response.append('01223358966')
+                    elif slot == 'color':
+                        response.append('white')
+                    elif slot == 'type':
+                        response.append('toyota')
+                else:
+                    # print(token)
+                    response.append(token)
+        else:
+            response.append(token)
+
+    try:
+        response = ' '.join(response)
+    except Exception as e:
+        # pprint(response)
+        raise
+    response = response.replace(' -s', 's')
+    response = response.replace(' -ly', 'ly')
+    response = response.replace(' .', '.')
+    response = response.replace(' ?', '?')
+    return response
+
+def decode(data, model, device):
     # model, val_dials, test_dials = loadModelAndData(num)
-    device = torch.device("cuda" if args.cuda else "cpu")
+    # device = torch.device("cuda" if args.cuda else "cpu")
 
     for ii in range(1):
         if ii == 0:
@@ -280,27 +427,23 @@ def decode(data, model, args):
 
 
 def loadModel(num, args):
+
     # Load dictionaries
-    dir_name = os.path.dirname(os.path.abspath(__file__))
-    with open(os.path.join(dir_name, 'data/input_lang.index2word.json')) as f:
+    with open(os.path.join(os.path.dirname(__file__), 'data','input_lang.index2word.json')) as f:
         input_lang_index2word = json.load(f)
-    with open(os.path.join(dir_name, 'data/input_lang.word2index.json')) as f:
+    with open(os.path.join(os.path.dirname(__file__), 'data', 'input_lang.word2index.json')) as f:
         input_lang_word2index = json.load(f)
-    with open(os.path.join(dir_name, 'data/output_lang.index2word.json')) as f:
+    with open(os.path.join(os.path.dirname(__file__), 'data', 'output_lang.index2word.json')) as f:
         output_lang_index2word = json.load(f)
-    with open(os.path.join(dir_name, 'data/output_lang.word2index.json')) as f:
+    with open(os.path.join(os.path.dirname(__file__), 'data', 'output_lang.word2index.json')) as f:
         output_lang_word2index = json.load(f)
 
     # Reload existing checkpoint
     model = Model(args, input_lang_index2word, output_lang_index2word, input_lang_word2index, output_lang_word2index)
-    # print(model.model_name)
-    # print(model.model_dir)
+
     if args.load_param:
         model.loadModel(iter=num)
-
     return model
-
-
 
 
 class MDRGWordPolicy(Policy):
@@ -337,7 +480,7 @@ class MDRGWordPolicy(Policy):
 
         torch.manual_seed(args.seed)
 
-        device = torch.device("cuda" if args.cuda else "cpu")
+        self.device = torch.device("cuda" if args.cuda else "cpu")
         with open(os.path.join(os.path.dirname(__file__), args.model_path + '.config'), 'r') as f:
             add_args = json.load(f)
             # print(add_args)
@@ -354,10 +497,17 @@ class MDRGWordPolicy(Policy):
         args.model_path = args.original
         self.model = loadModel(num, args)
         self.dial = {"cur": {"log": []}}
-        self.args = args
+        self.prev_state = default_state()
+        self.prev_active_domain = None
 
 
     def predict(self, state):
+        # active_domain = get_active_domain(self.prev_active_domain, self.prev_state['belief_state'], state['belief_state'])
+        # print(state)
+        # print(active_domain)
+
+        pointer_vector, top_results, num_results = addDBPointer(state)
+        # print(num_results)
         last_usr_uttr = state['history'][-1][-1]
         usr_turn = {"text": last_usr_uttr, "metadata": ""}
         sys_turn = {"text": "placeholder " * 50, "metadata": state['belief_state']}
@@ -366,7 +516,40 @@ class MDRGWordPolicy(Policy):
         # print(self.dial)
 
         self.normalized_dial = createDelexData(self.dial)
-        response = decode(self.normalized_dial, self.model, self.args)
+
+        response = decode(self.normalized_dial, self.model, self.device)
+
+        active_domain = None
+        domains = ['restaurant', 'hotel', 'taxi', 'train', 'police', 'hospital', 'attraction']
+
+        for word in response.split(' '):
+            for domain in domains:
+                if (domain + '_') in word:
+                    active_domain = domain
+                    break
+            if active_domain is not None:
+                break
+
+        if active_domain is not None and active_domain in num_results:
+            num_results = num_results[active_domain]
+        else:
+            num_results = 0
+        if active_domain is not None and active_domain in top_results:
+            top_results = {active_domain: top_results[active_domain]}
+        else:
+            top_results = {}
+        # response = populate_template(output_words[0], top_results, num_results, state)
+        # return response, active_domain
+
+        # print(response)
+        response = populate_template(response, top_results, num_results, state['belief_state'])
+        response = response.split(' ')
+        if '_UNK' in response:
+            response.remove('_UNK')
+        response = ' '.join(response)
+        if not top_results:
+            response = 'Sorry, I can\'t find any result matching your condition, please try again.'
+
         self.dial['cur']['log'][-1]['text'] = response
 
         return response
@@ -376,11 +559,12 @@ class MDRGWordPolicy(Policy):
 
 def main():
     s = default_state()
-    s['history'] = [['null', 'I want a korean restaurant in the centre.']]
-    s['belief_state']['attraction']['semi']['area'] = 'centre'
-    s['belief_state']['restaurant']['semi']['area'] = 'centre'
-    s['belief_state']['restaurant']['semi']['food'] = 'korean'
+    s['history'] = [['null', 'I want a chinese restaurant']]
+    # s['belief_state']['attraction']['semi']['area'] = 'centre'
+    s['belief_state']['restaurant']['semi']['area'] = 'south'
+    s['belief_state']['restaurant']['semi']['food'] = 'mexican'
     testPolicy = MDRGWordPolicy()
+    print(s)
     print(testPolicy.predict(s))
 
 

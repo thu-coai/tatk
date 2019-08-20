@@ -46,6 +46,8 @@ Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tut
 
 - [Getting Started](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Getting%20Started)
 - [Add New Model](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Add%20New%20Model)
+- [RNN rollout - deal or not](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#RNN%20rollout%20-%20deal%20or%20not)
+- [Train RL Policies](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Train%20RL%20Policies)
 
 ## Documents
 
@@ -67,14 +69,16 @@ For  more details about these models, You can refer to `README.md` under `tatk/$
 ## Supported Dataset
 
 - [Multiwoz](https://www.repository.cam.ac.uk/handle/1810/280608)
-  - We add some annotation and place it under `data/multiwoz` dir.
-    - Add user dialog act (*inform*, *request*, *bye*, *greet*, *thank*)
+  - We add user dialog act (*inform*, *request*, *bye*, *greet*, *thank*), remove 5 sessions that have incomplete dialog act annotation and place it under `data/multiwoz` dir.
+  - Train/val/test size: 8434/999/1000. Split as original data.
   - LICENSE: Attribution 4.0 International, url: http://creativecommons.org/licenses/by/4.0/
 - [Camrest](https://www.repository.cam.ac.uk/handle/1810/260970)
-  - We add some annotation and place it under `data/camrest` dir.
-    - Add system dialog act (*inform*, *request*, *nooffer*)
-    - LICENSE: Attribution 4.0 International, url: http://creativecommons.org/licenses/by/4.0/
+  - We add system dialog act (*inform*, *request*, *nooffer*) and place it under `data/camrest` dir.
+  - Train/val/test size: 406/135/135. Split as original data.
+  - LICENSE: Attribution 4.0 International, url: http://creativecommons.org/licenses/by/4.0/
 - [Dealornot](https://github.com/facebookresearch/end-to-end-negotiator/tree/master/src/data/negotiate)
+  - Place it under `data/dealornot` dir.
+  - Train/val/test size: 5048/234/526. Split as original data.
   - LICENSE: Attribution-NonCommercial 4.0 International, url: https://creativecommons.org/licenses/by-nc/4.0/
 
 ## Issues

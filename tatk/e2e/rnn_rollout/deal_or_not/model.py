@@ -15,6 +15,10 @@ class DealornotAgent(RNNRolloutAgent):
                  model_url='https://tatk-data.s3-ap-northeast-1.amazonaws.com/rnnrollout_dealornot.zip'):
         self.config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs')
 
+        self.file_url = model_url
+
+        self.auto_download()
+
         if not os.path.exists(self.config_path):
             os.mkdir(self.config_path)
         _model_path = os.path.join(self.config_path, 'models')
@@ -39,10 +43,6 @@ class DealornotAgent(RNNRolloutAgent):
 
         super(DealornotAgent, self).__init__(model, sel_model, args, name, train, diverse, max_total_len)
         self.vis = args.visual
-
-        self.file_url = model_url
-
-        self.auto_download()
 
     def auto_download(self):
         """Automatically download the pretrained model and necessary data."""

@@ -82,34 +82,38 @@ class PipelineAgent(Agent):
     def response(self, observation):
         """Generate agent response using the agent modules."""
         # TODO: history for mdbt
-        self.tracker.state['history'].append(['null', observation])
+        if self.tracker is not None:
+            self.tracker.state['history'].append(['opponent', observation])
 
         # get dialog act
         if self.nlu_model is not None:
-            dialog_act = self.nlu_model.predict(observation)
+            self.dialog_act = self.nlu_model.predict(observation)
         else:
-            dialog_act = observation
+            self.dialog_act = observation
+
+        # get state
+        if self.tracker is not None:
+            state = self.tracker.update(self.dialog_act)
+        else:
+            state = self.dialog_act
 
         # get action
-        if self.tracker is not None:
-            state = self.tracker.update(dialog_act)
-        else:
-            state = dialog_act
-        action = self.policy.predict(state)
+        self.action = self.policy.predict(state)
 
         # get model response
         if self.nlg_model is not None:
-            model_response = self.nlg_model.generate(action)
+            model_response = self.nlg_model.generate(self.action)
         else:
-            model_response = action
+            model_response = self.action
 
-        self.tracker.state['history'].append(['null', model_response])
+        if self.tracker is not None:
+            self.tracker.state['history'].append(['self', model_response])
 
         return model_response
 
-    def is_terminal(self):
-        if hasattr(self.policy, 'is_terminal'):
-            return self.policy.is_terminal()
+    def is_terminated(self):
+        if hasattr(self.policy, 'is_terminated'):
+            return self.policy.is_terminated()
         return None
 
     def get_reward(self):
@@ -123,3 +127,9 @@ class PipelineAgent(Agent):
             self.tracker.init_session()
         if self.policy is not None:
             self.policy.init_session()
+
+    def get_in_da(self):
+        return self.dialog_act
+
+    def get_out_da(self):
+        return self.action

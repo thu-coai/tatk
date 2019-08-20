@@ -53,7 +53,7 @@ class BiSession(Session):
             The dialog history, formatted as [[user_uttr1, sys_uttr1], [user_uttr2, sys_uttr2], ...]
     """
 
-    def __init__(self, sys_agent, user_agent, kb_query):
+    def __init__(self, sys_agent, user_agent, kb_query=None, evaluator=None):
         """
         Args:
             sys_agent (Agent):
@@ -64,10 +64,14 @@ class BiSession(Session):
 
             kb_query (KBquery):
                 An instance of database query tool.
+
+            evaluator (Evaluator):
+                An instance of evaluator.
         """
         self.sys_agent = sys_agent
         self.user_agent = user_agent
         self.kb_query = kb_query
+        self.evaluator = evaluator
 
         self.dialog_history = []
         self.__turn_indicator = 0
@@ -111,7 +115,15 @@ class BiSession(Session):
                 The reward given by the user.
         """
         user_response = self.next_response(last_observation)
-        session_over = self.user_agent.is_terminal()
+        if self.evaluator:
+            self.evaluator.add_sys_da(self.user_agent.get_in_da())
+            self.evaluator.add_usr_da(self.user_agent.get_out_da())
+        session_over = self.user_agent.is_terminated()
+        if session_over and self.evaluator:
+            prec, rec, f1 = self.evaluator.inform_F1()
+            print('inform prec. {} rec. {} F1 {}'.format(prec, rec, f1))
+            print('book rate {}'.format(self.evaluator.book_rate()))
+            print('task success {}'.format(self.evaluator.task_success()))
         reward = self.user_agent.get_reward()
         sys_response = self.next_response(user_response)
 
@@ -126,6 +138,8 @@ class BiSession(Session):
     def init_session(self):
         self.sys_agent.init_session()
         self.user_agent.init_session()
+        if self.evaluator:
+            self.evaluator.add_goal(self.user_agent.policy.get_goal())
 
 
 class DealornotSession(Session):
@@ -155,8 +169,8 @@ class DealornotSession(Session):
         self.dialog_history.append(model_response)
         return model_response
 
-    def is_terminal(self):
-        if self.current_agent.is_terminal():
+    def is_terminated(self):
+        if self.current_agent.is_terminated():
             return True
 
     def get_rewards(self, ctxs):

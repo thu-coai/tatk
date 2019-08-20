@@ -35,12 +35,17 @@ class Rule(Policy):
         """
         self.policy.init_session()
 
-    def is_terminal(self):
+    def is_terminated(self):
         if self.character == 'sys':
             return None
-        return self.policy.is_terminal()
+        return self.policy.is_terminated()
 
     def get_reward(self):
         if self.character == 'sys':
             return None
         return self.policy.get_reward()
+
+    def get_goal(self):
+        if hasattr(self.policy, 'get_goal'):
+            return self.policy.get_goal()
+        return None

@@ -2,10 +2,10 @@
 
 Based on pre-trained bert, BERTNLU use a linear layer for slot tagging and another linear layer for intent classification. Dialog acts are split into two groups, depending on whether the value is in the utterance. 
 
-- For those dialog acts that the value appears in the utterance, they are translated to BIO tags. For example, `"Find me a cheap restaurant"`, its dialog act is `{"Inform":[["Price", "cheap"]]}`, and translated tag sequence is `["O", "O", "O", "B-Inform+Price", "O"]`. A linear layer takes pre-trained bert word embeddings as input and classify the tag label.
-- For the other dialog acts, another linear layer takes pre-trained bert embeddings of `[CLS]` as input and do the classification.
+- For those dialog acts that the value appears in the utterance, they are translated to BIO tags. For example, `"Find me a cheap hotel"`, its dialog act is `{"Hotel-Inform":[["Price", "cheap"]]}`, and translated tag sequence is `["O", "O", "O", "B-Hotel-Inform+Price", "O"]`. A linear layer takes pre-trained bert word embeddings as input and classify the tag label.
+- For each of the other dialog acts, such as `(Hotel-Request, Address, ?)`, another linear layer takes pre-trained bert embeddings of `[CLS]` as input and do the binary classification.
 
-## Example usage
+## Usage
 
 Determine which data you want to use: if **mode**='usr', use user utterances to train; if **mode**='sys', use system utterances to train; if **mode**='all', use both user and system utterances to train.
 
@@ -24,7 +24,7 @@ output processed data on `data/[mode]_data/` dir.
 On `bert` dir:
 
 ```sh
-$ PYTHONPATH=../../.. python train.py --config_path camrest/configs/camrest_[mode].json
+$ python train.py --config_path camrest/configs/camrest_[mode].json
 ```
 
 The model will be saved on `output/[mode]/bestcheckpoint.tar`. Also, it will be zipped as `output/[mode]/bert_camrest_[mode].zip`. 
@@ -40,7 +40,7 @@ Trained models can be download on:
 On `bert/camrest` dir:
 
 ```sh
-$ PYTHONPATH=../../../.. python evaluate.py [mode]
+$ python evaluate.py [mode]
 ```
 
 #### Predict
@@ -62,11 +62,15 @@ We use the multiwoz data (`data/camrest/[train|val|test].json.zip`).
 
 ## Performance
 
+`mode` determines the data we use: if mode=`usr`, use user utterances to train; if mode=`sys`, use system utterances to train; if mode=`all`, use both user and system utterances to train.
+
+We evaluate the precision/recall/f1 of predicted dialog act.
+
 | mode | Precision | Recall | F1    |
 | ---- | --------- | ------ | ----- |
-| usr  | 78.44     | 69.73  | 73.83 |
-| sys  | 90.04     | 87.47  | 88.74 |
-| all  | 84.53     | 80.79  | 82.62 |
+| usr  | 77.99     | 79.87  | 78.92 |
+| sys  | 88.84     | 89.21  | 89.02 |
+| all  | 83.11     | 86.02  | 84.54 |
 
 ## References
 

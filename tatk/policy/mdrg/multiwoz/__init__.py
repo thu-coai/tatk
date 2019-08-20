@@ -1,0 +1,1 @@
+from tatk.policy.mdrg.multiwoz.policy import MDRGWordPolicy
