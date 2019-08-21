@@ -99,6 +99,7 @@ class MultiWozEvaluator(Evaluator):
 
                 if da == 'booking-book-ref' and self.cur_domain in ['hotel', 'restaurant', 'train']:
                     if not self.booked[self.cur_domain] and re.match(r'^\d{8}$', value):
+                        print(da_turn)
                         self.booked[self.cur_domain] = dbs[self.cur_domain][int(value)]
                 elif da == 'train-offerbooked-ref' or da == 'train-inform-ref':
                     if not self.booked['train'] and re.match(r'^\d{8}$', value):
@@ -144,8 +145,6 @@ class MultiWozEvaluator(Evaluator):
                     score.append(1)
                     continue
                 match = 0
-                print(goal)
-                print(entity)
                 for k, v in goal[domain]['info'].items():
                     if k in ['destination', 'departure', 'name']:
                         tot -= 1
