@@ -144,6 +144,8 @@ class MultiWozEvaluator(Evaluator):
                     score.append(1)
                     continue
                 match = 0
+                print(goal)
+                print(entity)
                 for k, v in goal[domain]['info'].items():
                     if k in ['destination', 'departure', 'name']:
                         tot -= 1
@@ -195,7 +197,6 @@ class MultiWozEvaluator(Evaluator):
                 if k in inform_slot[domain]:
                     TP += 1
                 else:
-                    print(k)
                     FN += 1
             for k in inform_slot[domain]:
                 # exclude slots that are informed by users
