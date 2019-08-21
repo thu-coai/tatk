@@ -24,3 +24,7 @@ under ```tests/e2e/rnn_rollout``` directory.
 
 You can also import RNN Rollout model in a pipeline dialog system and
 run the entire model to test its performance.
+
+# Performance
+The reward of our pretrained model against seq2seq model is 7.2 vs. 6.4.
+You can train the model by your self for better performance.

@@ -44,8 +44,6 @@ class DealornotAgent(RNNRolloutAgent):
         super(DealornotAgent, self).__init__(model, sel_model, args, name, train, diverse, max_total_len)
         self.vis = args.visual
 
-
-
     def auto_download(self):
         """Automatically download the pretrained model and necessary data."""
         if os.path.exists(os.path.join(self.config_path, 'model/rnn_model_state_dict.th')) and \
