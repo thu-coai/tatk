@@ -400,10 +400,7 @@ class GoalGenerator:
 
         return domain_goal
 
-    def get_user_goal(self, seed=None):
-        if seed is not None:
-            random.seed(seed)
-            np.random.seed(seed)
+    def get_user_goal(self):
         domain_ordering = ()
         while len(domain_ordering) <= 0:
             domain_ordering = nomial_sample(self.domain_ordering_dist)
