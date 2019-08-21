@@ -195,6 +195,7 @@ class MultiWozEvaluator(Evaluator):
                 if k in inform_slot[domain]:
                     TP += 1
                 else:
+                    print(k)
                     FN += 1
             for k in inform_slot[domain]:
                 # exclude slots that are informed by users
