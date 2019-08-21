@@ -48,7 +48,7 @@ class Dataloader:
             self.intent_weight[intent_id] = np.log(neg_pos)
             # 4) pos_weight = min(MAX_WEIGHT, neg_pos)
             # self.intent_weight[intent_id] = min(20, neg_pos)
-            print(intent, self.intent_weight[intent_id], neg_pos)
+            # print(intent, self.intent_weight[intent_id], neg_pos)
         self.intent_weight = torch.tensor(self.intent_weight)
 
     def bert_tokenize(self, word_seq, tag_seq):
