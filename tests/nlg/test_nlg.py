@@ -9,40 +9,67 @@ def test_nlg():
 
 
 class BaseTestNLG:
-    """
+    """Base class for testing nlg."""
+
+    @staticmethod
+    def _test_generate(nlg, acts):
+        assert hasattr(nlg, 'generate')
+        for act in acts:
+            result = nlg.generate(act)
+            assert isinstance(result, str)
+
+    @classmethod
+    def setup_class(cls):
+        pass
+
+
+class BaseTestTemplateNLG(BaseTestNLG):
+    """Base class for testing template nlg.
 
     Note:
-        BaseTestNLG or its subclass should have attributes(instance attributes or class attributes):
+        BaseTestTemplateNLG or its subclass should have attributes(instance attributes or class attributes):
             `usr_acts` and `sys_acts`
     """
+
     @classmethod
     def setup_class(cls):
         cls.modes = 'auto', 'manual', 'auto_manual'
-
-    def _test_generate(self, acts):
-        assert hasattr(self, 'nlg')
-        assert hasattr(self.nlg, 'generate')
-        for act in acts:
-            result = self.nlg.generate(act)
-            assert isinstance(result, str)
 
     def _test_nlg(self, nlg_class):
         for mode in self.modes:
             is_user = True
             acts = self.usr_acts
-            self.nlg = nlg_class(is_user, mode)
-            self._test_generate(acts)
+            nlg = nlg_class(is_user, mode)
+            self._test_generate(nlg, acts)
 
             is_user = False
             acts = self.sys_acts
-            self.nlg = nlg_class(is_user, mode)
-            self._test_generate(acts)
+            nlg = nlg_class(is_user, mode)
+            self._test_generate(nlg, acts)
 
 
-class BaseTestNLGMultiwoz(BaseTestNLG):
+class BaseTestSCLSTM(BaseTestNLG):
+    """Base class for testing sclstm nlg.
+
+    Note:
+        BaseTestSCLSTM or its subclass should have attributes(instance attributes or class attributes):
+            `usr_acts` and `sys_acts`
+    """
+    def _test_nlg(self, nlg_class):
+        for is_user in (True, False):
+            nlg = nlg_class(is_user=is_user)
+            if is_user:
+                acts = self.usr_acts
+            else:
+                acts = self.sys_acts
+            self._test_generate(nlg, acts)
+
+
+class BaseTestMultiwoz:
+    """Base class for testing multiwoz. This class has attributes `usr_acts` and `sys_acts`."""
+
     @classmethod
     def setup_class(cls):
-        super().setup_class()
         cls.usr_acts = [
             {
                 "Hotel-Inform": [
@@ -263,10 +290,11 @@ class BaseTestNLGMultiwoz(BaseTestNLG):
         ]
 
 
-class BaseTestNLGCamrest(BaseTestNLG):
+class BaseTestCamrest:
+    """Base class for testing camrest. This class has attributes `usr_acts` and `sys_acts`."""
+
     @classmethod
     def setup_class(cls):
-        super().setup_class()
         cls.usr_acts = [
             {
                 "inform": [

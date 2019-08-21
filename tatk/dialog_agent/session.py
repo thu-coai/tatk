@@ -119,11 +119,11 @@ class BiSession(Session):
             self.evaluator.add_sys_da(self.user_agent.get_in_da())
             self.evaluator.add_usr_da(self.user_agent.get_out_da())
         session_over = self.user_agent.is_terminated()
-        if session_over and self.evaluator:
-            prec, rec, f1 = self.evaluator.inform_F1()
-            print('inform prec. {} rec. {} F1 {}'.format(prec, rec, f1))
-            print('book rate {}'.format(self.evaluator.book_rate()))
-            print('task success {}'.format(self.evaluator.task_success()))
+        # if session_over and self.evaluator:
+            # prec, rec, f1 = self.evaluator.inform_F1()
+            # print('inform prec. {} rec. {} F1 {}'.format(prec, rec, f1))
+            # print('book rate {}'.format(self.evaluator.book_rate()))
+            # print('task success {}'.format(self.evaluator.task_success()))
         reward = self.user_agent.get_reward()
         sys_response = self.next_response(user_response)
 
