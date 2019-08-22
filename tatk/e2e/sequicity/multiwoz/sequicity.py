@@ -26,7 +26,7 @@ from tatk.dialog_agent import Agent
 DEFAULT_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DEFAULT_CONFIG_FILE = os.path.join(DEFAULT_DIRECTORY, "multiwoz/configs/multiwoz.json")
 DEFAULT_ARCHIVE_FILE_URL = "https://tatk-data.s3-ap-northeast-1.amazonaws.com/sequicity_multiwoz_data.zip"
-DEFAULT_MODEL_URL = "https://tatk-data.s3-ap-northeast-1.amazonaws.com/sequicity_multiwoz.pkl"
+DEFAULT_MODEL_URL = "https://tatk-data.s3-ap-northeast-1.amazonaws.com/sequicity_multiwoz.zip"
 
 
 def denormalize(uttr):
@@ -44,7 +44,7 @@ class Sequicity(Agent):
 
         Args:
             model_file (str):
-                trained model path or url. default="https://tatk-data.s3-ap-northeast-1.amazonaws.com/sequicity_multiwoz.pkl"
+                trained model path or url. default="https://tatk-data.s3-ap-northeast-1.amazonaws.com/sequicity_multiwoz.zip"
 
         Example:
             sequicity = Sequicity()
