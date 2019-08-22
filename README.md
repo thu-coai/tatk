@@ -11,8 +11,8 @@ Features included:
 - Rule simulators on Multiwoz and Camrest dataset for RL policy training.
 - Unified agent definition which allows customized dialog scene such as multiparty dialog.
 
-This project is a part of ``thutk`` (Toolkits for Dialog System by Tsinghua University), you can follow [thutk](http://coai.cs.tsinghua.edu.cn/thutk/) or 
-[tatk](http://coai.cs.tsinghua.edu.cn/thutk/tatk/) on our home page. Some code are shared with [Convlab](https://github.com/ConvLab/ConvLab).
+This project is a part of ``dialtk`` (Toolkits for Dialog System by Tsinghua University), you can follow [dialtk](http://coai.cs.tsinghua.edu.cn/dialtk/) or 
+[tatk](http://coai.cs.tsinghua.edu.cn/dialtk/tatk/) on our home page. Some code are shared with [Convlab](https://github.com/ConvLab/ConvLab).
 
 - [Installation](#installation)
 - [Tutorials](#tutorials)
@@ -42,7 +42,7 @@ pip install -e .
 
 ## Tutorials
 
-Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tutorials) directory. You can also view it on [thutk/tatk](http://coai.cs.tsinghua.edu.cn/thutk/tatk/).
+Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tutorials) directory. You can also view it on [dialtk/tatk](http://coai.cs.tsinghua.edu.cn/dialtk/tatk/).
 
 - [Getting Started](https://github.com/thu-coai/tatk/blob/master/tutorials/Getting_Started/Getting_Started.ipynb) (Have a try on [Colab](https://colab.research.google.com/github/thu-coai/tatk/blob/master/tutorials/Getting_Started/Getting_Started.ipynb)!)
 - [Add New Model](https://github.com/thu-coai/tatk/blob/master/tutorials/Adapt_Models_and_Datasets/Add_New_Model.md)
