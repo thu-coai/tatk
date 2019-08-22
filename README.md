@@ -45,7 +45,7 @@ pip install -e .
 Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tutorials) directory. You can also view it on [dialtk/tatk](http://coai.cs.tsinghua.edu.cn/dialtk/tatk/).
 
 - [Getting Started](https://github.com/thu-coai/tatk/blob/master/tutorials/Getting_Started/Getting_Started.ipynb) (Have a try on [Colab](https://colab.research.google.com/github/thu-coai/tatk/blob/master/tutorials/Getting_Started/Getting_Started.ipynb)!)
-- [Add New Model](https://github.com/thu-coai/tatk/blob/master/tutorials/Adapt_Models_and_Datasets/Add_New_Model.md)
+- [Add New Model](https://github.com/thu-coai/tatk/blob/master/tutorials/Add_New_Model/Add_New_Model.md)
 - [RNN rollout - deal or not](https://github.com/thu-coai/tatk/blob/master/tutorials/Deal_or_Not/rnn_rollout_deal_or_not.md)
 - [Train RL Policies](https://github.com/thu-coai/tatk/blob/master/tutorials/Train_RL_Policies/README.md)
 
