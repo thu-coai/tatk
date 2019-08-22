@@ -108,7 +108,6 @@ class PipelineAgent(Agent):
 
         if self.tracker is not None:
             self.tracker.state['history'].append(['self', model_response])
-
         return model_response
 
     def is_terminated(self):

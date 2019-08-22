@@ -165,7 +165,7 @@ class RuleBasedMultiwozBot(Policy):
             if 'Taxi-Inform' not in DA:
                 DA['Taxi-Inform'] = []
             car = generate_car()
-            phone_num = generate_ref_num(11)
+            phone_num = generate_phone_num(11)
             DA['Taxi-Inform'].append(['Car', car])
             DA['Taxi-Inform'].append(['Phone', phone_num])
             return
@@ -502,6 +502,14 @@ def generate_ref_num(length):
     string = ""
     while len(string) < length:
         string += alphabet[random.randint(0, 999999) % 36]
+    return string
+
+
+def generate_phone_num(length):
+    """ Generate phone number."""
+    string = ""
+    while len(string) < length:
+        string += '0123456789'[random.randint(0, 999999) % 10]
     return string
 
 
