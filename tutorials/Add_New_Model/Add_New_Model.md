@@ -1,10 +1,10 @@
 # Add New Model
 
-- [Add NLU model](#Add NLU model)
-- [Add DST model](#Add DST model)
-- [Add Policy model](#Add Policy model)
-- [Add NLG model](#Add NLG model)
-- [Add End2End model](#Add End2End model)
+- [Add NLU model](#Add-NLU-model)
+- [Add DST model](#Add-DST-model)
+- [Add Policy model](#Add-Policy-model)
+- [Add NLG model](#Add-NLG-model)
+- [Add End2End model](#Add-End2End-model)
 
 ## Add NLU model
 
