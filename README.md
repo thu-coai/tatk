@@ -42,12 +42,12 @@ pip install -e .
 
 ## Tutorials
 
-Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tutorials) directory. You can also view it on [thutk/tatk](http://coai.cs.tsinghua.edu.cn/thutk/tatk/):
+Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tutorials) directory. You can also view it on [thutk/tatk](http://coai.cs.tsinghua.edu.cn/thutk/tatk/).
 
-- [Getting Started](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Getting%20Started)
-- [Add New Model](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Add%20New%20Model)
-- [RNN rollout - deal or not](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#RNN%20rollout%20-%20deal%20or%20not)
-- [Train RL Policies](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Train%20RL%20Policies)
+- [Getting Started](https://github.com/thu-coai/tatk/blob/master/tutorials/Getting_Started/Getting_Started.ipynb) (Have a try on [Colab](https://colab.research.google.com/github/thu-coai/tatk/blob/master/tutorials/Getting_Started/Getting_Started.ipynb)!)
+- [Add New Model](https://github.com/thu-coai/tatk/blob/master/tutorials/Adapt_Models_and_Datasets/Add_New_Model.md)
+- [RNN rollout - deal or not](https://github.com/thu-coai/tatk/blob/master/tutorials/Deal_or_Not/rnn_rollout_deal_or_not.md)
+- [Train RL Policies](https://github.com/thu-coai/tatk/blob/master/tutorials/Train_RL_Policies/README.md)
 
 ## Documents
 
