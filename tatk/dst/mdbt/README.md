@@ -14,3 +14,7 @@ To run the code, you have to download the pre-trained model and data
 from [here](https://drive.google.com/open?id=1k6wbabIlYju7kR0Zr4aVXwE_fsGBOtdw),
 and put the ```word-vectors, models``` and ```data``` directories under
 ```tatk/dst/mdbt/multiwoz/configs```.
+
+## Performance
+The performance of our pre-trained MDBT model is 13.9%. 
+You can train the model by your self for better performance.

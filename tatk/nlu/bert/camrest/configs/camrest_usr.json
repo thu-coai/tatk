@@ -7,7 +7,7 @@
   "model": {
     "pre-trained": "bert-base-uncased",
     "lr": 0.001,
-    "dropout": 0.3,
+    "dropout": 0.0,
     "optimizer": "Adam"
   },
   "check_step": 100,

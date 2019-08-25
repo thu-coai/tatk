@@ -1,6 +1,11 @@
 # Template-based NLG on Camrest
 
-Template NLG for Camrest dataset. The templates are extracted from data and modified manually. In addition, we have added some templates from the _Restaurant_ domain in the [Multiwoz templates](../multiwoz/README.md).
+Template NLG for Camrest dataset. The templates are extracted from data and modified manually.
+
+The camrest template set consists of two sources.
+
+1. Extract data from the Camrest dataset. The extraction method is the same as the [Multiwoz](../multiwoz/README.md).
+2. Added templates from the _Restaurant_ domain in the [Multiwoz templates](../multiwoz/README.md).
 
 ## How to run
 
@@ -37,18 +42,18 @@ auto        :  Both are in the west and in the cheap price range .
 auto_manual :  Yes , it is cheap and in the west .
 ```
 
+## Evaluate
+
+run `python evaluate.py [usr|sys]`
+
 ## Performance on Camrest
 
-run `python evaluate.py [usr|sys|all]`
+`mode` determines the data we use: if mode=`usr`, use user utterances to train; if mode=`sys`, use system utterances to train.
 
-|       | usr    | sys    | all    |
-| ----- | ------ | ------ | ------ |
-| BLEU4 | 0.3131 | 0.2174 | 0.2538 |
+We evaluate the BLEU4 of delexicalized utterance. The references of a generated sentence are all the golden sentences that have the same dialog act.
+
+| mode  | usr    | sys    |
+| ----- | ------ | ------ |
+| BLEU4 | 0.3131 | 0.2174 |
 
 
-
-## Templates
-
-The camrest template set consists of two sources.
-1. Extract data from the Camrest dataset. The extraction method is the same as the [Multiwoz](../multiwoz/README.md).
-2. Added templates from the _Restaurant_ domain in the [Multiwoz templates](../multiwoz/README.md).

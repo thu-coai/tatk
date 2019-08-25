@@ -51,7 +51,8 @@ if __name__ == '__main__':
         archive.close()
     print('Load from',best_model_path)
     checkpoint = torch.load(best_model_path, map_location=DEVICE)
-    print('train step', checkpoint['step'])
+    print('best_intent_step', checkpoint['best_intent_step'])
+    print('best_tag_step', checkpoint['best_tag_step'])
 
     model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
                     DEVICE=DEVICE,
@@ -61,7 +62,6 @@ if __name__ == '__main__':
     model_dict.update(state_dict)
     model.load_state_dict(model_dict)
     model.to(DEVICE)
-    model.eval()
 
     batch_size = config['batch_size']
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     test_intent_loss = 0
     test_tag_loss = 0
     for batched_data, real_batch_size in dataloader.yield_batches(batch_size, data_key='test'):
-        intent_loss, tag_loss, total_loss = model.eval_batch(*batched_data)
+        intent_loss, tag_loss, total_loss, intent_logits, tag_logits = model.eval_batch(*batched_data)
         test_intent_loss += intent_loss * real_batch_size
         test_tag_loss += tag_loss * real_batch_size
         test_loss += total_loss * real_batch_size
@@ -80,3 +80,6 @@ if __name__ == '__main__':
     print('%d samples test loss: %f' % (total, test_loss))
     print('\t intent loss:', test_intent_loss)
     print('\t tag loss:', test_tag_loss)
+    print('Load from', best_model_path)
+    print('best_intent_step', checkpoint['best_intent_step'])
+    print('best_tag_step', checkpoint['best_tag_step'])

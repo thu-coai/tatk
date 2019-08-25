@@ -7,6 +7,14 @@ import math
 
 class Dataloader:
     def __init__(self, data, intent_vocab, tag_vocab, tokenizer):
+        """
+        tokenize data and convert to ids.
+        sample representation: [list of words, list of tags, list of intents, original dialog act]
+        :param data: {'train': train_data, 'val': val_data, 'test': test_data}
+        :param intent_vocab: list of all intens
+        :param tag_vocab: list of all tags
+        :param tokenizer: bert_tokenizer, same with pre-trained model
+        """
         self.data = data
         self.intent_vocab = intent_vocab
         self.tag_vocab = tag_vocab
@@ -29,9 +37,18 @@ class Dataloader:
                     for intent_id in d[-1]:
                         self.intent_weight[intent_id] += 1
         train_size = len(self.data['train'])
-        for intent, inten_id in self.intent2id.items():
-            self.intent_weight[inten_id] = np.log((train_size-self.intent_weight[inten_id])/self.intent_weight[inten_id])
-            # print(intent, self.intent_weight[id], np.exp(self.intent_weight[id]))
+        for intent, intent_id in self.intent2id.items():
+            neg_pos = (train_size - self.intent_weight[intent_id]) / self.intent_weight[intent_id]
+            # pos_weight param for intent classification. bigger->higher recall. Tune this on your dataset
+            # 1) pos_weight = 1. low recall
+            # self.intent_weight[intent_id] = 1
+            # 2) pos_weight = neg_samples/pos_samples. predict too much
+            # self.intent_weight[intent_id] = neg_pos
+            # 3) pos_weight = log(neg_samples/pos_samples)
+            self.intent_weight[intent_id] = np.log(neg_pos)
+            # 4) pos_weight = min(MAX_WEIGHT, neg_pos)
+            # self.intent_weight[intent_id] = min(20, neg_pos)
+            # print(intent, self.intent_weight[intent_id], neg_pos)
         self.intent_weight = torch.tensor(self.intent_weight)
 
     def bert_tokenize(self, word_seq, tag_seq):

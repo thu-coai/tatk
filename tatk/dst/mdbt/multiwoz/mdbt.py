@@ -26,6 +26,7 @@ class MultiWozMDBT(MDBT):
         Args:
             data_dir (str): The path of data dir, where the root path is tatk/dst/mdbt/multiwoz.
         """
+        self.file_url = 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/mdbt_multiwoz_sys.zip'
         local_path = os.path.dirname(os.path.abspath(__file__))
         self.data_dir = os.path.join(local_path, data_dir)  # abstract data path
         self.validation_url = os.path.join(self.data_dir, 'data/validate.json')
@@ -40,6 +41,8 @@ class MultiWozMDBT(MDBT):
         self.train_model_url = os.path.join(self.data_dir, 'train_models/model-1')
         self.train_graph_url = os.path.join(self.data_dir, 'train_graph/graph-1')
 
+        self.auto_download()
+
         print('Configuring MDBT model...')
         self.word_vectors = load_word_vectors(self.word_vectors_url)
 
@@ -51,10 +54,6 @@ class MultiWozMDBT(MDBT):
         self.no_dialogues = len(self.dialogues)
 
         super(MultiWozMDBT, self).__init__(self.ontology_vectors, self.ontology, self.slots, self.data_dir)
-
-        self.file_url = 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/mdbt_multiwoz_sys.zip'
-
-        self.auto_download()
 
     def auto_download(self):
         """Automatically download the pretrained model and necessary data."""

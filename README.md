@@ -11,8 +11,8 @@ Features included:
 - Rule simulators on Multiwoz and Camrest dataset for RL policy training.
 - Unified agent definition which allows customized dialog scene such as multiparty dialog.
 
-This project is a part of ``thutk`` (Toolkits for Dialog System by Tsinghua University), you can follow [thutk](http://coai.cs.tsinghua.edu.cn/thutk/) or 
-[tatk](http://coai.cs.tsinghua.edu.cn/thutk/tatk/) on our home page. Some code are shared with [Convlab](https://github.com/ConvLab/ConvLab).
+This project is a part of ``dialtk`` (Toolkits for Dialog System by Tsinghua University), you can follow [dialtk](http://coai.cs.tsinghua.edu.cn/dialtk/) or 
+[tatk](http://coai.cs.tsinghua.edu.cn/dialtk/tatk/) on our home page. Some code are shared with [Convlab](https://github.com/ConvLab/ConvLab).
 
 - [Installation](#installation)
 - [Tutorials](#tutorials)
@@ -42,12 +42,12 @@ pip install -e .
 
 ## Tutorials
 
-Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tutorials) directory. You can also view it on [thutk/tatk](http://coai.cs.tsinghua.edu.cn/thutk/tatk/):
+Tutorials are under [tutorials](https://github.com/thu-coai/tatk/tree/master/tutorials) directory. You can also view it on [dialtk/tatk](http://coai.cs.tsinghua.edu.cn/dialtk/tatk/).
 
-- [Getting Started](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Getting%20Started)
-- [Add New Model](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Add%20New%20Model)
-- [RNN rollout - deal or not](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#RNN%20rollout%20-%20deal%20or%20not)
-- [Train RL Policies](http://coai.cs.tsinghua.edu.cn/thutk/tatk/tutorial/#Train%20RL%20Policies)
+- [Getting Started](https://github.com/thu-coai/tatk/blob/master/tutorials/Getting_Started/Getting_Started.ipynb) (Have a try on [Colab](https://colab.research.google.com/github/thu-coai/tatk/blob/master/tutorials/Getting_Started/Getting_Started.ipynb)!)
+- [Add New Model](https://github.com/thu-coai/tatk/blob/master/tutorials/Add_New_Model/Add_New_Model.md)
+- [RNN rollout - deal or not](https://github.com/thu-coai/tatk/blob/master/tutorials/Deal_or_Not/rnn_rollout_deal_or_not.md)
+- [Train RL Policies](https://github.com/thu-coai/tatk/blob/master/tutorials/Train_RL_Policies/README.md)
 
 ## Documents
 

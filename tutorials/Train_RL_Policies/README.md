@@ -39,13 +39,13 @@ policy.update(epoch, batchsz_real, s, a, r, mask)
 
 ## Run
 
-Please refer to [example_train.py](https://github.com/truthless11/tatk/blob/master/example_train.py) for details.
+Please refer to [example_train.py](https://github.com/thu-coai/tatk/blob/master/tutorials/Train_RL_Policies/example_train.py) for details.
 
 ```bash
-$ PYTHONPATH=../.. python example_train.py
+$ python example_train.py
 ```
 
-You can change the following arguments in [example_train.py](https://github.com/truthless11/tatk/blob/master/example_train.py),
+You can change the following arguments in [example_train.py](https://github.com/thu-coai/tatk/blob/master/tutorials/Train_RL_Policies/example_train.py),
 
 ```python
 batchsz = 1024
@@ -54,3 +54,4 @@ process_num = 8
 ```
 
 or `config.json` of corresponding RL policy during the training.
+
