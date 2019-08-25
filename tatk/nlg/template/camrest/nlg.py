@@ -160,7 +160,8 @@ class TemplateNLG(NLG):
 
     @staticmethod
     def _postprocess(sen):
-        sen = sen.strip().capitalize()
+        sen = sen.strip()
+        sen = sen[0].capitalize() + sen[1:]
         if sen and sen[-1] != '?' and sen[-1] != '.':
             sen += '.'
         sen += ' '
