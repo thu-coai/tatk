@@ -8,16 +8,22 @@ import json
 from tatk.policy.policy import Policy
 from tatk.policy.rlmodule import MultiDiscretePolicy, Value
 from tatk.util.train_util import init_logging_handler
+from tatk.policy.vector.vector_multiwoz import MultiWozVector
+import sys
+
+root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(root_dir)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class PPO(Policy):
-    
-    def __init__(self, is_train=False):
-        
+
+    def __init__(self, is_train=False, dataset='Multiwoz'):
+
         with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
             cfg = json.load(f)
-        self.save_dir = cfg['save_dir']
+        self.save_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), cfg['save_dir'])
         self.save_per_epoch = cfg['save_per_epoch']
         self.update_round = cfg['update_round']
         self.optim_batchsz = cfg['batchsz']
@@ -26,10 +32,15 @@ class PPO(Policy):
         self.tau = cfg['tau']
         self.is_train = is_train
         if is_train:
-            init_logging_handler(cfg['log_dir'])
-        
+            init_logging_handler(os.path.join(os.path.dirname(os.path.abspath(__file__)), cfg['log_dir']))
+
         # construct policy and value network
-        self.policy = MultiDiscretePolicy(self.vector.state_dim, cfg['h_dim'], self.vector.da_dim).to(device=DEVICE)
+        if dataset == 'Multiwoz':
+            voc_file = os.path.join(root_dir, 'data/multiwoz/sys_da_voc.txt')
+            voc_opp_file = os.path.join(root_dir, 'data/multiwoz/usr_da_voc.txt')
+            self.vector = MultiWozVector(voc_file, voc_opp_file)
+            self.policy = MultiDiscretePolicy(self.vector.state_dim, cfg['h_dim'], self.vector.da_dim).to(device=DEVICE)
+
         self.value = Value(self.vector.state_dim, cfg['hv_dim']).to(device=DEVICE)
         if is_train:
             self.policy_optim = optim.RMSprop(self.policy.parameters(), lr=cfg['lr'])
@@ -45,9 +56,7 @@ class PPO(Policy):
         """
         s_vec = torch.Tensor(self.vector.state_vectorize(state))
         a = self.policy.select_action(s_vec.to(device=DEVICE), self.is_train).cpu()
-        action = self.vector.action_devectorize(a.numpy())
-        
-        return action
+        return self.vector.action_devectorize(a.numpy())
 
     def init_session(self):
         """
@@ -169,7 +178,7 @@ class PPO(Policy):
             policy_loss /= optim_chunk_num
             logging.debug('<<dialog policy ppo>> epoch {}, iteration {}, value, loss {}'.format(epoch, i, value_loss))
             logging.debug('<<dialog policy ppo>> epoch {}, iteration {}, policy, loss {}'.format(epoch, i, policy_loss))
-        
+
         if (epoch+1) % self.save_per_epoch == 0:
             self.save(self.save_dir, epoch)
     
