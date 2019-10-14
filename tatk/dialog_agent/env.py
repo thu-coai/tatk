@@ -18,9 +18,9 @@ class Environment():
         self.sys_dst.init_session()
         
     def step(self, action):
-        model_response = self.sys_nlg.generate(action)
+        model_response = self.sys_nlg.generate(action) if self.sys_nlg else action
         observation = self.usr.response(model_response)
-        dialog_act = self.nlu_model.predict(observation)
+        dialog_act = self.nlu_model.predict(observation) if self.nlu_model else observation
         state = self.sys_dst.update(dialog_act)
         
         reward = self.usr.get_reward()

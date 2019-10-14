@@ -108,7 +108,7 @@ class MultiDiscretePolicy(nn.Module):
         a_probs = torch.cat([1-a_probs, a_probs], -1)
         
         # [b, a_dim, 2] => [b, a_dim]
-        trg_a_probs = a_probs.gather(-1, a.unsqueeze(-1)).squeeze(-1)
+        trg_a_probs = a_probs.gather(-1, a.unsqueeze(-1).long()).squeeze(-1)
         log_prob = torch.log(trg_a_probs)
         
         return log_prob.sum(-1, keepdim=True)
