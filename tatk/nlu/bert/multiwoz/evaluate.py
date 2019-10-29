@@ -78,6 +78,7 @@ if __name__ == '__main__':
 
     golden_da_triples = []
     output_da_triples = []
+    predict_golden = []
     for i in range(batch_num):
         print("batch [%d|%d]" % (i + 1, batch_num))
         batch_data = dataloader.data['test'][i * batch_size:(i + 1) * batch_size]
@@ -94,6 +95,11 @@ if __name__ == '__main__':
                 for s, v in svs:
                     triples.append((act, s, v.lower()))
             golden_da_triples.append(triples)
+            predict_golden.append({'predict': sorted([(x[0].split('-')[1],x[0].split('-')[0],x[1],x[2]) for x in output_da_triples[-1]]),
+                                   'golden': sorted([(x[0].split('-')[1],x[0].split('-')[0],x[1],x[2]) for x in golden_da_triples[-1]])})
+
+    output_file = os.path.join(output_dir, 'output.json')
+    json.dump(predict_golden, open(output_file, 'w', encoding='utf-8'), indent=4, ensure_ascii=False)
 
     TP, FP, FN = 0, 0, 0
     for (predicts, labels) in zip(output_da_triples, golden_da_triples):
