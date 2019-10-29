@@ -36,16 +36,16 @@ class MultiwozDataloader(BaseDataloader):
     def load_data(self,
                   data_dir=os.path.abspath(os.path.join(os.path.abspath(__file__),'../../../../data/multiwoz')),
                   role='system',
-                  utterance=True,
-                  dialog_act=True,
-                  context=True,
-                  context_window_size=3,
+                  utterance=False,
+                  dialog_act=False,
+                  context=False,
+                  context_window_size=0,
                   context_dialog_act=False,
                   belief_state=False,
                   last_opponent_utterance=False,
                   last_self_utterance=False,
                   session_id=False,
-                  span_info=True
+                  span_info=False
                   ):
 
         def da2tuples(dialog_act):
