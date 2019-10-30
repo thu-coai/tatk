@@ -6,7 +6,6 @@ import os
 import json
 import zipfile
 from pprint import pprint
-from copy import deepcopy
 
 
 def read_zipped_json(filepath, filename):
@@ -14,7 +13,7 @@ def read_zipped_json(filepath, filename):
     return json.load(archive.open(filename))
 
 
-class BaseDataloader(metaclass=ABCMeta):
+class DatasetDataloader(metaclass=ABCMeta):
     def __init__(self):
         self.data = None
 
@@ -29,13 +28,14 @@ class BaseDataloader(metaclass=ABCMeta):
         pass
 
 
-class MultiwozDataloader(BaseDataloader):
+class MultiWOZDataloader(DatasetDataloader):
     def __init__(self):
-        super(MultiwozDataloader, self).__init__()
+        super(MultiWOZDataloader, self).__init__()
 
     def load_data(self,
                   data_dir=os.path.abspath(os.path.join(os.path.abspath(__file__),'../../../../data/multiwoz')),
-                  role='system',
+                  data_key='all',
+                  role='all',
                   utterance=False,
                   dialog_act=False,
                   context=False,
@@ -60,7 +60,11 @@ class MultiwozDataloader(BaseDataloader):
         info_list = list(filter(eval, ['utterance', 'dialog_act', 'context', 'context_dialog_act', 'belief_state',
                                        'last_opponent_utterance', 'last_self_utterance', 'session_id', 'span_info']))
         self.data = {'train': {}, 'val': {}, 'test': {}, 'role': role}
-        for data_key in ['train', 'val', 'test']:
+        if data_key=='all':
+            data_key_list = ['train', 'val', 'test']
+        else:
+            data_key_list = [data_key]
+        for data_key in data_key_list:
             data = read_zipped_json(os.path.join(data_dir, '{}.json.zip'.format(data_key)), '{}.json'.format(data_key))
             print('loaded {}, size {}'.format(data_key, len(data)))
             for x in info_list:
@@ -105,7 +109,7 @@ class MultiwozDataloader(BaseDataloader):
 
 
 if __name__ == '__main__':
-    m = MultiwozDataloader()
+    m = MultiWOZDataloader()
     pprint(m.load_data(role='user', context=False, context_window_size=0, span_info=False))
 
 
