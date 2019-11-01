@@ -14,8 +14,17 @@ class ModuleDataloader(metaclass=ABCMeta):
 
 class SingleTurnNLUDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
-        kwargs['utterance'] = True
-        kwargs['dialog_act'] = True
+        kwargs.setdefault('utterance', True)
+        kwargs.setdefault('dialog_act', True)
+        return self.dataset_dataloader.load_data(*args, **kwargs)
+
+
+class MultiTurnNLUDataloader(ModuleDataloader):
+    def load_data(self, *args, **kwargs):
+        kwargs.setdefault('utterance', True)
+        kwargs.setdefault('dialog_act', True)
+        kwargs.setdefault('context', True)
+        kwargs.setdefault('context_window_size', 3)
         return self.dataset_dataloader.load_data(*args, **kwargs)
 
 
