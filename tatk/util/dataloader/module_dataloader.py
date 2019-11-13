@@ -1,9 +1,9 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from pprint import pprint
 from tatk.util.dataloader.dataset_dataloader import DatasetDataloader, MultiWOZDataloader
 
 
-class ModuleDataloader(metaclass=ABCMeta):
+class ModuleDataloader(ABC):
     def __init__(self, dataset_dataloader:DatasetDataloader):
         self.dataset_dataloader = dataset_dataloader
 
@@ -20,6 +20,22 @@ class SingleTurnNLUDataloader(ModuleDataloader):
 
 
 class MultiTurnNLUDataloader(ModuleDataloader):
+    def load_data(self, *args, **kwargs):
+        kwargs.setdefault('utterance', True)
+        kwargs.setdefault('dialog_act', True)
+        kwargs.setdefault('context', True)
+        kwargs.setdefault('context_window_size', 3)
+        return self.dataset_dataloader.load_data(*args, **kwargs)
+
+
+class SingleTurnNLGDataloader(ModuleDataloader):
+    def load_data(self, *args, **kwargs):
+        kwargs.setdefault('utterance', True)
+        kwargs.setdefault('dialog_act', True)
+        return self.dataset_dataloader.load_data(*args, **kwargs)
+
+
+class MultiTurnNLGDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
         kwargs.setdefault('utterance', True)
         kwargs.setdefault('dialog_act', True)

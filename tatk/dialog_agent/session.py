@@ -1,10 +1,10 @@
 """Dialog controller classes."""
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 import random
-import tatk.e2e.rnn_rollout.utils as utils
+from tatk.dialog_agent.agent import Agent
 
 
-class Session(metaclass=ABCMeta):
+class Session(metaclass=ABC):
     """Base dialog session controller, which manages the agents to conduct a complete dialog session.
     """
 
@@ -53,7 +53,7 @@ class BiSession(Session):
             The dialog history, formatted as [[user_uttr1, sys_uttr1], [user_uttr2, sys_uttr2], ...]
     """
 
-    def __init__(self, sys_agent, user_agent, kb_query=None, evaluator=None):
+    def __init__(self, sys_agent: Agent, user_agent: Agent, kb_query=None, evaluator=None):
         """
         Args:
             sys_agent (Agent):
@@ -126,6 +126,8 @@ class BiSession(Session):
             # print('task success {}'.format(self.evaluator.task_success()))
         reward = self.user_agent.get_reward()
         sys_response = self.next_response(user_response)
+        self.dialog_history.append([self.user_agent.name, user_response])
+        self.dialog_history.append([self.sys_agent.name, sys_response])
 
         return sys_response, user_response, session_over, reward
 

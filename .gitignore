@@ -15,6 +15,7 @@ data/**/val.json
 data/**/test.json
 data/camrest/CamRest676_v2.json
 data/multiwoz/annotated_user_da_with_span_full.json
+data/schema/dstc8-schema-guided-dialogue-master
 **/processed_data/*
 data/mdbt/data
 data/mdbt/models
