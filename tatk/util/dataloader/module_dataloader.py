@@ -1,9 +1,9 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 from pprint import pprint
 from tatk.util.dataloader.dataset_dataloader import DatasetDataloader, MultiWOZDataloader
 
 
-class ModuleDataloader(metaclass=ABCMeta):
+class ModuleDataloader(ABC):
     def __init__(self, dataset_dataloader:DatasetDataloader):
         self.dataset_dataloader = dataset_dataloader
 

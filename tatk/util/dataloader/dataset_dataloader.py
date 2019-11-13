@@ -1,7 +1,7 @@
 """
 Dataloader base class. Every dataset should inherit this class and implement its own dataloader.
 """
-from abc import ABCMeta, abstractmethod
+from abc import ABC, abstractmethod
 import os
 import json
 import zipfile
@@ -13,7 +13,7 @@ def read_zipped_json(filepath, filename):
     return json.load(archive.open(filename))
 
 
-class DatasetDataloader(metaclass=ABCMeta):
+class DatasetDataloader(metaclass=ABC):
     def __init__(self):
         self.data = None
 
