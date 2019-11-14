@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Jul 14 16:14:07 2019
-
 @author: truthless
 """
 
@@ -15,9 +14,10 @@ from tatk.dst.rule.multiwoz import RuleDST
 from tatk.policy.rule.multiwoz import Rule
 from tatk.policy.ppo import PPO
 from tatk.policy.rlmodule import Memory, Transition
-from tatk.nlg.template_nlg.multiwoz import TemplateNLG
+from tatk.nlg.template.multiwoz import TemplateNLG
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 def sampler(pid, queue, evt, env, policy, batchsz):
     """
@@ -51,19 +51,19 @@ def sampler(pid, queue, evt, env, policy, batchsz):
 
             # [s_dim] => [a_dim]
             s_vec = torch.Tensor(policy.vector.state_vectorize(s))
-            a = policy.predict(s).cpu()
+            a = policy.predict(s)
 
             # interact with env
             next_s, r, done = env.step(a)
 
             # a flag indicates ending or not
             mask = 0 if done else 1
-            
+
             # get reward compared to demostrations
             next_s_vec = torch.Tensor(policy.vector.state_vectorize(next_s))
-            
+
             # save to queue
-            buff.push(s_vec.numpy(), a.numpy(), r, mask, next_s_vec.numpy())
+            buff.push(s_vec.numpy(), policy.vector.action_vectorize(a), r, next_s_vec.numpy(), mask)
 
             # update per step
             s = next_s
@@ -81,6 +81,7 @@ def sampler(pid, queue, evt, env, policy, batchsz):
     # when sampling is over, push all buff data into queue
     queue.put([pid, buff])
     evt.wait()
+
 
 def sample(env, policy, batchsz, process_num):
     """
@@ -120,13 +121,14 @@ def sample(env, policy, batchsz, process_num):
     pid0, buff0 = queue.get()
     for _ in range(1, process_num):
         pid, buff_ = queue.get()
-        buff0.append(buff_) # merge current Memory into buff0
+        buff0.append(buff_)  # merge current Memory into buff0
     evt.set()
 
     # now buff saves all the sampled data
     buff = buff0
 
     return buff.get_batch()
+
 
 def update(env, policy, batchsz, epoch, process_num):
     # sample data asynchronously
@@ -140,34 +142,36 @@ def update(env, policy, batchsz, epoch, process_num):
     r = torch.from_numpy(np.stack(batch.reward)).to(device=DEVICE)
     mask = torch.Tensor(np.stack(batch.mask)).to(device=DEVICE)
     batchsz_real = s.size(0)
-    
-    policy.update(epoch, batchsz_real, s, a, r, mask)    
+
+    policy.update(epoch, batchsz_real, s, a, r, mask)
+
 
 if __name__ == '__main__':
     # svm nlu trained on usr sentence of multiwoz
-    nlu_sys = SVMNLU('usr', model_file="https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip")
+    # nlu_sys = SVMNLU('usr')
     # simple rule DST
     dst_sys = RuleDST()
     # rule policy
     policy_sys = PPO(True)
     # template NLG
-    nlg_sys = TemplateNLG(is_user=False)    
-    
+    # nlg_sys = TemplateNLG(is_user=False)
+
     # svm nlu trained on sys sentence of multiwoz
-    nlu_usr = SVMNLU('sys', model_file="https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_sys.zip")
+    # nlu_usr = SVMNLU('sys')
     # not use dst
     dst_usr = None
     # rule policy
     policy_usr = Rule(character='usr')
     # template NLG
-    nlg_usr = TemplateNLG(is_user=True)
+    # nlg_usr = TemplateNLG(is_user=True)
     # assemble
-    simulator = PipelineAgent(nlu_usr, dst_usr, policy_usr, nlg_usr)
-    
-    env = Environment(nlg_sys, simulator, nlu_sys, dst_sys)
-    
-    batchsz = 1024
-    epoch = 20
-    process_num = 8
-    update(env, policy_sys, batchsz, epoch, process_num)
+    simulator = PipelineAgent(None, None, policy_usr, None)
 
+    env = Environment(None, simulator, None, dst_sys)
+
+    batchsz = 1024
+    epoch = 5
+    process_num = 8
+    mp.set_start_method('spawn')
+    for i in range(epoch):
+        update(env, policy_sys, batchsz, i, process_num)
