@@ -43,6 +43,7 @@ class BertNLU(nn.Module):
         return intent_logits, tag_logits
 
     def train_batch(self, word_seq_tensor, tag_seq_tensor, intent_tensor, word_mask_tensor, tag_mask_tensor):
+        self.train()
         self.optim.zero_grad()
 
         word_seq_tensor = word_seq_tensor.to(self.DEVICE)
@@ -56,14 +57,15 @@ class BertNLU(nn.Module):
         active_tag_loss = tag_mask_tensor.view(-1) == 1
         active_tag_logits = tag_logits.view(-1, self.tag_dim)[active_tag_loss]
         active_tag_labels = tag_seq_tensor.view(-1)[active_tag_loss]
-        intent_loss = self.intent_loss(intent_logits, intent_tensor)/intent_tensor.size(0)
-        tag_loss = self.tag_loss(active_tag_logits, active_tag_labels)/intent_tensor.size(0)
+        intent_loss = self.intent_loss(intent_logits, intent_tensor)
+        tag_loss = self.tag_loss(active_tag_logits, active_tag_labels)
         loss = intent_loss + tag_loss
         loss.backward()
         self.optim.step()
-        return intent_loss.item(), tag_loss.item(), loss.item()
+        return intent_loss.item(), tag_loss.item(), loss.item(), intent_logits, tag_logits
 
     def eval_batch(self, word_seq_tensor, tag_seq_tensor, intent_tensor, word_mask_tensor, tag_mask_tensor):
+        self.eval()
         with torch.no_grad():
             word_seq_tensor = word_seq_tensor.to(self.DEVICE)
             tag_seq_tensor = tag_seq_tensor.to(self.DEVICE)
@@ -76,7 +78,13 @@ class BertNLU(nn.Module):
             active_tag_loss = tag_mask_tensor.view(-1) == 1
             active_tag_logits = tag_logits.view(-1, self.tag_dim)[active_tag_loss]
             active_tag_labels = tag_seq_tensor.view(-1)[active_tag_loss]
-            intent_loss = self.intent_loss(intent_logits, intent_tensor)/intent_tensor.size(0)
-            tag_loss = self.tag_loss(active_tag_logits, active_tag_labels)/intent_tensor.size(0)
+            intent_loss = self.intent_loss(intent_logits, intent_tensor)
+            tag_loss = self.tag_loss(active_tag_logits, active_tag_labels)
             loss = intent_loss + tag_loss
-        return intent_loss.item(), tag_loss.item(), loss.item()
+        return intent_loss.item(), tag_loss.item(), loss.item(), intent_logits, tag_logits
+
+    def predict_batch(self, word_seq_tensor, word_mask_tensor):
+        self.eval()
+        with torch.no_grad():
+            intent_logits, tag_logits = self.forward(word_seq_tensor, word_mask_tensor)
+        return intent_logits, tag_logits

@@ -5,7 +5,7 @@ Metric:
     dataset level Precision/Recall/F1
 
 Usage:
-    PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
+    python evaluate.py [usr|sys|all]
 """
 import pickle
 import os
@@ -60,7 +60,8 @@ if __name__ == '__main__':
         archive.close()
     print('Load from', best_model_path)
     checkpoint = torch.load(best_model_path, map_location=DEVICE)
-    print('train step', checkpoint['step'])
+    print('best_intent_step', checkpoint['best_intent_step'])
+    print('best_tag_step', checkpoint['best_tag_step'])
 
     model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
                     DEVICE=DEVICE,
@@ -82,7 +83,7 @@ if __name__ == '__main__':
         batch_data = dataloader.data['test'][i * batch_size:(i + 1) * batch_size]
         real_batch_size = len(batch_data)
         word_seq_tensor, tag_seq_tensor, intent_tensor, word_mask_tensor, tag_mask_tensor = dataloader._pad_batch(batch_data)
-        intent_logits, tag_logits = model.forward(word_seq_tensor, word_mask_tensor)
+        intent_logits, tag_logits = model.predict_batch(word_seq_tensor, word_mask_tensor)
         for j in range(real_batch_size):
             intent = recover_intent(dataloader, intent_logits[j], tag_logits[j], tag_mask_tensor[j],
                                     batch_data[j][0], batch_data[j][-4])
@@ -112,3 +113,6 @@ if __name__ == '__main__':
     print('\t Precision: %.2f' % (100 * precision))
     print('\t Recall: %.2f' % (100 * recall))
     print('\t F1: %.2f' % (100 * F1))
+    print('Load from', best_model_path)
+    print('best_intent_step', checkpoint['best_intent_step'])
+    print('best_tag_step', checkpoint['best_tag_step'])

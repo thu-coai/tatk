@@ -5,7 +5,7 @@ Metric:
     dataset level Precision/Recall/F1
 
 Usage:
-    PYTHONPATH=../../../.. python evaluate.py [usr|sys|all]
+    python evaluate.py [usr|sys|all]
 """
 import pickle
 import os
@@ -60,7 +60,8 @@ if __name__ == '__main__':
         archive.close()
     print('Load from', best_model_path)
     checkpoint = torch.load(best_model_path, map_location=DEVICE)
-    print('train step', checkpoint['step'])
+    print('best_intent_step', checkpoint['best_intent_step'])
+    print('best_tag_step', checkpoint['best_tag_step'])
 
     model = BertNLU(config['model'], dataloader.intent_dim, dataloader.tag_dim,
                     DEVICE=DEVICE,
@@ -77,12 +78,13 @@ if __name__ == '__main__':
 
     golden_da_triples = []
     output_da_triples = []
+    predict_golden = []
     for i in range(batch_num):
         print("batch [%d|%d]" % (i + 1, batch_num))
         batch_data = dataloader.data['test'][i * batch_size:(i + 1) * batch_size]
         real_batch_size = len(batch_data)
         word_seq_tensor, tag_seq_tensor, intent_tensor, word_mask_tensor, tag_mask_tensor = dataloader._pad_batch(batch_data)
-        intent_logits, tag_logits = model.forward(word_seq_tensor, word_mask_tensor)
+        intent_logits, tag_logits = model.predict_batch(word_seq_tensor, word_mask_tensor)
         for j in range(real_batch_size):
             intent = recover_intent(dataloader, intent_logits[j], tag_logits[j], tag_mask_tensor[j],
                                     batch_data[j][0], batch_data[j][-4])
@@ -93,6 +95,11 @@ if __name__ == '__main__':
                 for s, v in svs:
                     triples.append((act, s, v.lower()))
             golden_da_triples.append(triples)
+            predict_golden.append({'predict': sorted([(x[0].split('-')[1],x[0].split('-')[0],x[1],x[2]) for x in output_da_triples[-1]]),
+                                   'golden': sorted([(x[0].split('-')[1],x[0].split('-')[0],x[1],x[2]) for x in golden_da_triples[-1]])})
+
+    output_file = os.path.join(output_dir, 'output.json')
+    json.dump(predict_golden, open(output_file, 'w', encoding='utf-8'), indent=4, ensure_ascii=False)
 
     TP, FP, FN = 0, 0, 0
     for (predicts, labels) in zip(output_da_triples, golden_da_triples):
@@ -112,3 +119,6 @@ if __name__ == '__main__':
     print('\t Precision: %.2f' % (100 * precision))
     print('\t Recall: %.2f' % (100 * recall))
     print('\t F1: %.2f' % (100 * F1))
+    print('Load from', best_model_path)
+    print('best_intent_step', checkpoint['best_intent_step'])
+    print('best_tag_step', checkpoint['best_tag_step'])

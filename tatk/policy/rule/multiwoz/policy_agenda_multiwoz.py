@@ -45,7 +45,7 @@ class UserPolicyAgendaMultiWoz(Policy):
     with open(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, os.pardir, os.pardir, 'data/multiwoz/value_set.json')) as f:
         stand_value_dict = json.load(f)
 
-    def __init__(self, max_goal_num=100, seed=2019):
+    def __init__(self):
         """
         Constructor for User_Policy_Agenda class.
         """
@@ -60,19 +60,12 @@ class UserPolicyAgendaMultiWoz(Policy):
         self.goal = None
         self.agenda = None
 
-        random.seed(seed)
-        self.goal_seeds = [random.randint(1, 1e7) for i in range(max_goal_num)]
-
         Policy.__init__(self)
 
     def init_session(self):
         """ Build new Goal and Agenda for next session """
         self.__turn = 0
-        if len(self.goal_seeds) > 1:
-            self.goal = Goal(self.goal_generator, self.goal_seeds[0])
-            self.goal_seeds = self.goal_seeds[1:]
-        else:
-            self.goal = Goal(self.goal_generator)
+        self.goal = Goal(self.goal_generator)
         self.domain_goals = self.goal.domain_goals
         self.agenda = Agenda(self.goal)
 
@@ -110,7 +103,7 @@ class UserPolicyAgendaMultiWoz(Policy):
 
         return action
 
-    def is_terminal(self):
+    def is_terminated(self):
         # Is there any action to say?
         return self.agenda.is_empty()
 
@@ -262,13 +255,13 @@ def check_if_time(value):
 class Goal(object):
     """ User Goal Model Class. """
 
-    def __init__(self, goal_generator: GoalGenerator, seed=None):
+    def __init__(self, goal_generator: GoalGenerator):
         """
         create new Goal by random
         Args:
             goal_generator (GoalGenerator): Goal Gernerator.
         """
-        self.domain_goals = goal_generator.get_user_goal(seed)
+        self.domain_goals = goal_generator.get_user_goal()
 
         self.domains = list(self.domain_goals['domain_ordering'])
         del self.domain_goals['domain_ordering']
