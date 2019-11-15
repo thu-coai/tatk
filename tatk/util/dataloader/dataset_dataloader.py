@@ -46,7 +46,8 @@ class MultiWOZDataloader(DatasetDataloader):
                   last_self_utterance=False,
                   session_id=False,
                   span_info=False,
-                  terminal=False
+                  terminal=False,
+                  goal=False
                   ):
 
         def da2tuples(dialog_act):
@@ -106,6 +107,8 @@ class MultiWOZDataloader(DatasetDataloader):
                         self.data[data_key]['span_info'].append(turn['span_info'])
                     if terminal:
                         self.data[data_key]['terminal'].append(i+2 >= len(sess['log']))
+                    if goal:
+                        self.data[data_key]['key'].append(sess['goal'])
                     cur_context.append(text)
                     cur_context_dialog_act.append(da)
         return self.data

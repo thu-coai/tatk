@@ -35,6 +35,15 @@ class ActPolicyDataloader(ModuleDataloader):
         kwargs.setdefault('context_dialog_act', True)
         kwargs.setdefault('context_window_size', 2)
         return self.dataset_dataloader.load_data(*args, **kwargs)
+    
+class ActUserPolicyDataloader(ModuleDataloader):
+    def load_data(self, *args, **kwargs):
+        kwargs.setdefault('goal', True)
+        kwargs.setdefault('dialog_act', True)
+        kwargs.setdefault('terminal', True)
+        kwargs.setdefault('context_dialog_act', True)
+        kwargs.setdefault('context_window_size', 2)
+        return self.dataset_dataloader.load_data(*args, **kwargs)
 
 class WordPolicyDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):

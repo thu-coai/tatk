@@ -2,13 +2,11 @@ import os
 import json
 import pickle
 import zipfile
-import torch
-import torch.utils.data as data
 from tatk.util.camrest.state import default_state
-from tatk.policy.loader.dataset import ActDataset
+from tatk.util.dataloader.module_dataloader import ActPolicyDataloader
 from tatk.policy.vector.vector_camrest import CamrestVector
 
-class ActPolicyDataLoaderCamrest():
+class ActPolicyDataLoaderCamrest(ActPolicyDataloader):
     
     def __init__(self):
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
@@ -24,7 +22,7 @@ class ActPolicyDataLoaderCamrest():
             print('Start preprocessing the dataset')
             self._build_data(root_dir, processed_dir)
         
-    def _build_data(self, root_dir, processed_dir):
+    def _build_data(self, root_dir, processed_dir): # TODO
         raw_data = {}
         for part in ['train', 'val', 'test']:
             archive = zipfile.ZipFile(os.path.join(root_dir, 'data/camrest/{}.json.zip'.format(part)), 'r')
@@ -55,26 +53,3 @@ class ActPolicyDataLoaderCamrest():
         for part in ['train', 'val', 'test']:
             with open(os.path.join(processed_dir, '{}.pkl'.format(part)), 'wb') as f:
                 pickle.dump(self.data[part], f)
-                     
-    def _load_data(self, processed_dir):
-        self.data = {}
-        for part in ['train', 'val', 'test']:
-            with open(os.path.join(processed_dir, '{}.pkl'.format(part)), 'rb') as f:
-                self.data[part] = pickle.load(f)
-                
-    def create_dataset(self, part, batchsz):
-        print('Start creating {} dataset'.format(part))
-        s = []
-        a = []
-        for item in self.data[part]:
-            s.append(torch.Tensor(item[0]))
-            a.append(torch.Tensor(item[1]))
-        s = torch.stack(s)
-        a = torch.stack(a)
-        dataset = ActDataset(s, a)
-        dataloader = data.DataLoader(dataset, batchsz, True)
-        print('Finish creating {} dataset'.format(part))
-        return dataloader
-
-
-
