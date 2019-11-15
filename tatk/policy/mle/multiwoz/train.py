@@ -3,14 +3,13 @@ import torch
 import logging
 import torch.nn as nn
 import json
-import pickle
 import sys
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 sys.path.append(root_dir)
 
 from tatk.policy.rlmodule import MultiDiscretePolicy
 from tatk.policy.vector.vector_multiwoz import MultiWozVector
-from tatk.policy.mle.multiwoz.multiwoz_data_loader import PolicyDataLoaderMultiWoz
+from tatk.policy.loader.da_loader_multiwoz import ActPolicyDataLoaderMultiWoz
 from tatk.util.train_util import to_device, init_logging_handler
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -125,7 +124,7 @@ class MLE_Trainer():
         logging.info('<<dialog policy>> epoch {}: saved network to mdl'.format(epoch))
         
 if __name__ == '__main__':
-    manager = PolicyDataLoaderMultiWoz()
+    manager = ActPolicyDataLoaderMultiWoz()
     with open('config.json', 'r') as f:
         cfg = json.load(f)
     init_logging_handler(cfg['log_dir'])

@@ -3,14 +3,13 @@ import torch
 import logging
 import torch.nn as nn
 import json
-import pickle
 import sys
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
 sys.path.append(root_dir)
 
 from tatk.policy.rlmodule import MultiDiscretePolicy
 from tatk.policy.vector.vector_camrest import CamrestVector
-from tatk.policy.mle.camrest.camrest_data_loader import PolicyDataLoaderCamrest
+from tatk.policy.loader.da_loader_camrest import ActPolicyDataLoaderCamrest
 from tatk.util.train_util import to_device, init_logging_handler
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -125,7 +124,7 @@ class MLE_Trainer():
         logging.info('<<dialog policy>> epoch {}: saved network to mdl'.format(epoch))
         
 if __name__ == '__main__':
-    manager = PolicyDataLoaderCamrest()
+    manager = ActPolicyDataLoaderCamrest()
     with open('config.json', 'r') as f:
         cfg = json.load(f)
     init_logging_handler(cfg['log_dir'])
