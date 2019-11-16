@@ -31,7 +31,3 @@ class NLG(Module):
                 Natural language utterances.
         """
         return [[]]
-
-    @abstractmethod
-    def get_name(self):
-        return super(NLG, self).get_name() + '-' + 'NLG'

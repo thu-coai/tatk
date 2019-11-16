@@ -14,10 +14,6 @@ class Module(ABC):
         """Model testing entry point"""
         pass
 
-    @abstractmethod
-    def get_name(self):
-        return "Module"
-
     def from_cache(self, *args, **kwargs):
         """restore internal state for multi-turn dialog"""
         return None
