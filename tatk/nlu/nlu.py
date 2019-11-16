@@ -36,7 +36,3 @@ class NLU(Module):
                 The dialog acts of utterances.
         """
         return [[]]
-
-    @abstractmethod
-    def get_name(self):
-        return super(NLU, self).get_name() + '-' + 'NLU'

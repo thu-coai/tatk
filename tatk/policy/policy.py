@@ -32,7 +32,3 @@ class Policy(Module):
                 The next dialog action.
         """
         pass
-
-    @abstractmethod
-    def get_name(self):
-        return super(Policy, self).get_name() + '-' + 'Policy'

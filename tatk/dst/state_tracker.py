@@ -31,7 +31,3 @@ class Tracker(Module):
                 Updated dialog states, with the same form of previous states.
         """
         pass
-
-    @abstractmethod
-    def get_name(self):
-        return super(Tracker, self).get_name() + '-' + 'DST'
