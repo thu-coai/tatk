@@ -1,8 +1,9 @@
 """Natural Language Generation Interface"""
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from tatk.util.module import Module
 
 
-class NLG(ABC):
+class NLG(Module):
     """Base class for NLG model."""
 
     def generate(self, action):
@@ -32,23 +33,5 @@ class NLG(ABC):
         return [[]]
 
     @abstractmethod
-    def train(self, *args, **kwargs):
-        """Model training entry point"""
-        pass
-
-    @abstractmethod
-    def test(self, *args, **kwargs):
-        """Model testing entry point"""
-        pass
-
-    def from_cache(self, *args, **kwargs):
-        """restore internal state for multi-turn dialog"""
-        return None
-
-    def to_cache(self, *args, **kwargs):
-        """save internal state for multi-turn dialog"""
-        return None
-
-    def init_session(self):
-        """Init the class variables for a new session."""
-        pass
+    def get_name(self):
+        return super(NLG, self).get_name() + '-' + 'NLG'
