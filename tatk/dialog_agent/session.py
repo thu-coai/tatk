@@ -4,7 +4,7 @@ import random
 from tatk.dialog_agent.agent import Agent
 
 
-class Session(metaclass=ABC):
+class Session(ABC):
     """Base dialog session controller, which manages the agents to conduct a complete dialog session.
     """
 
