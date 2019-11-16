@@ -352,17 +352,3 @@ class UserDataManager(object):
     def get_usrda_id(self, usr_das):
         return [[self.voc_usr[self.sos]] + [self.voc_usr.get(word, self.voc_usr[self.unk]) for word in usr_da] + [self.voc_usr[self.eos]]
                  for usr_da in usr_das]
-
-def batch_iter(x, y, z, batch_size=64):
-    data_len = len(x)
-    num_batch = ((data_len - 1) // batch_size) + 1
-
-    indices = np.random.permutation(np.arange(data_len))
-    x_shuffle = np.array(x)[indices]
-    y_shuffle = np.array(y)[indices]
-    z_shuffle = np.array(z)[indices]
-
-    for i in range(num_batch):
-        start_id = i * batch_size
-        end_id = min((i + 1) * batch_size, data_len)
-        yield x_shuffle[start_id:end_id], y_shuffle[start_id:end_id], z_shuffle[start_id:end_id]
