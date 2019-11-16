@@ -1,0 +1,82 @@
+{
+  "net":
+  {
+    "port": 8787,
+    "app_name": "tatk"
+  },
+
+  "nlu":
+  {
+    "svm-cam":
+    {
+      "class_path": "tatk.nlu.svm.camrest.nlu.SVMNLU",
+      "data_set": "camrest",
+      "ini_params": {"mode": "usr"},
+      "enable": true
+    },
+
+    "svm-mul":
+    {
+      "class_path": "tatk.nlu.svm.multiwoz.nlu.SVMNLU",
+      "data_set": "multiwoz",
+      "ini_params": {"mode": "usr"},
+      "enable": true
+    }
+  },
+
+  "dst":
+  {
+    "rule-cam":
+    {
+      "class_path": "tatk.dst.rule.camrest.state_tracker.RuleDST",
+      "data_set": "camrest",
+      "ini_params": {},
+      "enable": true
+    },
+
+    "rule-mul":
+    {
+      "class_path": "tatk.dst.rule.multiwoz.state_tracker.RuleDST",
+      "data_set": "multiwoz",
+      "ini_params": {},
+      "enable": true
+    }
+
+  },
+
+  "policy":
+  {
+    "mle-cam":
+    {
+      "class_path": "tatk.policy.mle.camrest.mle.MLE",
+      "data_set": "camrest",
+      "ini_params": {},
+      "enable": true
+    },
+    "mle-mul":
+    {
+      "class_path": "tatk.policy.mle.multiwoz.mle.MLE",
+      "data_set": "multiwoz",
+      "ini_params": {},
+      "enable": true
+    }
+  },
+
+  "nlg":
+  {
+    "tmp-cam-usr-manual":
+    {
+      "class_path": "tatk.nlg.template.camrest.nlg.TemplateNLG",
+      "data_set": "camrest",
+      "ini_params": {"is_user": true},
+      "enable": true
+    },
+    "mod1-usr-auto-manual":
+    {
+      "class_path": "tatk.nlg.template.camrest.nlg.TemplateNLG",
+      "data_set": "camrest",
+      "ini_params": {"is_user": true, "mode": "auto_manual"},
+      "enable": true
+    }
+  }
+}
