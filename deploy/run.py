@@ -8,7 +8,6 @@ import os
 import sys
 import json
 from flask import Flask, request
-from flask import _request_ctx_stack
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
@@ -45,12 +44,21 @@ def net_function(fun):
     params = get_params_from_request(request)
     ret = {}
     try:
+        # clear expire session every time
+        ctrl_server.on_clear_expire()
+
         if fun == 'models':
             ret = ctrl_server.on_models()
         elif fun == 'register':
             ret = ctrl_server.on_register(**params)
         elif fun == 'close':
             ret = ctrl_server.on_close(**params)
+        elif fun == 'clear_expire':
+            ret = ctrl_server.on_clear_expire()
+        elif fun == 'response':
+            ret = ctrl_server.on_response(**params)
+        elif fun == 'rollback':
+            ret = ctrl_server.on_rollback(**params)
         else:
             raise DeployError('Unknow funtion \'%s\'' % fun)
     except Exception as e:
@@ -66,53 +74,6 @@ def net_function(fun):
         ret = json.dumps(ret, ensure_ascii=False)
     return ret
 
-
-"""
-import time
-# ll = Lock()
-# ll = GlobalLock()
-
-
-ll = GlobalSemaphore(2)
-# ll = MySemaphore(2)
-
-@app.route('/')
-def index():
-    print('start')
-    with ll:
-        print(_request_ctx_stack._local.__ident_func__(), 'bng')
-
-        time.sleep(5)
-        '''
-        while True:
-            pass
-        '''
-
-        print(_request_ctx_stack._local.__ident_func__(), 'end')
-    print('over')
-    return '<h1>hello</h1>'
-"""
-
-"""
-
-from concurrent.futures import ThreadPoolExecutor
-import threading
-
-pool = ThreadPoolExecutor(max_workers=2)
-
-def work(ids: str):
-    print(ids, 'bng')
-    time.sleep(5)
-    print(ids, 'end')
-    return '<h1>hello</h1>'
-
-@app.route('/')
-def index():
-    f = pool.submit(work, _request_ctx_stack._local.__ident_func__())
-    ret = f.result()
-    return ret
-"""
-from gunicorn.app.wsgiapp import run
 
 if __name__ == '__main__':
     # gunicorn deploy.run:app --threads 4

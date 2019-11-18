@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 
 """
@@ -150,30 +151,28 @@ class MySemaphore(LockBase):
         return th_lock
 
 
-class DeployError(Exception):
-    def __init__(self, msg: str, module: str = 'system', model: str = ''):
-        super().__init__(self)
-        self.msg = msg
-        self.module = module
-        self.model = model
+class ResourceLock(object):
+    def __init__(self, value: int = 1):
+        self.sema = MySemaphore(value)
+        self.lock = MyLock()
+        self.used = [0 for _ in range(value)]
 
-    def __str__(self):
-        text = ''
-        if self.module:
-            text += '[%s]' % self.module
-        if self.model:
-            text += '<%s>' % self.model
-        return text + ' ' + self.msg
+    def res_catch(self):
+        self.sema.enter()
+        with self.lock:
+            unused_idx = self.used.index(0)
+            self.used[unused_idx] = 1
+        return unused_idx
+
+    def res_leave(self, idx):
+        with self.lock:
+            self.used[idx] = 0
+        self.sema.leave()
 
 
-def test():
+if __name__ == '__main__':
     lock = GlobalLock(is_rlock=False)
     with lock:
         print("running")
         with lock:
             print("running")
-
-
-
-if __name__ == '__main__':
-    test()
