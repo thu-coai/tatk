@@ -25,6 +25,7 @@ ctrl_server = ServerCtrl(**dep_conf)
 
 # flask app
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
 def get_params_from_request(gp_reqt):
@@ -62,7 +63,7 @@ def net_function(fun):
         else:
             raise DeployError('Unknow funtion \'%s\'' % fun)
     except Exception as e:
-        err_msg = 'There are some errors in the operation.'
+        err_msg = 'There are some errors in the operation. %s' % str(e)
         if isinstance(e, DeployError):
             err_msg = str(e)
         elif isinstance(e, TypeError):
@@ -81,4 +82,4 @@ def dialog():
 
 if __name__ == '__main__':
     # gunicorn deploy.run:app --threads 4
-    app.run(host='0.0.0.0', port=dep_conf['net']['port'])
+    app.run(host='0.0.0.0', port=dep_conf['net']['port'], debug=True)
