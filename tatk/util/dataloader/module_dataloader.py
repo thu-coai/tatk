@@ -34,7 +34,8 @@ class AgentDSTDataloader(ModuleDataloader):
         kwargs.setdefault('belief_state', True)
         kwargs.setdefault('last_opponent_utterance', True)
         kwargs.setdefault('last_self_utterance', True)
-        return None
+        kwargs.setdefault('ontology', True)
+        return self.dataset_dataloader.load_data(*args, **kwargs)
 
 class UserDSTDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
@@ -43,7 +44,7 @@ class UserDSTDataloader(ModuleDataloader):
         kwargs.setdefault('belief_state', True)
         kwargs.setdefault('last_opponent_utterance', True)
         kwargs.setdefault('last_self_utterance', True)
-        return None
+        return self.dataset_dataloader.load_data(*args, **kwargs)
 
 class ActPolicyDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
