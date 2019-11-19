@@ -21,7 +21,7 @@
             width: 92%;
             margin-left: 5%;
             text-align: center;
-            margin-bottom: 5px;
+            {#margin-bottom: 5px;#}
             {#border-bottom: black solid 1px;#}
             font-weight: bold;
             color: white;
@@ -32,7 +32,7 @@
             float: left;
             margin-left: 5%;
             margin-right: 0;
-            margin-top: 5px;
+            margin-top: 10px;
         }
         .right {
             float:left;
@@ -68,8 +68,9 @@
             float:left;
             width: 40%;
             margin-left: 5%;
-            height: 34px;
-            font-size: 25px;
+            height: 25px;
+            font-size: 18px;
+            margin-top: 5px;
         }
         .module_output {
             height: 105px;;
@@ -78,13 +79,13 @@
         .module_output_area {
             height: 100px;
             width: 100%;
-            font-size: 5px;
+            font-size: 10px;
             resize: none;
         }
         .dialog_history {
             background-color: #e3e3e3;
             width: 100%;
-            height: 550px;
+            height: 555px;
             {#border-radius:10px;#}
             overflow-y: scroll;
         }
@@ -130,16 +131,31 @@
             float: right;
         }
         .bubble_text{
-            font-size: 20px;
+            font-size: 18px;
             padding: 3px;
             padding-left: 10px;
             padding-right: 10px;
         }
+        .whole_page {
+            max-width: 1200px;
+            margin:0 auto;
+        }
+        .recall_line{
+            width: 100%;
+            height: 30px;
+        }
+        .recall_button {
+            width: 30%;
+            height: 29px;
+            text-align: center;
+            float:right;
+            font-size: 12px;
+        }
 	</style>
 
-<title>Dialog Interface</title>
-    <div id="whole_page">
-        <div id="title" class="title_div">Title</div>
+<title>TaTK</title>
+    <div id="whole_page" class="whole_page">
+        <div id="title" class="title_div">TaTK Interaction Toolkit</div>
         <div class="left">
             <div class="item">
                 <div class="item_title">Dataset</div>
@@ -158,8 +174,12 @@
             </div>
             <div class="module_output">
 {#                <textarea :rows={output_rows} id="stem_source" class="form-control module_output_area"></textarea>#}
-                <pre id="nlu_output" class="form-control module_output_area" contenteditable="true">{nlu_output}</pre>
+                <pre @input="input(event)" id="nlu_output" class="form-control module_output_area" contenteditable="true">{nlu_output}</pre>
             </div>
+            <div id="nlu_button" class="recall_line" hidden>
+                <button class="btn btn-info recall_button" @click="recall_module(event)">Recall NLU</button>
+            </div>
+
             <div class="divide"></div>
             <div class="item">
                 <div class="item_title">DST Model</div>
@@ -170,8 +190,12 @@
             </div>
             <div class="module_output">
 {#                <textarea :rows={output_rows}  id="stem_source" class="form-control module_output_area" v-model="dst_output"></textarea>#}
-                <pre id="dst_output" class="form-control module_output_area" contenteditable="true">{dst_output}</pre>
+                <pre @input="input(event)" id="dst_output" class="form-control module_output_area" contenteditable="true">{dst_output}</pre>
             </div>
+            <div id="dst_button" class="recall_line" hidden>
+                <button class="btn btn-info recall_button" @click="recall_module(event)">Recall DST</button>
+            </div>
+
             <div class="divide"></div>
             <div class="item">
                 <div class="item_title">Policy Model</div>
@@ -182,9 +206,13 @@
             </div>
             <div class="module_output">
 {#                <textarea :rows={output_rows}  id="stem_source" class="form-control module_output_area" v-model="policy_output"></textarea>#}
-                <pre id="policy_output" class="form-control module_output_area" contenteditable="true">{policy_output}</pre>
+                <pre @input="input(event)" id="policy_output" class="form-control module_output_area" contenteditable="true">{policy_output}</pre>
             </div>
             <div class="divide"></div>
+            <div id="policy_button" class="recall_line" hidden>
+                <button class="btn btn-info recall_button" @click="recall_module(event)">Recall Policy</button>
+            </div>
+
             <div class="item">
                 <div class="item_title">NLG Model</div>
                 <select v-model="nlg" id="nlg" class="item_select">
@@ -194,7 +222,10 @@
             </div>
             <div class="module_output">
 {#                <textarea :rows={output_rows}  id="stem_source" class="form-control module_output_area" v-model="nlg_output"></textarea>#}
-                <pre id="nlg_output" class="form-control module_output_area" contenteditable="true">{nlg_output}</pre>
+                <pre @input="input(event)" id="nlg_output" class="form-control module_output_area" contenteditable="true">{nlg_output}</pre>
+            </div>
+            <div id="nlg_button" class="recall_line" hidden>
+                <button class="btn btn-info recall_button" @click="recall_module(event)">Recall NLG</button>
             </div>
         </div>
         <div class="right">
@@ -213,8 +244,8 @@
                 <textarea rows="3"  id="input_text" class="form-control input_area" v-model="input_text"></textarea>
             </div>
             <div class="buttons">
-                <button class="btn btn-info single_button" @click="recall">recall</button>
-                <button class="btn btn-info single_button" @click="submit">send</button>
+{#                TODO: sent invalid when recall btn appears#}
+                <button id="submit_btn" class="btn btn-info single_button" @click="submit(event)">send</button>
             </div>
         </div>
     </div>
@@ -228,9 +259,9 @@
             el: '#whole_page',
             data: {
                 dataset: null,
-                dataset_list: ['set1', 'set2'],
+                dataset_list: ['MultiWoz', 'set1', 'set2'],
                 nlu: null,
-                nlu_list: ['nlu1', 'nlu2', 'nlu3'],
+                nlu_list: ['SVM', 'nlu1', 'nlu2', 'nlu3'],
                 nlu_output : {
                       "Attraction-Inform": [
                         [
@@ -244,7 +275,7 @@
                       ]
                 },
                 dst: null,
-                dst_list: ['dst1', 'dst2', 'dst3'],
+                dst_list: ['Rule', 'dst1', 'dst2', 'dst3'],
                 dst_output: {
           "taxi": {
             "book": {
@@ -340,7 +371,7 @@
           }
         },
                 policy: null,
-                policy_list: ['policy1', 'policy2', 'policy3'],
+                policy_list: ['Rule', 'policy1', 'policy2', 'policy3'],
                 policy_output: {
           "Attraction-Inform": [
             [
@@ -362,7 +393,7 @@
           ]
         },
                 nlg: null,
-                nlg_list: ['nlg1', 'nlg2', 'nlg3'],
+                nlg_list: ['Template', 'nlg1', 'nlg2', 'nlg3'],
                 nlg_output: {'utterance': 'All Saints Church is an architectural attraction . It is in the Centre of town and entrance is free !'},
 
                 history: [
@@ -395,9 +426,13 @@
                     alert(this.dataset);
                     alert('recall');
                 },
-                submit: function () {
+                submit: function (e) {
                     this.update_vals();
                     alert('submit');
+                    var b = e.srcElement;
+                    b.setAttribute("disabled", true);
+                    alert('processing');
+                    b.removeAttribute("disabled");
                 },
                 scroll_auto: function() {
                     var his = document.getElementById('conv_history_div');
@@ -408,6 +443,28 @@
                     this.dst_output = JSON.parse($("#dst_output").html());
                     this.policy_output = JSON.parse($("#policy_output").html());
                     this.nlg_output = JSON.parse($("#nlg_output").html());
+                },
+                recall_module: function(e) {
+                    var target = e.srcElement.parentElement;
+                    var m = target.id.substring(0, target.id.length-7);
+                    alert(m);
+                    target.setAttribute("hidden", true);
+                },
+                input: function(e) {
+                    this.clear_button();
+                    var m = e.srcElement.id.substring(0, e.srcElement.id.length-7);
+                    var button_id = m + '_button';
+                    var d = document.getElementById(button_id);
+                    d.removeAttribute("hidden");
+                },
+                clear_button: function() {
+                    var mlist = ['nlu', 'dst', 'policy', 'nlg'];
+                    for (var m in mlist){
+                        var item = mlist[m];
+                        var id = item + '_button';
+                        var d = document.getElementById(id);
+                        d.setAttribute("hidden", true);
+                    }
                 }
             }
         });
