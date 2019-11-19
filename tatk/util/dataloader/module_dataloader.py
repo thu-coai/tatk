@@ -27,6 +27,24 @@ class MultiTurnNLUDataloader(ModuleDataloader):
         kwargs.setdefault('context_window_size', 3)
         return self.dataset_dataloader.load_data(*args, **kwargs)
 
+class AgentDSTDataloader(ModuleDataloader):
+    def load_data(self, *args, **kwargs):
+        kwargs.setdefault('context', True)
+        kwargs.setdefault('context_dialog_act', True)
+        kwargs.setdefault('belief_state', True)
+        kwargs.setdefault('last_opponent_utterance', True)
+        kwargs.setdefault('last_self_utterance', True)
+        return None
+
+class UserDSTDataloader(ModuleDataloader):
+    def load_data(self, *args, **kwargs):
+        kwargs.setdefault('context', True)
+        kwargs.setdefault('context_dialog_act', True)
+        kwargs.setdefault('belief_state', True)
+        kwargs.setdefault('last_opponent_utterance', True)
+        kwargs.setdefault('last_self_utterance', True)
+        return None
+
 class ActPolicyDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
         kwargs.setdefault('belief_state', True)
