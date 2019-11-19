@@ -4,6 +4,7 @@ from tatk.e2e.rnn_rollout.deal_or_not import DealornotAgent
 from tatk.e2e.rnn_rollout.deal_or_not.model import get_context_generator
 from tatk import DealornotSession
 import tatk.e2e.rnn_rollout.utils as utils
+import numpy as np
 
 session_num = 20
 
@@ -206,6 +207,7 @@ context_generator = get_context_generator(rnn_model_args().context_file)
 session = DealornotSession(alice_agent, bob_agent)
 
 session_idx = 0
+rewards = [[], []]
 for ctxs in context_generator.iter():
     print('session_idx', session_idx)
     for agent, ctx, partner_ctx in zip(agents, ctxs, reversed(ctxs)):
@@ -214,12 +216,15 @@ for ctxs in context_generator.iter():
     last_observation = None
     while True:
         response = session.next_response(last_observation)
-        print('\t', response)
+        print('\t', ' '.join(response))
         session_over = session.is_terminated()
         if session_over:
             break
         last_observation = response
     agree, [alice_r, bob_r] = session.get_rewards(ctxs)
     print('session [{}] alice vs bos: {:.1f}/{:.1f}'.format(session_idx, alice_r, bob_r))
+    rewards[0].append(alice_r)
+    rewards[1].append(bob_r)
     session.init_session()
     session_idx += 1
+# print(np.mean(rewards, axis=1))

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-theme.css">
+    <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+    <script src="/static/js/bootstrap.js" type="text/javascript"></script>
+    <script src="/static/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="/static/js/npm.js" type="text/javascript"></script>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/vue.min.js" type="text/javascript"></script>
+
+    <style type="text/css">
+    	{#div {#}
+    	{#	border: solid 1px black;#}
+    	{#}#}
+        .title_div {
+            font-size: 30px;
+            width: 92%;
+            margin-left: 5%;
+            text-align: center;
+            margin-bottom: 5px;
+            {#border-bottom: black solid 1px;#}
+            font-weight: bold;
+            color: white;
+            background-color: #ff8729;
+        }
+        .left {
+            width: 30%;
+            float: left;
+            margin-left: 5%;
+            margin-right: 0;
+            margin-top: 5px;
+        }
+        .right {
+            float:left;
+            width: 60%;
+            margin-left: 2%;
+            margin-top: 5px;
+        }
+        .item {
+            height: 35px;
+            margin-bottom: 5px;
+        }
+        .divide {
+            height: 10px;
+            {#margin-top: 6px;#}
+            {#margin-bottom: 10px;#}
+            width: 100%;
+            {#border-bottom: 1px solid gray;#}
+        }
+    	.item_title {
+            float:left;
+            width: 43%;
+            margin-left: 2%;
+            height: 34px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+            white-space: nowrap;
+            text-overflow:ellipsis;
+            overflow:hidden;
+            line-height:34px
+        }
+        .item_select {
+            float:left;
+            width: 40%;
+            margin-left: 5%;
+            height: 34px;
+            font-size: 25px;
+        }
+        .module_output {
+            height: 105px;;
+            width: 100%;
+        }
+        .module_output_area {
+            height: 100px;
+            width: 100%;
+            font-size: 5px;
+            resize: none;
+        }
+        .dialog_history {
+            background-color: #e3e3e3;
+            width: 100%;
+            height: 550px;
+            {#border-radius:10px;#}
+            overflow-y: scroll;
+        }
+        .text_input {
+            width: 100%;
+            height: 100px;
+            margin-top: 7px;
+        }
+        .input_area {
+            width: 100%;
+            font-size: 20px;
+            resize: none;
+        }
+        .buttons {
+            float:right;
+            margin-right: 5%;
+            margin-top: 3px;
+        }
+        .single_button {
+            width: 90px;
+            font-size: 20px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .line{
+            word-wrap:break-word;
+            {#word-break:break-all;#}
+            overflow: hidden;
+            width: 90%;
+            margin-left: 5%;
+            margin-bottom: 10px;
+        }
+        .bubble{
+            background-color: white;
+            border-radius:5px;
+            max-width: 80%;
+            float:left;
+        }
+        .bubble2{
+            background-color: #9ae766;
+            border-radius:5px;
+            max-width: 80%;
+            float: right;
+        }
+        .bubble_text{
+            font-size: 20px;
+            padding: 3px;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+	</style>
+
+<title>Dialog Interface</title>
+    <div id="whole_page">
+        <div id="title" class="title_div">Title</div>
+        <div class="left">
+            <div class="item">
+                <div class="item_title">Dataset</div>
+                <select v-model="dataset" id="dataet" class="item_select">
+                    <option disabled selected hidden>请选择</option>
+                    <option v-for="item in dataset_list" :value=item>{item}</option>
+                </select>
+            </div>
+            <div class="divide"></div>
+            <div class="item">
+                <div class="item_title">NLU Model</div>
+                <select v-model="nlu" id="nlu" class="item_select">
+                    <option disabled selected hidden>请选择</option>
+                    <option v-for="item in nlu_list" :value=item>{item}</option>
+                </select>
+            </div>
+            <div class="module_output">
+{#                <textarea :rows={output_rows} id="stem_source" class="form-control module_output_area"></textarea>#}
+                <pre id="nlu_output" class="form-control module_output_area" contenteditable="true">{nlu_output}</pre>
+            </div>
+            <div class="divide"></div>
+            <div class="item">
+                <div class="item_title">DST Model</div>
+                <select v-model="dst" id="dst" class="item_select">
+                    <option disabled selected hidden>请选择</option>
+                    <option v-for="item in dst_list" :value=item>{item}</option>
+                </select>
+            </div>
+            <div class="module_output">
+{#                <textarea :rows={output_rows}  id="stem_source" class="form-control module_output_area" v-model="dst_output"></textarea>#}
+                <pre id="dst_output" class="form-control module_output_area" contenteditable="true">{dst_output}</pre>
+            </div>
+            <div class="divide"></div>
+            <div class="item">
+                <div class="item_title">Policy Model</div>
+                <select v-model="policy" id="policy" class="item_select">
+                    <option disabled selected hidden>请选择</option>
+                    <option v-for="item in policy_list" :value=item>{item}</option>
+                </select>
+            </div>
+            <div class="module_output">
+{#                <textarea :rows={output_rows}  id="stem_source" class="form-control module_output_area" v-model="policy_output"></textarea>#}
+                <pre id="policy_output" class="form-control module_output_area" contenteditable="true">{policy_output}</pre>
+            </div>
+            <div class="divide"></div>
+            <div class="item">
+                <div class="item_title">NLG Model</div>
+                <select v-model="nlg" id="nlg" class="item_select">
+                    <option disabled selected hidden>请选择</option>
+                    <option v-for="item in nlg_list" :value=item>{item}</option>
+                </select>
+            </div>
+            <div class="module_output">
+{#                <textarea :rows={output_rows}  id="stem_source" class="form-control module_output_area" v-model="nlg_output"></textarea>#}
+                <pre id="nlg_output" class="form-control module_output_area" contenteditable="true">{nlg_output}</pre>
+            </div>
+        </div>
+        <div class="right">
+            <div class="dialog_history" id="conv_history_div">
+                <div style="height: 20px;"></div>
+                <div class="line" v-for="(line, turn_id) in history">
+                    <div v-if="line[0]=='system'" class="bubble bubble_text">
+                        {line[1]}
+                    </div>
+                    <div v-if="line[0]=='user'" class="bubble2 bubble_text">
+                        {line[1]}
+                    </div>
+                </div>
+            </div>
+            <div class="text_input">
+                <textarea rows="3"  id="input_text" class="form-control input_area" v-model="input_text"></textarea>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-info single_button" @click="recall">recall</button>
+                <button class="btn btn-info single_button" @click="submit">send</button>
+            </div>
+        </div>
+    </div>
+</head>
+<body>
+</body>
+
+<script type="text/javascript">
+    vm = new Vue({
+            delimiters: ['{', '}'],
+            el: '#whole_page',
+            data: {
+                dataset: null,
+                dataset_list: ['set1', 'set2'],
+                nlu: null,
+                nlu_list: ['nlu1', 'nlu2', 'nlu3'],
+                nlu_output : {
+                      "Attraction-Inform": [
+                        [
+                          "Area",
+                          "centre"
+                        ],
+                        [
+                          "Type",
+                          "architecture"
+                        ]
+                      ]
+                },
+                dst: null,
+                dst_list: ['dst1', 'dst2', 'dst3'],
+                dst_output: {
+          "taxi": {
+            "book": {
+              "booked": []
+            },
+            "semi": {
+              "leaveAt": "",
+              "destination": "",
+              "departure": "",
+              "arriveBy": ""
+            }
+          },
+          "police": {
+            "book": {
+              "booked": []
+            },
+            "semi": {}
+          },
+          "restaurant": {
+            "book": {
+              "booked": [],
+              "people": "",
+              "day": "",
+              "time": ""
+            },
+            "semi": {
+              "food": "not mentioned",
+              "pricerange": "moderate",
+              "name": "not mentioned",
+              "area": "centre"
+            }
+          },
+          "bus": {
+            "book": {
+              "booked": [],
+              "people": ""
+            },
+            "semi": {
+              "leaveAt": "",
+              "destination": "",
+              "day": "",
+              "arriveBy": "",
+              "departure": ""
+            }
+          },
+          "hospital": {
+            "book": {
+              "booked": []
+            },
+            "semi": {
+              "department": ""
+            }
+          },
+          "hotel": {
+            "book": {
+              "booked": [],
+              "people": "",
+              "day": "",
+              "stay": ""
+            },
+            "semi": {
+              "name": "",
+              "area": "",
+              "parking": "",
+              "pricerange": "",
+              "stars": "",
+              "internet": "",
+              "type": ""
+            }
+          },
+          "attraction": {
+            "book": {
+              "booked": []
+            },
+            "semi": {
+              "type": "architecture",
+              "name": "not mentioned",
+              "area": "centre"
+            }
+          },
+          "train": {
+            "book": {
+              "booked": [],
+              "people": ""
+            },
+            "semi": {
+              "leaveAt": "",
+              "destination": "",
+              "day": "",
+              "arriveBy": "",
+              "departure": ""
+            }
+          }
+        },
+                policy: null,
+                policy_list: ['policy1', 'policy2', 'policy3'],
+                policy_output: {
+          "Attraction-Inform": [
+            [
+              "Area",
+              "Centre of town"
+            ],
+            [
+              "Type",
+              "architectural"
+            ],
+            [
+              "Name",
+              "All Saints Church"
+            ],
+            [
+              "Fee",
+              "free"
+            ]
+          ]
+        },
+                nlg: null,
+                nlg_list: ['nlg1', 'nlg2', 'nlg3'],
+                nlg_output: {'utterance': 'All Saints Church is an architectural attraction . It is in the Centre of town and entrance is free !'},
+
+                history: [
+                    ['user', 'I want to find a moderately priced restaurant .'],
+                    ['system', 'I have many options available for you ! Is there a certain area or cuisine that interests you ?'],
+                    ['user', 'Yes I would like the restaurant to be located in the center of the attractions .'],
+                    ['system', 'There are 21 restaurants available in the centre of town . How about a specific type of cuisine ?'],
+                    ['user', 'i need to know the food type and postcode and it should also have mutliple sports'],
+                    ['system', 'I am sorry I do not understand what you just said . Please repeat in a way that makes sense .'],
+                    ['user', 'get me the food type and the post code'],
+                    ['system', 'My favorite it The Copper Kettle at 4 Kings Parade City Centre CB21SJ .   It serves British food .   Does that interest you ?'],
+                    ['user', 'Absolutely ! Thank you ! I also need information on the attractions that have multiple sports in town , in the same area as the restaurant please .'],
+                    ['system', 'The only multiple sports attraction is located in the east of town . Would you like more information ?'],
+                    ['user', 'No , I want to be in the centre of town . What about architecture attractions ?'],
+                    ['system', 'All Saints Church is an architectural attraction . It is in the Centre of town and entrance is free !'],
+                ],
+
+                input_text: 'Can I get their phone number and address please ?',
+
+                output_rows: 5
+            },
+            mounted: function() {
+                this.scroll_auto();
+            },
+            created: function() {
+            },
+            methods: {
+                recall: function () {
+                    this.update_vals();
+                    alert(this.dataset);
+                    alert('recall');
+                },
+                submit: function () {
+                    this.update_vals();
+                    alert('submit');
+                },
+                scroll_auto: function() {
+                    var his = document.getElementById('conv_history_div');
+                    his.scrollTop = his.scrollHeight;
+                },
+                update_vals: function() {
+                    this.nlu_output = JSON.parse($("#nlu_output").html());
+                    this.dst_output = JSON.parse($("#dst_output").html());
+                    this.policy_output = JSON.parse($("#policy_output").html());
+                    this.nlg_output = JSON.parse($("#nlg_output").html());
+                }
+            }
+        });
+</script>
+
+</html>
