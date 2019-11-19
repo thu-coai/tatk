@@ -13,7 +13,7 @@ def read_zipped_json(filepath, filename):
     return json.load(archive.open(filename))
 
 
-class DatasetDataloader(metaclass=ABC):
+class DatasetDataloader(ABC):
     def __init__(self):
         self.data = None
 
@@ -44,6 +44,7 @@ class MultiWOZDataloader(DatasetDataloader):
                   belief_state=False,
                   last_opponent_utterance=False,
                   last_self_utterance=False,
+                  ontology = False,
                   session_id=False,
                   span_info=False,
                   terminal=False,
@@ -111,9 +112,17 @@ class MultiWOZDataloader(DatasetDataloader):
                         self.data[data_key]['key'].append(sess['goal'])
                     cur_context.append(text)
                     cur_context_dialog_act.append(da)
+        if ontology:
+            ontology_path = os.path.join(data_dir, 'ontology.json')
+            self.data['ontology'] = json.load(open(ontology_path))
+
         return self.data
 
 
 if __name__ == '__main__':
     m = MultiWOZDataloader()
-    pprint(m.load_data(role='user', context=False, context_window_size=0, span_info=False))
+    pprint(m.load_data(role='system', context=True, context_dialog_act=True, belief_state=True,
+                       last_opponent_utterance=True, last_self_utterance=True, context_window_size=0, span_info=False))
+    # m.load_data(role='system', context=True, context_window_size=5, context_dialog_act=True, belief_state=True,
+    #                    last_opponent_utterance=True, last_self_utterance=True, span_info=False)
+    a = 0
