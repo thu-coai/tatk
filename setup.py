@@ -41,11 +41,12 @@ setup(
         'numpy>=1.15.0',
         'scipy',
         'scikit-learn==0.20.3',
-        'pytorch_pretrained_bert',
+        'transformers',
         'tensorflow==1.14',
         'tensorboard>=1.14.0',
         'tensorboardX==1.7',
-        'requests'
+        'requests',
+        'simplejson'
     ],
     extras_require={
         'develop': [

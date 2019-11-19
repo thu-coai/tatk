@@ -1,11 +1,11 @@
 """Policy Interface"""
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
+from tatk.util.module import Module
 
 
-class Policy(metaclass=ABCMeta):
+class Policy(Module):
     """Base class for policy model."""
 
-    @abstractmethod
     def predict(self, state):
         """Predict the next agent action given dialog state.
         
@@ -14,12 +14,21 @@ class Policy(metaclass=ABCMeta):
                 when the DST and Policy module are separated, the type of state is tuple.
                 else when they are aggregated together, the type of state is dict (dialog act).
         Returns:
-            action (dict):
+            action (list of tuples):
                 The next dialog action.
         """
-        pass
+        return self.predict_batch([state])[0]
 
     @abstractmethod
-    def init_session(self):
-        """Init the class variables for a new session."""
+    def predict_batch(self, batch_state):
+        """Predict actions given a batch of dialog states.
+
+        Args:
+            batch_state (list of tuple or dict):
+                when the DST and Policy module are separated, the type of state is tuple.
+                else when they are aggregated together, the type of state is dict (dialog act).
+        Returns:
+            batch_action (list of list of tuples):
+                The next dialog action.
+        """
         pass

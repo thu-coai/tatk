@@ -4,6 +4,7 @@ import json
 import numpy as np
 from tatk.policy.vec import Vector
 from tatk.util.multiwoz.lexicalize import delexicalize_da, flat_da, deflat_da, lexicalize_da
+from tatk.util.multiwoz.state import default_state
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_USR_DA
 from tatk.util.multiwoz.dbquery import query
 
@@ -52,21 +53,12 @@ class MultiWozVector(Vector):
         self.opp2vec = dict((a, i) for i, a in enumerate(self.da_voc_opp))
         self.da_opp_dim = len(self.da_voc_opp)
 
-        self.inform_da, self.request_da = [], []
-        for da in self.da_voc:
-            d, i, s, v = da.split('-')
-            if s == 'none':
-                continue
-            if i in self.informable:
-                self.inform_da.append('-'.join([d, s, v]))
-            elif i in self.requestable:
-                self.request_da.append('-'.join([d, s]))
-        self.inform2vec = dict((a, i) for i, a in enumerate(self.inform_da))
-        self.inform_dim = len(self.inform_da)
-        self.request2vec = dict((a, i) for i, a in enumerate(self.request_da))
-        self.request_dim = len(self.request_da)
+        self.belief_state_dim = 0
+        for domain in self.belief_domains:
+            for slot, value in default_state()['belief_state'][domain.lower()]['semi'].items():
+                self.belief_state_dim += 1
 
-        self.state_dim = self.da_opp_dim + self.da_dim + self.inform_dim + \
+        self.state_dim = self.da_opp_dim + self.da_dim + self.belief_state_dim + \
                          len(self.db_domains) + 6 * len(self.db_domains) + 1
 
     def pointer(self, turn):
@@ -144,18 +136,13 @@ class MultiWozVector(Vector):
             if da in self.act2vec:
                 last_act_vec[self.act2vec[da]] = 1.
 
-        inform = np.zeros(self.inform_dim)
+        belief_state = np.zeros(self.belief_state_dim)
+        i = 0
         for domain in self.belief_domains:
             for slot, value in state['belief_state'][domain.lower()]['semi'].items():
-                dom_slot, p = domain + '-' + REF_USR_DA[domain][slot] + '-', 1
-                key = dom_slot + str(p)
-                while inform[self.inform2vec[key]]:
-                    p += 1
-                    key = dom_slot + str(p)
-                    if key not in self.inform2vec:
-                        break
-                else:
-                    inform[self.inform2vec[key]] = 1.
+                if value:
+                    belief_state[i] = 1.
+                i += 1
 
         book = np.zeros(len(self.db_domains))
         for i, domain in enumerate(self.db_domains):
@@ -166,7 +153,8 @@ class MultiWozVector(Vector):
 
         final = 1. if state['terminal'] else 0.
 
-        state_vec = np.r_[opp_act_vec, last_act_vec, inform, book, degree, final]
+        state_vec = np.r_[opp_act_vec, last_act_vec, belief_state, book, degree, final]
+        assert len(state_vec) == self.state_dim
         return state_vec
 
     def action_devectorize(self, action_vec):

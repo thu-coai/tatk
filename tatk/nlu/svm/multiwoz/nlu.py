@@ -22,7 +22,7 @@ from tatk.nlu import NLU
 
 
 class SVMNLU(NLU):
-    def __init__(self, mode, model_file):
+    def __init__(self, mode):
         """
         SVM NLU initialization.
 
@@ -30,14 +30,12 @@ class SVMNLU(NLU):
             mode (str):
                 can be either `'usr'`, `'sys'` or `'all'`, representing which side of data the model was trained on.
 
-            model_file (str):
-                trained model path or url, should be coherent with mode.
-
         Example:
-            nlu = SVMNLU(mode='usr', model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip')
+            nlu = SVMNLU(mode='usr')
         """
         assert mode == 'usr' or mode == 'sys' or mode == 'all'
-        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),'configs/multiwoz_{}.cfg'.format(mode))
+        model_file = 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_{}.zip'.format(mode)
+        config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs/multiwoz_{}.cfg'.format(mode))
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
         self.c = Classifier.classifier(self.config)
@@ -96,8 +94,7 @@ class SVMNLU(NLU):
 
 
 if __name__ == "__main__":
-    nlu = SVMNLU(mode='usr',
-                 model_file='model/svm_multiwoz_usr.zip')
+    nlu = SVMNLU(mode='usr')
     test_utterances = [
         "What type of accommodations are they. No , i just need their address . Can you tell me if the hotel has internet available ?",
         "What type of accommodations are they.",

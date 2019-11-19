@@ -151,11 +151,7 @@ class GoalGenerator:
 
         return domain_goal
 
-    def get_user_goal(self, seed=None):
-        if seed is not None:
-            random.seed(seed)
-            np.random.seed(seed)
-
+    def get_user_goal(self):
         user_goal = self._get_restaurant_goal()
         assert len(user_goal.keys()) > 0
 

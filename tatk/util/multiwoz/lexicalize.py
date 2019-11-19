@@ -64,7 +64,7 @@ def lexicalize_da(meta, entities, state, requestable):
                     pair[1] = str(len(entities[domain]))
                 else:
                     n = int(pair[1]) - 1
-                    if len(entities[domain]) > n and REF_SYS_DA[domain][pair[0]] in entities[domain][n]:
+                    if len(entities[domain]) > n and pair[0] in REF_SYS_DA[domain] and REF_SYS_DA[domain][pair[0]] in entities[domain][n]:
                         pair[1] = entities[domain][n][REF_SYS_DA[domain][pair[0]]]
                     else:
                         pair[1] = 'none'    

@@ -116,7 +116,8 @@ class TemplateNLG(NLG):
             raise e
 
     def _postprocess(self, sen):
-        sen = sen.strip().capitalize()
+        sen_strip = sen.strip()
+        sen = ''.join([val.capitalize() if i == 0 else val for i, val in enumerate(sen_strip)])
         if sen and sen[-1] != '?' and sen[-1] != '.':
             sen += '.'
         sen += ' '
@@ -193,7 +194,7 @@ class TemplateNLG(NLG):
 
 def example():
     # dialog act
-    dialog_acts = {'Train-Inform': [['Day', 'wednesday'], ['Leave', '10:15']]}
+    dialog_acts = {'Train-Inform': [['Day', 'Wednesday'], ['Leave', '10:15']]}
     print(dialog_acts)
 
     # system model for manual, auto, auto_manual
