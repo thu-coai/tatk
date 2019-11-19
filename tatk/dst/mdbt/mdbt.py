@@ -70,6 +70,9 @@ class MDBT(Tracker):
     def restore(self):
         self.__restore_model(self.sess, tf.train.Saver())
 
+    def update_batch(self, batch_action):
+        pass
+
     def update(self, user_act=None):
         """Update the dialog state."""
         if type(user_act) is not str:
@@ -198,5 +201,3 @@ class MDBT(Tracker):
         print('Loading trained MDBT model from ', self.model_url)
         self.param_restored = True
 
-if __name__ == '__main__':
-    MDBT()
