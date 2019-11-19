@@ -62,7 +62,7 @@ def net_function(fun):
         else:
             raise DeployError('Unknow funtion \'%s\'' % fun)
     except Exception as e:
-        err_msg = 'There are some errors in the operation.'
+        err_msg = 'There are some errors in the operation. %s' % str(e)
         if isinstance(e, DeployError):
             err_msg = str(e)
         elif isinstance(e, TypeError):
@@ -73,6 +73,7 @@ def net_function(fun):
     finally:
         ret = json.dumps(ret, ensure_ascii=False)
     return ret
+
 
 @app.route("/dialog")
 def dialog():
