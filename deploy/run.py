@@ -7,7 +7,7 @@
 import os
 import sys
 import json
-from flask import Flask, request
+from flask import Flask, request, render_template
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 
@@ -73,6 +73,10 @@ def net_function(fun):
     finally:
         ret = json.dumps(ret, ensure_ascii=False)
     return ret
+
+@app.route("/dialog")
+def dialog():
+    return render_template("dialog.html")
 
 
 if __name__ == '__main__':
