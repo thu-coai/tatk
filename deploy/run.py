@@ -25,6 +25,7 @@ ctrl_server = ServerCtrl(**dep_conf)
 
 # flask app
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
 def get_params_from_request(gp_reqt):
@@ -74,7 +75,6 @@ def net_function(fun):
         ret = json.dumps(ret, ensure_ascii=False)
     return ret
 
-
 @app.route("/dialog")
 def dialog():
     return render_template("dialog.html")
@@ -82,4 +82,4 @@ def dialog():
 
 if __name__ == '__main__':
     # gunicorn deploy.run:app --threads 4
-    app.run(host='0.0.0.0', port=dep_conf['net']['port'])
+    app.run(host='0.0.0.0', port=dep_conf['net']['port'], debug=True)
