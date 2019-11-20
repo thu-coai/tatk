@@ -23,7 +23,7 @@
       "class_path": "tatk.nlu.svm.multiwoz.nlu.SVMNLU",
       "data_set": "multiwoz",
       "ini_params": {"mode": "usr"},
-      "enable": false
+      "enable": true
     }
   },
 
