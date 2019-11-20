@@ -74,7 +74,6 @@ class ServerCtrl(object):
         if not self.sessions.has_token(token):
             raise DeployError('No such token:\'%s\'' % token)
         sess_info = self.sessions.get_session(token)
-        print(sess_info)
         isfirst = not sess_info['cache']
         history = []
         if isfirst:
@@ -86,8 +85,8 @@ class ServerCtrl(object):
             cache_plc = last_cache.get('policy', None)
             cache_nlg = last_cache.get('nlg', None)
             for cache in sess_info['cache']:
-                history.append(['usr', cache.get('usr', '')])
-                history.append(['sys', cache.get('sys', '')])
+                history.append(['user', cache.get('usr', '')])
+                history.append(['system', cache.get('sys', '')])
 
         ret_nlu, ret_dst, ret_plc, ret_nlg = None, None, None, None
         new_cache_nlu, new_cache_dst, new_cache_plc, new_cache_nlg = None, None, None, None
@@ -133,7 +132,10 @@ class ServerCtrl(object):
         sess_info['cache'].append(copy.deepcopy(new_cache))
         self.sessions.set_session(token, sess_info)
 
-        return {'nlu': ret_nlu, 'dst': ret_dst, 'policy': ret_plc, 'nlg': ret_nlg}
+        history.append(['user', new_cache.get('usr', '')])
+        history.append(['system', new_cache.get('sys', '')])
+
+        return {'nlu': ret_nlu, 'dst': ret_dst, 'policy': ret_plc, 'nlg': ret_nlg, 'history': history}
 
     def on_rollback(self, token, back_turns=1):
         if not self.sessions.has_token(token):
