@@ -173,7 +173,6 @@
             <div class="item">
                 <div class="item_title">Dataset</div>
                 <select v-model="dataset" id="dataet" class="item_select">
-                    <option disabled selected>请选择</option>
                     <option v-for="item in dataset_list" :value=item>{item}</option>
                 </select>
             </div>
@@ -181,7 +180,7 @@
             <div class="item">
                 <div class="item_title">NLU Model</div>
                 <select v-model="nlu" id="nlu" class="item_select">
-                    <option disabled selected>请选择</option>
+                    <option  selected>缺省</option>
                     <option v-for="item in nlu_list" :value=item>{item}</option>
                 </select>
             </div>
@@ -198,7 +197,7 @@
             <div class="item">
                 <div class="item_title">DST Model</div>
                 <select v-model="dst" id="dst" class="item_select">
-                    <option disabled selected>请选择</option>
+                    <option  selected>缺省</option>
                     <option v-for="item in dst_list" :value=item>{item}</option>
                 </select>
             </div>
@@ -216,7 +215,7 @@
             <div class="item">
                 <div class="item_title">Policy Model</div>
                 <select v-model="policy" id="policy" class="item_select">
-                    <option disabled selected>请选择</option>
+                    <option selected >缺省</option>
                     <option v-for="item in policy_list" :value=item>{item}</option>
                 </select>
             </div>
@@ -281,7 +280,7 @@
         el: '#whole_page',
         data: {
             dataset: null,
-            dataset_list: [],
+            dataset_list: ['MultiWoz'],
             nlu: null,
             nlu_list: [],
             nlu_output: {},
@@ -325,11 +324,11 @@
         created: function () {
         },
         methods: {
-            recall: function () {
-                this.update_vals();
-                alert(this.dataset);
-                alert('recall');
-            },
+            // recall: function () {
+            //     this.update_vals();
+            //     alert(this.dataset);
+            //     alert('recall');
+            // },
             submt: function () {
                 // alert('submt');
                 // this.update_vals();
@@ -396,6 +395,7 @@
                 var token = localStorage.getItem('token');
                 var sent = this.input_text;
                 var self = this;
+                // alert('response start')
                 return $.ajax({
                     type: 'POST',
                     url: '/tatk/response',
@@ -406,7 +406,7 @@
                     contentType: 'application/json; charset=utf-8',
                     data: JSON.stringify({
                         "token": token,
-                        "input_module": null,
+                        "input_module": "nlu",
                         "data": sent
                     }),
                     success: function (data) {
@@ -459,6 +459,7 @@
                             // alert('register ok');
                         } else {
                             alert(data.error_msg);
+                            // alert('register failed');
                         }
                     },
                     error: function () {
@@ -482,8 +483,10 @@
                     success: function (data) {
                         var status = data.status;
                         if (status === 'ok') {
-                            self.clear_all();
-                            self.load_ontology();
+                            ajax1 = self.clear_all();
+                            $.when(ajax1).done(function() {
+                                self.load_ontology();
+                            });
                             alert('对话结束!')
                         } else {
                             alert(data.error_msg);
@@ -539,8 +542,8 @@
                 });
             },
             clear_all: function () {
-                this.dataset = null;
-                this.dataset_list = [];
+                // this.dataset = null;
+                // this.dataset_list = [];
                 this.nlu = null;
                 this.nlu_list = [];
                 this.nlu_output = {};
@@ -560,6 +563,20 @@
             }
         }
     });
+    window.onbeforeunload = function (e) {
+      e = e || window.event;
+      var y = e.clientY;
+      if (y <= 0 || y >= Math.max(document.body ? document.body.clientHeight : 0, document.documentElement ? document.documentElement.clientHeight : 0))
+      {
+        //IE 和 Firefox
+        alert("IE or Firefox");
+        e.returnValue = "确定要刷新或关闭浏览器窗口？";
+      }
+      //谷歌
+      console.log("beforeclosing");
+      window.vm.close();
+      return "确定要刷新或关闭浏览器窗口？";
+    }
 </script>
 
 </html>
