@@ -18,7 +18,7 @@ class NLG(Module):
         """
         return self.generate_batch([action])[0]
 
-    @abstractmethod
+    # @abstractmethod
     def generate_batch(self, batch_action):
         """Generate natural language utterances conditioned on a batch of dialog acts.
 

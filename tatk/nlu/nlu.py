@@ -21,7 +21,7 @@ class NLU(Module):
         """
         return self.predict_batch([utterance], [context])[0]
 
-    @abstractmethod
+    # @abstractmethod
     def predict_batch(self, batch_utterance, batch_context=list()):
         """Predict the dialog acts of a batch of natural language utterances.
 
