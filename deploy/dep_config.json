@@ -54,7 +54,7 @@
     "rule-cam":
     {
       "class_path": "tatk.policy.rule.camrest.rule_based_camrest_bot.RuleBasedCamrestBot",
-      "data_set": "",camrest
+      "data_set": "camrest",
       "ini_params": {}
     },
     "mle-mul":
