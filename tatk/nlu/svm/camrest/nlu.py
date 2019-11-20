@@ -52,7 +52,7 @@ class SVMNLU(NLU):
             archive.close()
         self.c.load(model_path)
 
-    def predict(self, utterance):
+    def predict(self, utterance, a):
         """
         Predict the dialog act of a natural language utterance.
 
