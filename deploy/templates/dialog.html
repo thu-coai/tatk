@@ -330,6 +330,7 @@
             //     alert('recall');
             // },
             submt: function () {
+                // alert('submt')
                 // alert('submt');
                 // this.update_vals();
                 // var b = e.srcElement;
@@ -353,6 +354,7 @@
                 // alert('submt done');
             },
             scroll_auto: function () {
+                // alert('scroll_auto')
                 this.$nextTick(() => {
                     var his = document.getElementById('conv_history_div');
                     // alert(his.scrollHeight);
@@ -360,6 +362,7 @@
                 })
             },
             update_vals: function () {
+                // alert('update_vals')
                 // alert(document.getElementById("nlu_output").html());
                 // alert(document.getElementById("dst_output").html());
                 // alert(document.getElementById("policy_output").html());
@@ -370,12 +373,14 @@
                 this.nlg_output = JSON.parse(document.getElementById("nlg_output").html());
             },
             recall_module: function (e) {
+                // alert('recall_module')
                 var target = e.srcElement.parentElement;
                 var m = target.id.substring(0, target.id.length - 7);
-                alert(m);
+                // alert(m);
                 target.setAttribute("hidden", true);
             },
             input: function (e) {
+                // alert('input')
                 this.clear_button();
                 var m = e.srcElement.id.substring(0, e.srcElement.id.length - 7);
                 var button_id = m + '_button';
@@ -383,6 +388,7 @@
                 d.removeAttribute("hidden");
             },
             clear_button: function () {
+                // alert('clear_button')
                 var mlist = ['nlu', 'dst', 'policy', 'nlg'];
                 for (var m in mlist) {
                     var item = mlist[m];
@@ -392,6 +398,7 @@
                 }
             },
             response: function() {
+                // alert('response')
                 var token = localStorage.getItem('token');
                 var sent = this.input_text;
                 var self = this;
@@ -436,6 +443,7 @@
                 });
             },
             register: function() {
+                // alert('register')
                 var self = this;
                 return $.ajax({
                     type: 'POST',
@@ -468,36 +476,52 @@
                 });
             },
             close: function() {
+                // alert('close')
                 var self = this;
-                $.ajax({
-                    type: 'POST',
-                    url: '/tatk/close',
-                    dataType: 'json',
-                    headers: {
-                        "Content-Type": "application/json;charset=utf-8"
-                    },
-                    contentType: 'application/json; charset=utf-8',
-                    data: JSON.stringify({
-                        "token": localStorage.getItem('token')
-                    }),
-                    success: function (data) {
-                        var status = data.status;
-                        if (status === 'ok') {
-                            ajax1 = self.clear_all();
-                            $.when(ajax1).done(function() {
-                                self.load_ontology();
-                            });
-                            alert('对话结束!')
-                        } else {
-                            alert(data.error_msg);
+                var token = localStorage.getItem('token');
+                if (token === null) {
+                    // alert(1);
+                    var self = this;
+                    ajax1 = this.clear_all();
+                    $.when(ajax1).done(function() {
+                        // alert(3);
+                        self.load_ontology();
+                    });
+                    alert('对话结束!')
+                } else {
+                    // alert(2)
+                    $.ajax({
+                        type: 'POST',
+                        url: '/tatk/close',
+                        dataType: 'json',
+                        headers: {
+                            "Content-Type": "application/json;charset=utf-8"
+                        },
+                        contentType: 'application/json; charset=utf-8',
+                        data: JSON.stringify({
+                            "token": token
+                        }),
+                        success: function (data) {
+                            var status = data.status;
+                            if (status === 'ok') {
+                                ajax1 = self.clear_all();
+                                $.when(ajax1).done(function() {
+                                    self.load_ontology();
+                                });
+                                alert('对话结束!')
+                            } else {
+                                alert(data.error_msg);
+                            }
+                        },
+                        error: function () {
+                            alert("服务器出错了！");
                         }
-                    },
-                    error: function () {
-                        alert("服务器出错了！");
-                    }
-                });
+                    });
+                }
+
             },
             load_ontology: function () {
+                // alert('load_ontology')
                 var self = this;
                 $.ajax({
                     type: 'POST',
@@ -542,6 +566,7 @@
                 });
             },
             clear_all: function () {
+                // alert('clear_all')
                 // this.dataset = null;
                 // this.dataset_list = [];
                 this.nlu = null;
@@ -563,20 +588,7 @@
             }
         }
     });
-    window.onbeforeunload = function (e) {
-      e = e || window.event;
-      var y = e.clientY;
-      if (y <= 0 || y >= Math.max(document.body ? document.body.clientHeight : 0, document.documentElement ? document.documentElement.clientHeight : 0))
-      {
-        //IE 和 Firefox
-        alert("IE or Firefox");
-        e.returnValue = "确定要刷新或关闭浏览器窗口？";
-      }
-      //谷歌
-      console.log("beforeclosing");
-      window.vm.close();
-      return "确定要刷新或关闭浏览器窗口？";
-    }
+
 </script>
 
 </html>
