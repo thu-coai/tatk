@@ -6,7 +6,7 @@ from tatk.util.module import Module
 class Tracker(Module):
     """Base class for dialog state tracker models."""
 
-    @abstractmethod
+    # @abstractmethod
     def update(self, action):
         """ Update the internal dialog state variable.
 
@@ -19,7 +19,7 @@ class Tracker(Module):
         """
         return self.update_batch([action])[0]
 
-    @abstractmethod
+    # @abstractmethod
     def update_batch(self, batch_action):
         """ Update the internal dialog state variable.
 
