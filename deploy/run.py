@@ -2,7 +2,12 @@
 # -*- coding: utf-8 -*-
 
 """
-
+Start the conversation DEMO service
+How to run:
+    Quick start:
+        `python ./deploy/run.py`
+    Deploy start:
+        `gunicorn -b 0.0.0.0:8888 deploy.run:app --threads 4`
 """
 import os
 import sys
@@ -29,14 +34,15 @@ app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 
 def get_params_from_request(gp_reqt):
-    in_dict = {}
+    in_dict = gp_reqt.args.to_dict()
     if gp_reqt.method == 'POST':
+        in_dict_post = {}
         if 'application/json' in gp_reqt.headers.environ['CONTENT_TYPE']:
-            in_dict = gp_reqt.json
+            in_dict_post = gp_reqt.json
         elif 'application/x-www-form-urlencoded' in gp_reqt.headers.environ['CONTENT_TYPE']:
-            in_dict = gp_reqt.form.to_dict()
-    elif gp_reqt.method == 'GET':
-        in_dict = gp_reqt.args.to_dict()
+            in_dict_post = gp_reqt.form.to_dict()
+        for (key, value) in in_dict_post.items():
+            in_dict[key] = value
     return in_dict
 
 
@@ -46,7 +52,7 @@ def net_function(fun):
     ret = {}
     try:
         # clear expire session every time
-        ctrl_server.on_clear_expire()
+        del_tokens = ctrl_server.on_clear_expire()
 
         if fun == 'models':
             ret = ctrl_server.on_models()
@@ -55,11 +61,11 @@ def net_function(fun):
         elif fun == 'close':
             ret = ctrl_server.on_close(**params)
         elif fun == 'clear_expire':
-            ret = ctrl_server.on_clear_expire()
+            ret = del_tokens
         elif fun == 'response':
             ret = ctrl_server.on_response(**params)
-        elif fun == 'edit_last':
-            ret = ctrl_server.on_edit_last(**params)
+        elif fun == 'modify_last':
+            ret = ctrl_server.on_modify_last(**params)
         elif fun == 'rollback':
             ret = ctrl_server.on_rollback(**params)
         else:
@@ -76,6 +82,7 @@ def net_function(fun):
     finally:
         ret = json.dumps(ret, ensure_ascii=False)
     return ret
+
 
 @app.route("/dialog")
 def dialog():

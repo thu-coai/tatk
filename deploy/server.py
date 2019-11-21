@@ -2,11 +2,14 @@
 # -*- coding: utf-8 -*-
 
 """
+Backend service response service class
 """
 import json
 import copy
 from deploy.ctrl import ModuleCtrl, SessionCtrl
 from deploy.utils import DeployError
+
+MODULES = ['nlu', 'dst', 'policy', 'nlg']
 
 
 class ServerCtrl(object):
@@ -23,7 +26,7 @@ class ServerCtrl(object):
 
     def on_models(self):
         ret = {}
-        for module_name in ['nlu', 'dst', 'policy', 'nlg']:
+        for module_name in MODULES:
             ret[module_name] = {}
             for model_id in self.module_conf[module_name].keys():
                 ret[module_name][model_id] = {key: self.module_conf[module_name][model_id][key] for key in
@@ -32,14 +35,14 @@ class ServerCtrl(object):
         return ret
 
     def on_register(self, **kwargs):
-        ret = {'nlu': 0, 'dst': 0, 'policy': 0, 'nlg': 0}
+        ret = {key: 0 for key in MODULES}
         try:
-            for module_name in ['nlu', 'dst', 'policy', 'nlg']:
+            for module_name in MODULES:
                 model_id = kwargs.get(module_name, None)
                 if isinstance(model_id, str):
                     ret[module_name] = self.modules[module_name].add_used_num(model_id)
         except Exception as e:
-            for module_name in ['nlu', 'dst', 'policy', 'nlg']:
+            for module_name in MODULES:
                 model_id = kwargs.get(module_name, None)
                 if isinstance(model_id, str) and ret[module_name] != 0:
                     self.modules[module_name].sub_used_num(model_id)
@@ -48,7 +51,7 @@ class ServerCtrl(object):
         if ret['nlu'] == 0 and ret['dst'] == 0 and ret['policy'] == 0 and ret['nlg'] == 0:
             raise DeployError('At least one model needs to be started')
 
-        token = self.sessions.new_session(*[kwargs.get(mn, None) for mn in ['nlu', 'dst', 'policy', 'nlg']])
+        token = self.sessions.new_session(*[kwargs.get(mn, None) for mn in MODULES])
 
         return {'token': token}
 
@@ -56,103 +59,128 @@ class ServerCtrl(object):
         if not self.sessions.has_token(token):
             raise DeployError('No such token:\'%s\'' % token)
 
-        sess_info = self.sessions.pop_session(token)
-        for module in ['nlu', 'dst', 'policy', 'nlg']:
-            self.modules[module].sub_used_num(sess_info[module])
+        session = self.sessions.pop_session(token)
+        for module in MODULES:
+            self.modules[module].sub_used_num(session['model_map'][module])
         return {'del_token': token}
 
     def on_clear_expire(self):
         expire_session = self.sessions.pop_expire_session()
         del_tokens = []
-        for (token, sess_info) in expire_session.items():
+        for (token, session) in expire_session.items():
             del_tokens.append(token)
-            for module in ['nlu', 'dst', 'policy', 'nlg']:
-                self.modules[module].sub_used_num(sess_info[module])
+            for module in MODULES:
+                self.modules[module].sub_used_num(session['model_map'][module])
         return {'del_tokens': del_tokens}
 
     def on_response(self, token, input_module, data, modified_output={}):
         if not self.sessions.has_token(token):
             raise DeployError('No such token:\'%s\'' % token)
-        session_infos = self.sessions.get_session(token)
+        session = self.sessions.get_session(token)
 
-        ret, session_infos = self.turn(session_infos, input_module, data, modified_output)
+        cur_turn = self._turn(last_turn=session['turns'][-1] if session['turns'] else None,
+                              model_map=session['model_map'],
+                              history=ServerCtrl._history_from_turns(session['turns']),
+                              input_module=input_module,
+                              data=data,
+                              modified_output=modified_output)
+        session['turns'].append(cur_turn)
+        self.sessions.set_session(token, session)
 
-        self.sessions.set_session(token, session_infos)
-        return ret
+        return ServerCtrl._response_from_session(session['turns'])
 
-    def on_edit_last(self, token, modified_output):
+    def on_modify_last(self, token, modified_output):
         if not self.sessions.has_token(token):
             raise DeployError('No such token:\'%s\'' % token)
-        session_infos = self.sessions.get_session(token)
+        session = self.sessions.get_session(token)
 
-        if not session_infos['cache']:
+        if not session['turns']:
             raise DeployError('This is the first turn in this session.')
 
-        last_cache = session_infos['cache'][-1]
-        session_infos['cache'] = session_infos['cache'][:-1]
-        for (key, value) in last_cache['modified_output'].items():
-            modified_output.setdefault(key, value)
+        last_turn = session['turns'][-1]
+        session['turns'] = session['turns'][:-1]
 
-        ret, session_infos = self.turn(session_infos, last_cache['input_module'], last_cache['data'], modified_output)
+        for (key, value) in modified_output.items():
+            last_turn['modified_output'][key] = value
 
-        self.sessions.set_session(token, session_infos)
-        return ret
+        cur_turn = self._turn(last_turn=session['turns'][-1] if session['turns'] else None,
+                              model_map=session['model_map'],
+                              history=ServerCtrl._history_from_turns(session['turns']),
+                              input_module=last_turn['input_module'],
+                              data=last_turn['data'],
+                              modified_output=last_turn['modified_output'])
+        session['turns'].append(cur_turn)
+        self.sessions.set_session(token, session)
 
-    def turn(self, session_infos, input_module, data, modified_output):
-        modules_list = ['nlu', 'dst', 'policy', 'nlg']
+        return ServerCtrl._response_from_session(session['turns'])
 
+    def on_rollback(self, token, back_turns=1):
+        if not self.sessions.has_token(token):
+            raise DeployError('No such token:\'%s\'' % token)
+        session = self.sessions.get_session(token)
+
+        session['turns'] = session['turns'][:-back_turns]
+        self.sessions.set_session(token, session)
+
+        return ServerCtrl._response_from_session(session['turns'])
+
+    def _turn(self, last_turn, model_map, history, input_module, data, modified_output):
         # params
-        cur_cache = {name: None for name in modules_list}
-        history = []
-        if session_infos['cache']:
-            cur_cache = {name: session_infos['cache'][-1].get(name, None) for name in modules_list}
-            for cache in session_infos['cache']:
-                history.append(['user', cache.get('usr', '')])
-                history.append(['system', cache.get('sys', '')])
+        modified_output = {mod: modified_output.get(mod, None) for mod in MODULES}
+        cur_cache = last_turn['cache'] if last_turn is not None else {name: None for name in MODULES}
 
         # process
-        new_cache = {name: None for name in modules_list}
-        model_ret = {name: None for name in modules_list}
+        new_cache = {name: None for name in MODULES}
+        model_ret = {name: None for name in MODULES}
         temp_data = None
-        for mod in modules_list:
+        for mod in MODULES:
             if input_module == mod:
                 temp_data = data
 
-            if temp_data is not None and session_infos[mod] is not None:
-                (model_ret[mod], new_cache[mod]) = self.modules[mod].run(session_infos[mod], cur_cache[mod], not session_infos['cache'],
+            if temp_data is not None and model_map[mod] is not None:
+                (model_ret[mod], new_cache[mod]) = self.modules[mod].run(model_map[mod],
+                                                                         cur_cache[mod],
+                                                                         last_turn is None,
                                                                          [temp_data, history] if mod == 'nlu' else [temp_data])
-                if mod in modified_output.keys():
+                if modified_output[mod] is not None:
                     model_ret[mod] = modified_output[mod]
 
                 temp_data = model_ret[mod]
             elif mod == 'policy':
                 temp_data = None
 
-
-
         # save cache
-        new_cache['usr'] = data if isinstance(data, str) and input_module == 'nlu' else ''
-        new_cache['sys'] = model_ret['nlg'] if isinstance(model_ret['nlg'], str) else ''
-        new_cache['input_module'] = input_module
-        new_cache['data'] = data
-        new_cache['modified_output'] = modified_output
-        session_infos['cache'].append(copy.deepcopy(new_cache))
+        cur_turn = {
+            'data': data, 'input_module': input_module, 'modified_output': modified_output,
+            'cache': new_cache,
+            'context': {
+                'usr': data if isinstance(data, str) and input_module == 'nlu' else '',
+                'sys': model_ret['nlg'] if isinstance(model_ret['nlg'], str) else ''
+            },
+            'return': model_ret
+        }
 
-        # update history
-        history.append(['user', new_cache['usr']])
-        history.append(['system', new_cache['sys']])
-        model_ret['history'] = history
+        return cur_turn
 
-        return model_ret, session_infos
+    @staticmethod
+    def _history_from_turns(turns):
+        history = []
+        for turn in turns:
+            history.append(['user', turn.get('context', {}).get('usr', '')])
+            history.append(['system', turn.get('context', {}).get('sys', '')])
+        return history
 
-    def on_rollback(self, token, back_turns=1):
-        if not self.sessions.has_token(token):
-            raise DeployError('No such token:\'%s\'' % token)
-        sess_info = self.sessions.get_session(token)
-        sess_info['cache'] = sess_info['cache'][:-back_turns]
-        turns = len(sess_info['cache'])
-        self.sessions.set_session(token, sess_info)
-        return {'current_turns': turns}
+    @staticmethod
+    def _response_from_session(turns):
+        ret = {
+            'nlu': turns[-1]['return']['nlu'] if turns else None,
+            'dst': turns[-1]['return']['dst'] if turns else None,
+            'policy': turns[-1]['return']['policy'] if turns else None,
+            'nlg': turns[-1]['return']['nlg'] if turns else None,
+            'modified_model': [mod for (mod, val) in turns[-1]['modified_output'].items() if val is not None] if turns else None,
+            'history': ServerCtrl._history_from_turns(turns)
+        }
+        return ret
 
 
 if __name__ == '__main__':

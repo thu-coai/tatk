@@ -68,7 +68,7 @@ class ModelCtrl(object):
 
             # load cache
             if isfirst:
-                getattr(model, 'init_session')()        # first turn
+                getattr(model, 'init_session')()  # first turn
             else:
                 getattr(model, 'from_cache')(cache)
 
