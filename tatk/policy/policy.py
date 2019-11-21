@@ -19,7 +19,7 @@ class Policy(Module):
         """
         return self.predict_batch([state])[0]
 
-    @abstractmethod
+    # @abstractmethod
     def predict_batch(self, batch_state):
         """Predict actions given a batch of dialog states.
 

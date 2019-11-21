@@ -4,12 +4,12 @@ from abc import ABC, abstractmethod
 
 class Module(ABC):
 
-    @abstractmethod
+    # @abstractmethod
     def train(self, *args, **kwargs):
         """Model training entry point"""
         pass
 
-    @abstractmethod
+    # @abstractmethod
     def test(self, *args, **kwargs):
         """Model testing entry point"""
         pass
