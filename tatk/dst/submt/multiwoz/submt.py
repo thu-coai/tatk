@@ -245,7 +245,7 @@ class MultiWozSUBMT(SUBMTTracker):
                     optimizer.step()
                     optimizer.zero_grad()
                     global_step += 1
-                break
+
             # Perform evaluation on validation dataset
             model.eval()
             dev_loss = 0
@@ -477,6 +477,6 @@ def eval_all_accs(pred_slot, labels, accuracies):
 if __name__ == "__main__":
 
     submt = MultiWozSUBMT()
-    # submt.train()
-    submt.test()
+    submt.train()
+    # submt.test()
 

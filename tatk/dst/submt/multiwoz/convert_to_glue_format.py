@@ -9,7 +9,7 @@ def convert_to_glue_format():
         os.mkdir(TMP_DATA_DIR)
 
     ### Read ontology file
-    fp_ont = open(os.path.join(SELF_DATA_DIR, "ontology.json"), "r")
+    fp_ont = open(os.path.join(DATA_DIR, "ontology.json"), "r")
     data_ont = json.load(fp_ont)
     ontology = {}
     for domain_slot in data_ont:
