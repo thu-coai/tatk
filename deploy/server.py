@@ -80,7 +80,7 @@ class ServerCtrl(object):
         self.sessions.set_session(token, session_infos)
         return ret
 
-    def on_edit_last(self, token, modified_output):
+    def on_modify_last(self, token, modified_output):
         if not self.sessions.has_token(token):
             raise DeployError('No such token:\'%s\'' % token)
         session_infos = self.sessions.get_session(token)
@@ -90,10 +90,11 @@ class ServerCtrl(object):
 
         last_cache = session_infos['cache'][-1]
         session_infos['cache'] = session_infos['cache'][:-1]
-        for (key, value) in last_cache['modified_output'].items():
-            modified_output.setdefault(key, value)
 
-        ret, session_infos = self.turn(session_infos, last_cache['input_module'], last_cache['data'], modified_output)
+        for (key, value) in modified_output.items():
+            last_cache['modified_output'][key] = value
+
+        ret, session_infos = self.turn(session_infos, last_cache['input_module'], last_cache['data'], last_cache['modified_output'])
 
         self.sessions.set_session(token, session_infos)
         return ret
@@ -102,6 +103,7 @@ class ServerCtrl(object):
         modules_list = ['nlu', 'dst', 'policy', 'nlg']
 
         # params
+        modified_output = {mod: modified_output.get(mod, None) for mod in modules_list}
         cur_cache = {name: None for name in modules_list}
         history = []
         if session_infos['cache']:
@@ -121,14 +123,12 @@ class ServerCtrl(object):
             if temp_data is not None and session_infos[mod] is not None:
                 (model_ret[mod], new_cache[mod]) = self.modules[mod].run(session_infos[mod], cur_cache[mod], not session_infos['cache'],
                                                                          [temp_data, history] if mod == 'nlu' else [temp_data])
-                if mod in modified_output.keys():
+                if modified_output[mod] is not None:
                     model_ret[mod] = modified_output[mod]
 
                 temp_data = model_ret[mod]
             elif mod == 'policy':
                 temp_data = None
-
-
 
         # save cache
         new_cache['usr'] = data if isinstance(data, str) and input_module == 'nlu' else ''
@@ -142,6 +142,9 @@ class ServerCtrl(object):
         history.append(['user', new_cache['usr']])
         history.append(['system', new_cache['sys']])
         model_ret['history'] = history
+
+        # reset model
+        model_ret['modified_model'] = [mod for (mod, val) in modified_output.items() if val is not None]
 
         return model_ret, session_infos
 

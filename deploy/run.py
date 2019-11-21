@@ -58,8 +58,8 @@ def net_function(fun):
             ret = ctrl_server.on_clear_expire()
         elif fun == 'response':
             ret = ctrl_server.on_response(**params)
-        elif fun == 'edit_last':
-            ret = ctrl_server.on_edit_last(**params)
+        elif fun == 'modify_last':
+            ret = ctrl_server.on_modify_last(**params)
         elif fun == 'rollback':
             ret = ctrl_server.on_rollback(**params)
         else:
