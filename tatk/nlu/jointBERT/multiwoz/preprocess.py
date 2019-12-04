@@ -6,7 +6,7 @@ Usage:
     mode: which side data will be use
 
 Require:
-    - ``../../../../../../data/multiwoz/[train|val|test].json.zip`` data file
+    - ``../../../../data/multiwoz/[train|val|test].json.zip`` data file
 
 Output:
     - ``data/[mode]_data/``: processed data dir
@@ -39,7 +39,7 @@ def da2triples(dialog_act):
 def preprocess(mode):
     assert mode == 'all' or mode == 'usr' or mode == 'sys'
     cur_dir = os.path.dirname(os.path.abspath(__file__))
-    data_dir = os.path.join(cur_dir, '../../../../../../data/multiwoz')
+    data_dir = os.path.join(cur_dir, '../../../../data/multiwoz')
     processed_data_dir = os.path.join(cur_dir, 'data/{}_data'.format(mode))
     if not os.path.exists(processed_data_dir):
         os.makedirs(processed_data_dir)

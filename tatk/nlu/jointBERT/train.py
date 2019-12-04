@@ -10,10 +10,10 @@ import zipfile
 from copy import deepcopy
 from pprint import pprint
 from transformers import BertConfig, AdamW, WarmupLinearSchedule
-from convlab.modules.nlu.multiwoz.bert.dataloader import Dataloader
-from convlab.modules.nlu.multiwoz.bert.jointBERT import JointBERT
-from convlab.modules.nlu.multiwoz.bert.multiwoz.postprocess import *
-from convlab.modules.nlu.multiwoz.bert.multiwoz.nlu import BERTNLU
+from tatk.nlu.jointBERT.dataloader import Dataloader
+from tatk.nlu.jointBERT.jointBERT import JointBERT
+from tatk.nlu.jointBERT.multiwoz.postprocess import *
+from tatk.nlu.jointBERT.multiwoz.nlu import BERTNLU
 
 
 def set_seed(seed):

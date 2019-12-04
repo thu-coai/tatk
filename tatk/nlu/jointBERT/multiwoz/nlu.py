@@ -18,12 +18,12 @@ import torch
 from transformers import BertConfig
 from unidecode import unidecode
 
-from convlab.lib.file_util import cached_path
-from convlab.modules.nlu.nlu import NLU
-from convlab.modules.nlu.multiwoz.bert.dataloader import Dataloader
-from convlab.modules.nlu.multiwoz.bert.jointBERT import JointBERT
-from convlab.modules.nlu.multiwoz.bert.multiwoz.postprocess import recover_intent
-from convlab.modules.nlu.multiwoz.bert.multiwoz.preprocess import preprocess
+from tatk.util.file_util import cached_path
+from tatk.nlu.nlu import NLU
+from tatk.nlu.jointBERT.dataloader import Dataloader
+from tatk.nlu.jointBERT.jointBERT import JointBERT
+from tatk.nlu.jointBERT.multiwoz.postprocess import recover_intent
+from tatk.nlu.jointBERT.multiwoz.preprocess import preprocess
 
 
 class BERTNLU(NLU):
