@@ -1,15 +1,9 @@
 import argparse
-import pickle
 import os
 import json
-import torch
-from torch.utils.tensorboard import SummaryWriter
 import random
 import numpy as np
-import zipfile
-from copy import deepcopy
-from pprint import pprint
-from transformers import BertConfig, AdamW, WarmupLinearSchedule
+from transformers import BertConfig
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
 from tatk.nlu.jointBERT.multiwoz.postprocess import *
@@ -59,9 +53,7 @@ if __name__ == '__main__':
     batch_size = config['model']['batch_size']
 
     for data_key in ['test']:
-        predict_golden_intents = []
-        predict_golden_slots = []
-        predict_golden_all = []
+        predict_golden = {'intent': [], 'slot': [], 'overall': []}
         slot_loss, intent_loss = 0, 0
         for pad_batch, ori_batch, real_batch_size in dataloader.yield_batches(batch_size, data_key=data_key):
             pad_batch = tuple(t.to(DEVICE) for t in pad_batch)
@@ -85,18 +77,19 @@ if __name__ == '__main__':
                 predicts = [[x[0], x[1], x[2].lower()] for x in predicts]
                 labels = ori_batch[j][3]
 
-                predict_golden_all.append({
+                predict_golden['overall'].append({
                     'predict': predicts,
                     'golden': labels
                 })
-                predict_golden_slots.append({
+                predict_golden['slot'].append({
                     'predict': [x for x in predicts if is_slot_da(x)],
                     'golden': [x for x in labels if is_slot_da(x)]
                 })
-                predict_golden_intents.append({
+                predict_golden['intent'].append({
                     'predict': [x for x in predicts if not is_slot_da(x)],
                     'golden': [x for x in labels if not is_slot_da(x)]
                 })
+            print('[%d|%d] samples' % (len(predict_golden['overall']), len(dataloader.data[data_key])))
 
         total = len(dataloader.data[data_key])
         slot_loss /= total
@@ -105,20 +98,9 @@ if __name__ == '__main__':
         print('\t slot loss:', slot_loss)
         print('\t intent loss:', intent_loss)
 
-        precision, recall, F1 = calculateF1(predict_golden_all)
-        print('-' * 20 + 'overall' + '-' * 20)
-        print('\t Precision: %.2f' % (100 * precision))
-        print('\t Recall: %.2f' % (100 * recall))
-        print('\t F1: %.2f' % (100 * F1))
-
-        precision, recall, F1 = calculateF1(predict_golden_intents)
-        print('-' * 20 + 'intent' + '-' * 20)
-        print('\t Precision: %.2f' % (100 * precision))
-        print('\t Recall: %.2f' % (100 * recall))
-        print('\t F1: %.2f' % (100 * F1))
-
-        precision, recall, F1 = calculateF1(predict_golden_slots)
-        print('-' * 20 + 'slot' + '-' * 20)
-        print('\t Precision: %.2f' % (100 * precision))
-        print('\t Recall: %.2f' % (100 * recall))
-        print('\t F1: %.2f' % (100 * F1))
+        for x in ['intent', 'slot', 'overall']:
+            precision, recall, F1 = calculateF1(predict_golden[x])
+            print('-' * 20 + x + '-' * 20)
+            print('\t Precision: %.2f' % (100 * precision))
+            print('\t Recall: %.2f' % (100 * recall))
+            print('\t F1: %.2f' % (100 * F1))

@@ -1,25 +1,7 @@
-"""
-Preprocess multiwoz data for BertNLU.
-
-Usage:
-    python preprocess [mode=all|usr|sys]
-    mode: which side data will be use
-
-Require:
-    - ``../../../../data/multiwoz/[train|val|test].json.zip`` data file
-
-Output:
-    - ``data/[mode]_data/``: processed data dir
-        - ``data.pkl``: data[data_key=train|val|test] is a list of [tokens,tags,intents],
-            tokens: list of words; tags: list of BIO tags(e.g. B-domain-intent+slot); intent: list of 'domain-intent+slot*value'.
-        - ``intent_vocab.pkl``: list of all intents (format: 'domain-intent+slot*value')
-        - ``tag_vocab.pkl``: list of all tags (format: 'O'|'B-domain-intent+slot'|'B-domain-intent+slot')
-"""
 import json
 import os
 import zipfile
 import sys
-import pickle
 from collections import Counter
 
 

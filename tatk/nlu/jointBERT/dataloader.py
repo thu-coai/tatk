@@ -101,7 +101,7 @@ class Dataloader:
     def seq_id2intent(self, ids):
         return [self.id2intent[x] for x in ids]
 
-    def _pad_batch(self, batch_data):
+    def pad_batch(self, batch_data):
         batch_size = len(batch_data)
         max_seq_len = max([len(x[-3]) for x in batch_data]) + 2
         word_mask_tensor = torch.zeros((batch_size, max_seq_len), dtype=torch.long)
@@ -133,10 +133,10 @@ class Dataloader:
 
     def get_train_batch(self, batch_size):
         batch_data = random.choices(self.data['train'], k=batch_size)
-        return self._pad_batch(batch_data)
+        return self.pad_batch(batch_data)
 
     def yield_batches(self, batch_size, data_key):
         batch_num = math.ceil(len(self.data[data_key]) / batch_size)
         for i in range(batch_num):
             batch_data = self.data[data_key][i * batch_size:(i + 1) * batch_size]
-            yield self._pad_batch(batch_data), batch_data, len(batch_data)
+            yield self.pad_batch(batch_data), batch_data, len(batch_data)
