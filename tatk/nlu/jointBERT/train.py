@@ -8,7 +8,7 @@ import zipfile
 from transformers import BertConfig, AdamW, WarmupLinearSchedule
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
-from tatk.nlu.jointBERT.multiwoz.postprocess import *
+from tatk.nlu.jointBERT.postprocess import *
 
 
 def set_seed(seed):
@@ -29,6 +29,11 @@ if __name__ == '__main__':
     output_dir = config['output_dir']
     log_dir = config['log_dir']
     DEVICE = config['DEVICE']
+
+    if 'multiwoz' in data_dir:
+        from tatk.nlu.jointBERT.multiwoz.is_slot_da import is_slot_da
+    elif 'camrest' in data_dir:
+        from tatk.nlu.jointBERT.camrest.is_slot_da import is_slot_da
 
     intent_vocab = json.load(open(os.path.join(data_dir, 'intent_vocab.json')))
     tag_vocab = json.load(open(os.path.join(data_dir, 'tag_vocab.json')))
