@@ -13,6 +13,7 @@ __pycache__
 data/**/train.json
 data/**/val.json
 data/**/test.json
+data/crosswoz/*
 data/camrest/CamRest676_v2.json
 data/multiwoz/annotated_user_da_with_span_full.json
 data/schema/dstc8-schema-guided-dialogue-master
@@ -47,6 +48,6 @@ dist
 tatk.egg-info
 
 # configs
-configs
+
 
 .ipynb_checkpoints
