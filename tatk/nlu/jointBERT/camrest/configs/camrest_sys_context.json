@@ -1,13 +1,13 @@
 {
   "data_dir": "camrest/data/sys_data",
-  "output_dir": "camrest/output/sys",
-  "zipped_model_path": "camrest/output/sys/bert_camrest_sys.zip",
-  "log_dir": "camrest/log/sys",
+  "output_dir": "camrest/output/sys_context",
+  "zipped_model_path": "camrest/output/sys_context/bert_camrest_sys_context.zip",
+  "log_dir": "camrest/log/sys_context",
   "DEVICE": "cuda:0",
   "seed": 2019,
   "model": {
     "finetune": true,
-    "context": false,
+    "context": true,
     "context_grad": false,
     "pretrained_weights": "bert-base-uncased",
     "check_step": 100,

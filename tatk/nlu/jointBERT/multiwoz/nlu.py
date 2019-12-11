@@ -55,7 +55,7 @@ class BERTNLU(NLU):
         self.dataloader = dataloader
         print("BERTNLU loaded")
 
-    def parse(self, utterance, context=[]):
+    def predict(self, utterance, context=list()):
         ori_word_seq = unidecode(utterance).split()
         ori_tag_seq = ['O'] * len(ori_word_seq)
         context_seq = self.dataloader.tokenizer.encode('[CLS] ' + ' [SEP] '.join(context[-3:]))

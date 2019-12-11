@@ -6,7 +6,6 @@ import numpy as np
 from transformers import BertConfig
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
-from tatk.nlu.jointBERT.postprocess import *
 
 
 def set_seed(seed):
@@ -27,6 +26,13 @@ if __name__ == '__main__':
     output_dir = config['output_dir']
     log_dir = config['log_dir']
     DEVICE = config['DEVICE']
+
+    if 'multiwoz' in data_dir:
+        from tatk.nlu.jointBERT.multiwoz.postprocess import *
+    elif 'camrest' in data_dir:
+        from tatk.nlu.jointBERT.camrest.postprocess import *
+    elif 'crosswoz' in data_dir:
+        from tatk.nlu.jointBERT.crosswoz.postprocess import *
 
     intent_vocab = json.load(open(os.path.join(data_dir, 'intent_vocab.json')))
     tag_vocab = json.load(open(os.path.join(data_dir, 'tag_vocab.json')))
