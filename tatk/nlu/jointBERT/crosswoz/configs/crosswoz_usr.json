@@ -5,6 +5,8 @@
   "log_dir": "crosswoz/log/usr",
   "DEVICE": "cuda:0",
   "seed": 2019,
+  "cut_sen_len": 60,
+  "use_bert_tokenizer": false,
   "model": {
     "finetune": true,
     "context": false,
@@ -17,6 +19,7 @@
     "adam_epsilon": 1e-8,
     "warmup_steps": 40000,
     "weight_decay": 0.0,
-    "dropout": 0.1
+    "dropout": 0.1,
+    "hidden_units": 768
   }
 }

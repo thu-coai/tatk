@@ -80,7 +80,6 @@ if __name__ == '__main__':
             for j in range(real_batch_size):
                 predicts = recover_intent(dataloader, intent_logits[j], slot_logits[j], tag_mask_tensor[j],
                                           ori_batch[j][0], ori_batch[j][-4])
-                predicts = [[x[0], x[1], x[2].lower()] for x in predicts]
                 labels = ori_batch[j][3]
 
                 predict_golden['overall'].append({

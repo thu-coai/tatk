@@ -43,7 +43,8 @@ if __name__ == '__main__':
     print('intent num:', len(intent_vocab))
     print('tag num:', len(tag_vocab))
     for data_key in ['train', 'val', 'test']:
-        dataloader.load_data(json.load(open(os.path.join(data_dir, '{}_data.json'.format(data_key)))), data_key)
+        dataloader.load_data(json.load(open(os.path.join(data_dir, '{}_data.json'.format(data_key)))), data_key,
+                             cut_sen_len=config['cut_sen_len'], use_bert_tokenizer=config['use_bert_tokenizer'])
         print('{} set size: {}'.format(data_key, len(dataloader.data[data_key])))
 
     if not os.path.exists(output_dir):
@@ -140,7 +141,6 @@ if __name__ == '__main__':
                 for j in range(real_batch_size):
                     predicts = recover_intent(dataloader, intent_logits[j], slot_logits[j], tag_mask_tensor[j],
                                               ori_batch[j][0], ori_batch[j][-4])
-                    predicts = [[x[0], x[1], x[2].lower()] for x in predicts]
                     labels = ori_batch[j][3]
 
                     predict_golden['overall'].append({
@@ -155,6 +155,11 @@ if __name__ == '__main__':
                         'predict': [x for x in predicts if not is_slot_da(x)],
                         'golden': [x for x in labels if not is_slot_da(x)]
                     })
+
+            for j in range(10):
+                writer.add_text('val_sample_{}'.format(j),
+                                json.dumps(predict_golden['overall'][j], indent=2, ensure_ascii=False),
+                                global_step=step)
 
             total = len(dataloader.data['val'])
             val_slot_loss /= total

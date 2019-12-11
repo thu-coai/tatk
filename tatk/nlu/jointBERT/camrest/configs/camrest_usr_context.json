@@ -5,6 +5,8 @@
   "log_dir": "camrest/log/usr_context",
   "DEVICE": "cuda:0",
   "seed": 2019,
+  "cut_sen_len": -1,
+  "use_bert_tokenizer": true,
   "model": {
     "finetune": true,
     "context": true,
@@ -17,6 +19,7 @@
     "adam_epsilon": 1e-8,
     "warmup_steps": 10000,
     "weight_decay": 0.0,
-    "dropout": 0.1
+    "dropout": 0.1,
+    "hidden_units": 1536
   }
 }

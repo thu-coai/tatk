@@ -10,6 +10,28 @@ def is_slot_da(da):
     return False
 
 
+def calculateF1(predict_golden):
+    TP, FP, FN = 0, 0, 0
+    for item in predict_golden:
+        predicts = item['predict']
+        predicts = [[x[0], x[1], x[2], x[3].lower()] for x in predicts]
+        labels = item['golden']
+        labels = [[x[0], x[1], x[2], x[3].lower()] for x in labels]
+        for ele in predicts:
+            if ele in labels:
+                TP += 1
+            else:
+                FP += 1
+        for ele in labels:
+            if ele not in predicts:
+                FN += 1
+    # print(TP, FP, FN)
+    precision = 1.0 * TP / (TP + FP) if TP + FP else 0.
+    recall = 1.0 * TP / (TP + FN) if TP + FN else 0.
+    F1 = 2.0 * precision * recall / (precision + recall) if precision + recall else 0.
+    return precision, recall, F1
+
+
 def tag2das(word_seq, tag_seq):
     assert len(word_seq)==len(tag_seq)
     das = []
@@ -44,7 +66,7 @@ def intent2das(intent_seq):
     return triples
 
 
-def recover_das(dataloader, intent_logits, tag_logits, tag_mask_tensor, word_seq):
+def recover_intent(dataloader, intent_logits, tag_logits, tag_mask_tensor, ori_word_seq, new2ori):
     # tag_logits = [sequence_length, tag_dim]
     # intent_logits = [intent_dim]
     # tag_mask_tensor = [sequence_length]
@@ -59,6 +81,6 @@ def recover_das(dataloader, intent_logits, tag_logits, tag_mask_tensor, word_seq
         if tag_mask_tensor[j] == 1:
             value, tag_id = torch.max(tag_logits[j], dim=-1)
             tags.append(dataloader.id2tag[tag_id.item()])
-    tag_intent = tag2das(word_seq, tags)
+    tag_intent = tag2das(ori_word_seq, tags)
     das += tag_intent
-    return das, tags
+    return das

@@ -10,19 +10,13 @@ def is_slot_da(da):
     return False
 
 
-def da2triples(dialog_act):
-    triples = []
-    for intent, svs in dialog_act.items():
-        for slot, value in svs:
-            triples.append((intent, slot, value.lower()))
-    return triples
-
-
 def calculateF1(predict_golden):
     TP, FP, FN = 0, 0, 0
     for item in predict_golden:
         predicts = item['predict']
+        predicts = [[x[0], x[1], x[2].lower()] for x in predicts]
         labels = item['golden']
+        labels = [[x[0], x[1], x[2].lower()] for x in labels]
         for ele in predicts:
             if ele in labels:
                 TP += 1
