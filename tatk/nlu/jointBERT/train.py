@@ -5,7 +5,7 @@ from torch.utils.tensorboard import SummaryWriter
 import random
 import numpy as np
 import zipfile
-from transformers import BertConfig, AdamW, WarmupLinearSchedule
+from transformers import AdamW, WarmupLinearSchedule
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
 
@@ -54,10 +54,7 @@ if __name__ == '__main__':
 
     writer = SummaryWriter(log_dir)
 
-    bert_config = BertConfig.from_pretrained(config['model']['pretrained_weights'])
-
-    model = JointBERT(bert_config, config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim,
-                      dataloader.intent_weight)
+    model = JointBERT(config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim, dataloader.intent_weight)
     model.to(DEVICE)
 
     if config['model']['finetune']:
@@ -187,7 +184,7 @@ if __name__ == '__main__':
 
             if F1 > best_val_f1:
                 best_val_f1 = F1
-                model.save_pretrained(output_dir)
+                torch.save(model.state_dict(), os.path.join(output_dir, 'pytorch_model.bin'))
                 print('best val F1 %.4f' % best_val_f1)
                 print('save on', output_dir)
 
