@@ -19,7 +19,7 @@ from tatk.dst.rule.multiwoz import normalize_value
 from tatk.util.multiwoz.state import default_state
 from tatk.dst.state_tracker import Tracker
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
-from tatk.dst.submt.config.config import *
+from tatk.dst.sumbt.config.config import *
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -630,7 +630,7 @@ class Processor(DataProcessor):
         return examples
 
 
-class SUBMTTracker(Tracker):
+class SUMBTTracker(Tracker):
     def __init__(self):
         self.belief_tracker = BeliefTracker()
         self.batch = None  # generated with dataloader
@@ -733,13 +733,14 @@ class SUBMTTracker(Tracker):
         model = self.belief_tracker
         # in the case that slot and values are different between the training and evaluation
         ptr_model = torch.load(output_model_file)
+        print('loading pretrained weights')
 
         if N_GPU == 1:
             state = model.state_dict()
             state.update(ptr_model)
             model.load_state_dict(state)
         else:
-            print("Evaluate using only one device!")
+            # print("Evaluate using only one device!")
             model.module.load_state_dict(ptr_model)
 
         model.to(DEVICE)
@@ -750,7 +751,7 @@ class SUBMTTracker(Tracker):
 
 
 if __name__ == '__main__':
-    tracker = SUBMTTracker()
+    tracker = SUMBTTracker()
     tracker.load_weights()
     dialog_history = [
         {'usr': "I would like a taxi from Saint John 's college to Pizza Hut Fen Ditton .", 'sys': ''},
