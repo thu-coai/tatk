@@ -1,6 +1,6 @@
 import json
 import zipfile
-from tatk.dst.submt.config.config import *
+from tatk.dst.sumbt.config.config import *
 
 # TODO: load data
 def convert_to_glue_format():

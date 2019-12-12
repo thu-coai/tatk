@@ -16,9 +16,9 @@ from torch.utils.data.distributed import DistributedSampler
 
 from pytorch_pretrained_bert.optimization import BertAdam
 
-from tatk.dst.submt.config.config import *
-from tatk.dst.submt.multiwoz.convert_to_glue_format import convert_to_glue_format
-from tatk.dst.submt.submt import SUBMTTracker, convert_examples_to_features, logger
+from tatk.dst.sumbt.config.config import *
+from tatk.dst.sumbt.multiwoz.convert_to_glue_format import convert_to_glue_format
+from tatk.dst.sumbt.sumbt import SUMBTTracker, convert_examples_to_features, logger
 
 from tensorboardX import SummaryWriter
 
@@ -48,9 +48,9 @@ def warmup_linear(x, warmup=0.002):
     return 1.0 - x
 
 
-class MultiWozSUBMT(SUBMTTracker):
+class MultiWozSUMBT(SUMBTTracker):
     def __init__(self):
-        super(MultiWozSUBMT, self).__init__()
+        super(MultiWozSUMBT, self).__init__()
         convert_to_glue_format()
         logger.info('dataset processed')
         if os.path.exists(OUTPUT_DIR) and os.listdir(OUTPUT_DIR):
@@ -68,7 +68,10 @@ class MultiWozSUBMT(SUBMTTracker):
         if N_GPU > 0:
             torch.cuda.manual_seed_all(SEED)
 
-    def train(self):
+    def train(self, load_model=False):
+        if load_model:
+            self.load_weights()
+
         train_examples = self.processor.get_train_examples(TMP_DATA_DIR, accumulation=self.accumulation)
         dev_examples = self.processor.get_dev_examples(TMP_DATA_DIR, accumulation=self.accumulation)
 
@@ -308,7 +311,7 @@ class MultiWozSUBMT(SUBMTTracker):
 
             output_model_file = os.path.join(OUTPUT_DIR, "pytorch_model.bin")
 
-            if last_update is None or dev_loss < best_loss or not os.path.exists(output_model_file):
+            if last_update is None or dev_loss < best_loss:
 
                 if N_GPU == 1:
                     torch.save(model.state_dict(), output_model_file)
@@ -476,7 +479,7 @@ def eval_all_accs(pred_slot, labels, accuracies):
 
 if __name__ == "__main__":
 
-    submt = MultiWozSUBMT()
-    submt.train()
+    sumbt = MultiWozSUMBT()
+    sumbt.train(load_model=True)
     # submt.test()
 
