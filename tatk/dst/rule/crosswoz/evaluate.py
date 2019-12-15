@@ -49,7 +49,7 @@ def test_sys_state(data, goal_type):
                                 ruleDST.state['belief_state'][domain][slot] = value
                 ruleDST.update(usr_da)
                 new_state = deepcopy(ruleDST.state['belief_state'])
-                golden_state = deepcopy(turn['sys_state'])
+                golden_state = deepcopy(turn['sys_state_init'])
                 for x in golden_state:
                     golden_state[x].pop('selectedResults')
                 state_predict_golden.append({
@@ -61,8 +61,8 @@ def test_sys_state(data, goal_type):
 
 
 if __name__ == '__main__':
-    test_data_path = '../../../../data/crosswoz/final_test.json.zip'
-    test_data = read_zipped_json(test_data_path, 'final_test.json')
+    test_data_path = '../../../../data/crosswoz/test.json.zip'
+    test_data = read_zipped_json(test_data_path, 'test.json')
     for goal_type in ['单领域', '独立多领域', '独立多领域+交通', '不独立多领域', '不独立多领域+交通', None]:
         print(goal_type)
         test_sys_state(test_data, goal_type=goal_type)
