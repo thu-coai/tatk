@@ -5,6 +5,7 @@ from torch.utils.tensorboard import SummaryWriter
 import random
 import numpy as np
 import zipfile
+import torch
 from transformers import AdamW, WarmupLinearSchedule
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
@@ -30,11 +31,14 @@ if __name__ == '__main__':
     DEVICE = config['DEVICE']
 
     if 'multiwoz' in data_dir:
-        from tatk.nlu.jointBERT.multiwoz.postprocess import *
+        print('-'*20 + 'dataset:multiwoz' + '-'*20)
+        from tatk.nlu.jointBERT.multiwoz.postprocess import is_slot_da, calculateF1, recover_intent
     elif 'camrest' in data_dir:
-        from tatk.nlu.jointBERT.camrest.postprocess import *
+        print('-' * 20 + 'dataset:camrest' + '-' * 20)
+        from tatk.nlu.jointBERT.camrest.postprocess import is_slot_da, calculateF1, recover_intent
     elif 'crosswoz' in data_dir:
-        from tatk.nlu.jointBERT.crosswoz.postprocess import *
+        print('-' * 20 + 'dataset:crosswoz' + '-' * 20)
+        from tatk.nlu.jointBERT.crosswoz.postprocess import is_slot_da, calculateF1, recover_intent
 
     intent_vocab = json.load(open(os.path.join(data_dir, 'intent_vocab.json')))
     tag_vocab = json.load(open(os.path.join(data_dir, 'tag_vocab.json')))
