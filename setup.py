@@ -42,7 +42,7 @@ setup(
         'scipy',
         'scikit-learn==0.20.3',
         'transformers',
-        'tensorflow==1.14',
+        'tensorflow==1.15.0',
         'tensorboard>=1.14.0',
         'tensorboardX==1.7',
         'requests',
