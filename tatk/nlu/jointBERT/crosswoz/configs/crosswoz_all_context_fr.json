@@ -11,7 +11,7 @@
     "finetune": false,
     "context": true,
     "context_grad": false,
-    "pretrained_weights": "/home/data/zhuqi/pre-trained-models/bert-chinese-wwm-ext/",
+    "pretrained_weights": "bert-chinese-wwm-ext/",
     "check_step": 1000,
     "max_step": 40000,
     "batch_size": 100,
