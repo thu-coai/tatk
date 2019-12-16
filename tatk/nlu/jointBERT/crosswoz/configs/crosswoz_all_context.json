@@ -13,7 +13,7 @@
     "context_grad": false,
     "pretrained_weights": "/home/data/zhuqi/pre-trained-models/bert-chinese-wwm-ext/",
     "check_step": 2000,
-    "max_step": 20000,
+    "max_step": 40000,
     "batch_size": 20,
     "learning_rate": 3e-5,
     "adam_epsilon": 1e-8,

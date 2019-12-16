@@ -1,1 +1,1 @@
-from tatk.nlg.sclstm.multiwoz_zh.sc_lstm import SCLSTM
+from tatk.nlg.sclstm.crosswoz.sc_lstm import SCLSTM

@@ -19,7 +19,7 @@ import numpy as np
 import torch
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 
-from tatk.nlg.sclstm.multiwoz_zh import SCLSTM
+from tatk.nlg.sclstm.crosswoz import SCLSTM
 
 seed = 2019
 random.seed(seed)
@@ -215,7 +215,7 @@ if __name__ == '__main__':
     if data_key == 'all' or data_key == 'sys':
         model_sys = SCLSTM(is_user=False)
 
-    archive = zipfile.ZipFile('../../../../data/multiwoz_zh/test.json.zip', 'r')
+    archive = zipfile.ZipFile('../../../../data/crosswoz/test.json.zip', 'r')
     test_data = json.load(archive.open('test.json'))
 
     dialog_acts = []

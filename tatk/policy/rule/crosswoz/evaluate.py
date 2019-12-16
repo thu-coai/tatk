@@ -16,6 +16,10 @@ def calculateF1(predict_golden):
     for item in predict_golden:
         predicts = item['predict']
         labels = item['golden']
+        if '推荐菜' in [x[2] for x in predicts]:
+            print(predicts)
+            print(labels)
+            print()
         for quad in predicts:
             if quad in labels:
                 TP += 1
@@ -220,8 +224,8 @@ if __name__ == '__main__':
     # test_begin_da_predict(train_data)
     # print(len(train_data))
     # test_state_predict(train_data)
-    test_data_path = '../../../../data/crosswoz/final_test.json.zip'
-    test_data = read_zipped_json(test_data_path, 'final_test.json')
+    test_data_path = '../../../../data/crosswoz/test.json.zip'
+    test_data = read_zipped_json(test_data_path, 'test.json')
     for goal_type in ['单领域', '独立多领域', '独立多领域+交通', '不独立多领域', '不独立多领域+交通', None]:
         print(goal_type)
         test_simulator_performance(test_data,goal_type=goal_type)
