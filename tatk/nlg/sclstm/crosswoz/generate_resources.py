@@ -234,7 +234,7 @@ for dialogue in train_data.values():
             intent_list.append(intent)
 
             # content replacement
-            if act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent:
+            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and '无' not in intent:
                 if act[3] in content or (facility and facility in content):
                     intent_frequency[intent] += 1
 
@@ -379,7 +379,7 @@ for require_role in ['sys', 'usr']:
                     # content replacement
                     value = 'none'
                     freq = 'none'
-                    if act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent:
+                    if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and '无' not in intent:
                         if act[3] in content or (facility and facility in content):
                             # value to be replaced
                             if '酒店设施' in intent:
@@ -462,10 +462,5 @@ for require_role in ['sys', 'usr']:
                 all_candidates.append([d_id, str(i + 1), "-"])
         split_dict[split] = copy(all_candidates)
 
-    # split_dict['valid'] = copy(all_candidates[:4000])
-    # split_dict['test'] = copy(all_candidates[4000:8000])
-    # split_dict['train'] = copy(all_candidates[8000:])
-
-    with open(os.path.join(output_data_dir, 'split.json'), 'w',
-              encoding='utf-8') as f:  # todo change a name?
+    with open(os.path.join(output_data_dir, 'split.json'), 'w', encoding='utf-8') as f:
         json.dump(split_dict, f, indent=4, sort_keys=True, ensure_ascii=False)

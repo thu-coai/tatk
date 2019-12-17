@@ -3,7 +3,7 @@ import os
 import zipfile
 from copy import deepcopy
 from collections import defaultdict
-
+from pprint import pprint
 import torch
 
 from tatk.util.file_util import cached_path
@@ -205,39 +205,96 @@ class SCLSTM(NLG):
         #     print(i, slots[i])
 
         return slots[0]
+
+    def _value_replace(self, sentences, dialog_act):
+        dialog_act = deepcopy(dialog_act)
+        intent_frequency = defaultdict(int)
+        for act in dialog_act:
+            intent = self._prepare_intent_string(deepcopy(act))
+            intent_frequency[intent] += 1
+            if intent_frequency[intent] > 1:  # if multiple same intents...
+                intent += str(intent_frequency[intent])
+
+            if '酒店设施' in intent:
+                try:
+                    sentences = sentences.replace('[' + intent + ']', act[2].split('-')[1])
+                    sentences = sentences.replace('[' + intent + '1]', act[2].split('-')[1])
+                except Exception as e:
+                    print('Act causing problem in replacement:')
+                    pprint(act)
+                    raise e
+            if act[0] == 'Inform' and act[3] == "无":
+                sentences = sentences.replace('[主体]', act[1])
+                sentences = sentences.replace('[属性]', act[2])
+            sentences = sentences.replace('[' + intent + ']', act[3])
+            sentences = sentences.replace('[' + intent + '1]', act[3])  # if multiple same intents and this is 1st
+
+        if '[' in sentences and ']' in sentences:
+            print('\n\nValue replacement not completed!!! Current sentence: %s' % sentences)
+            print('Current DA:')
+            pprint(dialog_act)
+            raise Exception
+        return sentences
+
+    def _prepare_intent_string(self, cur_act):
+        """
+        Generate the intent form **to be used in selecting templates** (rather than value replacement)
+        :param cur_act: one act list
+        :return: one intent string
+        """
+        cur_act = deepcopy(cur_act)
+        if cur_act[0] == 'Inform' and '酒店设施' in cur_act[2]:
+            cur_act[2] = cur_act[2].split('-')[0] + '+' + cur_act[3]
+        elif cur_act[0] == 'Request' and '酒店设施' in cur_act[2]:
+            cur_act[2] = cur_act[2].split('-')[0]
+        if cur_act[0] == 'Select':
+            cur_act[2] = '源领域+' + cur_act[3]
+        try:
+            if '+'.join(cur_act) == 'Inform+景点+门票+免费':
+                intent = '+'.join(cur_act)
+            # "Inform+景点+周边酒店+无"
+            elif cur_act[3] == '无':
+                intent = '+'.join(cur_act)
+            else:
+                intent = '+'.join(cur_act[:-1])
+        except Exception as e:
+            print('Act causing error:')
+            pprint(cur_act)
+            raise e
+        return intent
     
     def generate(self, meta):
         meta = deepcopy(meta)
         
         delex = self.generate_delex(meta)
-        
-        # replace the placeholder with entities
-        recover = []
-        for sen in delex:
-            counter = {}
-            words = sen.split()
-            for word in words:
-                if word.startswith('slot-'):
-                    flag = True
-                    _, domain, intent, slot_type = word.split('-')
-                    da = domain.capitalize() + '-' + intent.capitalize()
-                    if da in meta:
-                        key = da + '-' + slot_type.capitalize()
-                        for pair in meta[da]:
-                            if (pair[0].lower() == slot_type) and (
-                                    (key not in counter) or (counter[key] == int(pair[1]) - 1)):
-                                sen = sen.replace(word, pair[2], 1)
-                                counter[key] = int(pair[1])
-                                flag = False
-                                break
-                    if flag:
-                        sen = sen.replace(word, '', 1)
-            recover.append(sen)
 
-        # print('meta', meta)
-        # for i in range(self.args.beam_size):
-        #     print(i, delex[i])
-        #     print(i, recover[i])
+        return self._value_replace(delex[0].replace(' ', ''), meta)
 
-        return recover[0]
-
+if __name__ == '__main__':
+    model_sys = SCLSTM(is_user=False)
+    print(model_sys.generate([
+                    [
+                        "Inform",
+                        "餐馆",
+                        "名称",
+                        "护国寺小吃店（护国寺总店）"
+                    ],
+                    [
+                        "Inform",
+                        "餐馆",
+                        "推荐菜",
+                        "羊杂汤"
+                    ],
+                    [
+                        "Inform",
+                        "餐馆",
+                        "评分",
+                        "4.3分"
+                    ],
+                    [
+                        "NoOffer",
+                        "餐馆",
+                        "none",
+                        "none"
+                    ]
+                ]))

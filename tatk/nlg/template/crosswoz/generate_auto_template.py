@@ -7,11 +7,14 @@ import pandas as pd
 from copy import copy
 import operator
 import functools
+import zipfile
 
-file_dir = 'data/train.json'
-with open(file_dir, 'r', encoding='utf-8') as f:
-    file = f.read()
-    data = json.loads(file)
+def read_zipped_json(filepath, filename):
+    archive = zipfile.ZipFile(filepath, 'r')
+    return json.load(archive.open(filename))
+
+file_path = '../../../../data/crosswoz/train.json.zip'
+data = read_zipped_json(file_path, 'train.json')
 
 print('\n\nLength of data: ', len(data))
 
@@ -209,14 +212,14 @@ for dialogue in data.values():
                 elif cur_act[0] == 'Request':
                     cur_act[2] = cur_act[2].split('-')[0]
             if cur_act[0] == 'Select':
-                cur_act[2] = '源领域+' + cur_act[2]
+                cur_act[2] = '源领域+' + cur_act[3]
             intent = '+'.join(cur_act[:-1])
             if '+'.join(cur_act) == 'Inform+景点+门票+免费' or cur_act[-1] == '无':
                 intent = '+'.join(cur_act)
             intent_list.append(intent)
 
             # content replacement
-            if act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent:
+            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and '无' not in intent:
                 if act[3] in content or (facility and facility in content):
                     intent_frequency[intent] += 1
 

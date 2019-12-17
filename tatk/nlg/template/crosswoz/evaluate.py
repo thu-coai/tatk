@@ -1,8 +1,3 @@
-"""
-Evaluate NLG models on utterances of Multiwoz_zh test dataset
-Metric: dataset level BLEU-4, slot error rate
-Usage: python evaluate.py [usr|sys|all]
-"""
 import json
 import random
 import sys
@@ -11,20 +6,17 @@ import copy
 import re
 import jieba
 from collections import defaultdict
-from pprint import pprint
-import pickle as pkl
 import os
-
+import pickle as pkl
+from pprint import pprint
 import numpy as np
-import torch
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
+from pprint import pprint
+from tatk.nlg.template.crosswoz.nlg import TemplateNLG
 
-from tatk.nlg.sclstm.crosswoz import SCLSTM
 
 seed = 2019
 random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
 
 
 def split_delex_sentence(sen):
@@ -167,128 +159,67 @@ def get_bleu4(dialog_acts, golden_utts, gen_utts, data_key):
     return bleu
 
 
-def get_err_slot(dialog_acts, gen_slots):
-    errs = []
-    N_total, p_total, q_total = 0, 0, 0
-    for i, (das, gen) in enumerate(zip(dialog_acts, gen_slots)):
-        print('[%d/%d]' % (i + 1, len(dialog_acts)))
-        triples = []
-        counter = {}
-        for da in das:
-            if 'Request' in da or 'general' in da:
-                continue
-            for s, v in das[da]:
-                if s == 'Internet' or s == 'Parking' or s == 'none' or v == 'none':
-                    continue
-                slot = da.lower() + '-' + s.lower()
-                counter.setdefault(slot, 0)
-                counter[slot] += 1
-                triples.append(slot + '-' + str(counter[slot]))
-        assert len(set(triples)) == len(triples)
-        assert len(set(gen)) == len(gen)
-        N = len(triples)
-        p = len(set(triples) - set(gen))
-        q = len(set(gen) - set(triples))
-        N_total += N
-        p_total += p
-        q_total += q
-        if N > 0:
-            err = (p + q) * 1.0 / N
-            print(err)
-            errs.append(err)
-        # else:
-        # assert q==0
-        print('mean(std): {}({})'.format(np.mean(errs), np.std(errs)))
-        if N_total > 0:
-            print('divide after sum:', (p_total + q_total) / N_total)
-    return np.mean(errs)
-
-
 if __name__ == '__main__':
-    if len(sys.argv) != 2:
-        print("usage:")
-        print("\t python evaluate.py data_key")
-        print("\t data_key=usr/sys/all")
-        sys.exit()
-    data_key = sys.argv[1]
-
-    if data_key == 'all' or data_key == 'usr':
-        print('absolute path:')
-        print(os.path.abspath(__file__))
-        model_usr = SCLSTM(is_user=True)
-    if data_key == 'all' or data_key == 'sys':
-        model_sys = SCLSTM(is_user=False)
-
     archive = zipfile.ZipFile('../../../../data/crosswoz/test.json.zip', 'r')
     test_data = json.load(archive.open('test.json'))
 
-    dialog_acts = []
-    golden_utts = []
-    gen_utts = []
-    gen_slots = []
-    intent_list = []
-    dialog_acts2genutts = defaultdict(list)
-    dialog_acts2goldutts = defaultdict(list)
+    for data_key in ['sys', 'usr']:
+        print('data_key: ', data_key)
 
-    sen_num = 0
-    sess_num = 0
+        dialog_acts = []
+        golden_utts = []
+        gen_utts = []
+        gen_slots = []
+        intent_list = []
+        dialog_acts2genutts = defaultdict(list)
 
-    if os.path.isfile('dialog_acts_%s.pkl' % data_key) and os.path.isfile(
-            'golden_utts_%s.pkl' % data_key) and os.path.isfile('gen_utts_%s.pkl' % data_key):
-        with open('dialog_acts_%s.pkl' % data_key, 'rb') as fda:
-            dialog_acts = pkl.load(fda)
-        with open('golden_utts_%s.pkl' % data_key, 'rb') as fgold:
-            golden_utts = pkl.load(fgold)
-        with open('gen_utts_%s.pkl' % data_key, 'rb') as fgen:
-            gen_utts = pkl.load(fgen)
-        for no, sess in list(test_data.items()):
-            sess_num += 1
-            for turn in sess['messages']:
-                if turn['role'] == 'usr' and data_key == 'sys':
-                    continue
-                elif turn['role'] == 'sys' and data_key == 'usr':
-                    continue
-                sen_num += 1
-        print('sen_num: ', sen_num)
-        print('Loaded from existing data!')
-    else:
-        for no, sess in list(test_data.items()):
-            sess_num += 1
-            print('[%d/%d]' % (sess_num, len(test_data)))
-            for turn in sess['messages']:
-                if turn['role'] == 'usr' and data_key == 'sys':
-                    continue
-                elif turn['role'] == 'sys' and data_key == 'usr':
-                    continue
-                sen_num += 1
-                model = model_usr if turn['role'] == 'usr' else model_sys
+        sen_num = 0
+        sess_num = 0
 
-                dialog_acts.append(turn['dialog_act'])
-                golden_utts.append(turn['content'])  # slots **values**
-                gen_utt = model.generate(turn['dialog_act'])
-                gen_utts.append(gen_utt)  # slots **placeholders**
+        if os.path.isfile('dialog_acts_%s.pkl' % data_key) and os.path.isfile(
+                        'golden_utts_%s.pkl' % data_key) and os.path.isfile('gen_utts_%s.pkl' % data_key):
+            with open('dialog_acts_%s.pkl' % data_key, 'rb') as fda:
+                dialog_acts = pkl.load(fda)
+            with open('golden_utts_%s.pkl' % data_key, 'rb') as fgold:
+                golden_utts = pkl.load(fgold)
+            with open('gen_utts_%s.pkl' % data_key, 'rb') as fgen:
+                gen_utts = pkl.load(fgen)
+            for no, sess in list(test_data.items()):
+                sess_num += 1
+                for turn in sess['messages']:
+                    if turn['role'] == 'usr' and data_key == 'sys':
+                        continue
+                    elif turn['role'] == 'sys' and data_key == 'usr':
+                        continue
+                    sen_num += 1
+            print('sen_num: ', sen_num)
+            print('Loaded from existing data!')
+        else:
+            template_nlg = TemplateNLG(is_user=data_key == 'usr', mode='auto_manual')
+            for no, sess in list(test_data.items()):
+                sess_num += 1
+                print('[%d/%d]' % (sess_num, len(test_data)))
+                for turn in sess['messages']:
+                    if turn['role'] == 'usr' and data_key == 'sys':
+                        continue
+                    elif turn['role'] == 'sys' and data_key == 'usr':
+                        continue
+                    sen_num += 1
 
-                # intent_list = []
-                # for act in turn['dialog_act']:
-                #     intent_list.append(act2intent(act))
-                # dialog_acts2genutts['*'.join(intent_list)].append(gen_utt)
-                # dialog_acts2goldutts['*'.join(intent_list)].append(turn['content'])
+                    dialog_acts.append(turn['dialog_act'])
+                    golden_utts.append(turn['content'])  # slots **values**
 
-        with open('dialog_acts_%s.pkl' % data_key, 'wb') as fda:
-            pkl.dump(dialog_acts, fda)
-        with open('golden_utts_%s.pkl' % data_key, 'wb') as fgold:
-            pkl.dump(golden_utts, fgold)
-        with open('gen_utts_%s.pkl' % data_key, 'wb') as fgen:
-            pkl.dump(gen_utts, fgen)
+                    gen_utts.append(template_nlg.generate(turn['dialog_act']))  # slots **values**
 
-    bleu4 = get_bleu4(dialog_acts, golden_utts, gen_utts, data_key)
+            with open('dialog_acts_%s.pkl' % data_key, 'wb') as fda:
+                pkl.dump(dialog_acts, fda)
+            with open('golden_utts_%s.pkl' % data_key, 'wb') as fgold:
+                pkl.dump(golden_utts, fgold)
+            with open('gen_utts_%s.pkl' % data_key, 'wb') as fgen:
+                pkl.dump(gen_utts, fgen)
 
-    print("Calculate bleu-4")
-    print("BLEU-4: %.4f" % bleu4)
-
-    # print("Calculate slot error rate:")
-    # err = get_err_slot(dialog_acts, gen_slots)
-    # print('ERR:', err)
-
-    print("BLEU-4: %.4f" % bleu4)
-    print('Model on {} session {} sentences data_key={}'.format(len(test_data), sen_num, data_key))
+        bleu4 = get_bleu4(dialog_acts, golden_utts, gen_utts, data_key)
+        print("Calculate bleu-4")
+        print("BLEU-4: %.4f" % bleu4)
+        print("BLEU-4: %.4f" % bleu4)
+        print('Model on {} session {} sentences data_key={}'.format(len(test_data), sen_num, data_key))

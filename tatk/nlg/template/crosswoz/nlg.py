@@ -19,7 +19,7 @@ def read_zipped_json(filepath, filename):
     return json.load(archive.open(filename))
 
 
-class TemplateNLG:
+class TemplateNLG(NLG):
     def __init__(self, is_user, mode="auto_manual"):
         # super().__init__()
         self.is_user = is_user
@@ -28,7 +28,7 @@ class TemplateNLG:
             self.role = 'usr'
         else:
             self.role = 'sys'
-        template_dir = 'templates'
+        template_dir = os.path.dirname(os.path.abspath(__file__))
         # multi-intent
         self.auto_user_template = read_json(os.path.join(template_dir, 'auto_user_template_nlg.json'))
         self.auto_system_template = read_json(os.path.join(template_dir, 'auto_system_template_nlg.json'))
@@ -406,8 +406,8 @@ class TemplateNLG:
 
 
 def example():
-    data_dir = '../../../../../data/raw_data'
-    train_data = read_zipped_json(os.path.join(data_dir, 'train.json.zip'), 'train.json')
+    data_dir = '../../../../data/crosswoz/'
+    train_data = read_zipped_json(os.path.join(data_dir, 'test.json.zip'), 'test.json')
     messages = [d["messages"] for d in train_data.values()]
     for i in range(100):
         for message in random.choices(messages):
@@ -429,11 +429,37 @@ def example():
                 # generate
                 try:
                     print('manual      : ', nlg_sys_manual.generate(dialog_act))
-                    # print('auto        : ', nlg_sys_auto.generate(dialog_act))
+                    print('auto        : ', nlg_sys_auto.generate(dialog_act))
                     print('auto_manual : ', nlg_sys_auto_manual.generate(dialog_act))
                 except Exception as e:
                     print("Generation failure.")
                     print(repr(e))
 
+
 if __name__ == '__main__':
-    example()
+    print(TemplateNLG(is_user=False).generate([
+        [
+            "Inform",
+            "餐馆",
+            "名称",
+            "护国寺小吃店（护国寺总店）"
+        ],
+        [
+            "Inform",
+            "餐馆",
+            "推荐菜",
+            "羊杂汤"
+        ],
+        [
+            "Inform",
+            "餐馆",
+            "评分",
+            "4.3分"
+        ],
+        [
+            "NoOffer",
+            "餐馆",
+            "none",
+            "none"
+        ]
+    ]))
