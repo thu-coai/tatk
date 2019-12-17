@@ -41,7 +41,7 @@ def tag2das(word_seq, tag_seq):
             value = word_seq[i]
             j = i + 1
             while j < len(tag_seq):
-                if tag_seq[j].startswith('I') and tag_seq[j][2:].split('+')[-1]==slot:
+                if tag_seq[j].startswith('I') and tag_seq[j][2:] == tag[2:]:
                     # tag_seq[j][2:].split('+')[-1]==slot or tag_seq[j][2:] == tag[2:]
                     if word_seq[j].startswith('##'):
                         value += word_seq[j][2:]
