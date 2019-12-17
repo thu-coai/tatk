@@ -100,7 +100,7 @@ def end_usr_da_type(data):
     pprint({x[0]: x[1] / s for x in c.items()})
 
 
-def test_begin_da_predict(data):
+def eval_begin_da_predict(data):
     predict_golden = []
     for task_id, item in data.items():
         for i, turn in enumerate(item['messages']):
@@ -124,7 +124,7 @@ def test_begin_da_predict(data):
     print('First turn da prediction given state precision/recall/f1',calculateF1(predict_golden))
 
 
-def test_simulator_performance(data, goal_type=None):
+def eval_simulator_performance(data, goal_type=None):
     begin_da_predict_golden = []
     state_da_predict_golden = []
     state_predict_golden = []
@@ -164,7 +164,7 @@ def test_simulator_performance(data, goal_type=None):
     print('slot state', calculateSlotState(state_predict_golden))
 
 
-def test_state_predict(data):
+def eval_state_predict(data):
     def state_update(prev_state, cur_state):
         update = []
         for prev_ele, cur_ele in zip(prev_state, cur_state):
@@ -209,19 +209,17 @@ def test_state_predict(data):
                 print('-'*100)
 
 
-
-
 if __name__ == '__main__':
     # train_data_path = '../../data/raw_data/train.json.zip'
     # train_data = read_zipped_json(train_data_path, 'train.json')
     # begin_active_tuple_num(train_data)
     # begin_da_type(train_data)
     # end_usr_da_type(train_data)
-    # test_begin_da_predict(train_data)
+    # eval_begin_da_predict(train_data)
     # print(len(train_data))
-    # test_state_predict(train_data)
+    # eval_state_predict(train_data)
     test_data_path = '../../../../data/crosswoz/test.json.zip'
     test_data = read_zipped_json(test_data_path, 'test.json')
     for goal_type in ['单领域', '独立多领域', '独立多领域+交通', '不独立多领域', '不独立多领域+交通', None]:
         print(goal_type)
-        test_simulator_performance(test_data,goal_type=goal_type)
+        eval_simulator_performance(test_data, goal_type=goal_type)

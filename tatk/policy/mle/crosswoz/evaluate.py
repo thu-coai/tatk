@@ -75,7 +75,7 @@ def evaluate_corpus_f1(policy, data, goal_type=None):
                 # print(delex_da_predict_golden[-1])
                 dst.state['system_action'] = golden_da
         # break
-    print('origin precision/recall/f1:',calculateF1(da_predict_golden))
+    print('origin precision/recall/f1:', calculateF1(da_predict_golden))
     print('delex precision/recall/f1:', calculateF1(delex_da_predict_golden))
 
 
@@ -134,8 +134,8 @@ if __name__ == '__main__':
     random.seed(random_seed)
     np.random.seed(random_seed)
     torch.manual_seed(random_seed)
-    test_data = os.path.abspath(os.path.join(os.path.abspath(__file__),'../../../data/crosswoz/final_test.json.zip'))
-    test_data = read_zipped_json(test_data, 'final_test.json')
+    test_data = os.path.abspath(os.path.join(os.path.abspath(__file__),'../../../../../data/crosswoz/test.json.zip'))
+    test_data = read_zipped_json(test_data, 'test.json')
     policy = MLE()
     # policy = PPO(dataset='CrossWOZ', is_train=True,pretrain_model_path='../../../tatk/policy/mle/crosswoz/save/best')
     # policy = PPO(dataset='CrossWOZ')
