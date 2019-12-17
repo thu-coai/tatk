@@ -16,10 +16,6 @@ def calculateF1(predict_golden):
     for item in predict_golden:
         predicts = item['predict']
         labels = item['golden']
-        if '推荐菜' in [x[2] for x in predicts]:
-            print(predicts)
-            print(labels)
-            print()
         for quad in predicts:
             if quad in labels:
                 TP += 1
