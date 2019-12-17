@@ -58,6 +58,7 @@ def act2intent(dialog_act: list):
 
 
 def value_replace(sentences, dialog_act):
+    ori_sen = copy.deepcopy(sentences)
     dialog_act = copy.deepcopy(dialog_act)
     intent_frequency = defaultdict(int)
     for act in dialog_act:
@@ -82,10 +83,12 @@ def value_replace(sentences, dialog_act):
         print('\n\nValue replacement not completed!!! Current sentence: %s' % sentences)
         print('current da:')
         print(dialog_act)
+        print('ori sen', ori_sen)
         pattern = re.compile(r'(\[[^\[^\]]+\])')
         slots = pattern.findall(sentences)
         for slot in slots:
             sentences = sentences.replace(slot, ' ')
+        print('after replace:', sentences)
         # raise Exception('\n\nValue replacement not completed!!! Current sentence: %s' % sentences)
     return sentences
 
@@ -114,7 +117,7 @@ def get_bleu4(dialog_acts, golden_utts, gen_utts, data_key):
             intent_frequency[intent] += 1
 
             # utt content replacement
-            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and '无' not in intent:
+            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and not intent.endswith('无'):
                 if act[3] in utt or (facility and facility in utt):
                     # value to be replaced
                     if '酒店设施' in intent:
@@ -208,16 +211,12 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("usage:")
         print("\t python evaluate.py data_key")
-        print("\t data_key=usr/sys/all")
+        print("\t data_key=usr/sys")
         sys.exit()
     data_key = sys.argv[1]
+    assert data_key=='usr' or data_key=='sys'
 
-    if data_key == 'all' or data_key == 'usr':
-        print('absolute path:')
-        print(os.path.abspath(__file__))
-        model_usr = SCLSTM(is_user=True)
-    if data_key == 'all' or data_key == 'sys':
-        model_sys = SCLSTM(is_user=False)
+    model = SCLSTM(is_user=(data_key=='usr'))
 
     archive = zipfile.ZipFile('../../../../data/crosswoz/test.json.zip', 'r')
     test_data = json.load(archive.open('test.json'))
@@ -228,7 +227,6 @@ if __name__ == '__main__':
     gen_slots = []
     intent_list = []
     dialog_acts2genutts = defaultdict(list)
-    dialog_acts2goldutts = defaultdict(list)
 
     sen_num = 0
     sess_num = 0
@@ -261,18 +259,11 @@ if __name__ == '__main__':
                 elif turn['role'] == 'sys' and data_key == 'usr':
                     continue
                 sen_num += 1
-                model = model_usr if turn['role'] == 'usr' else model_sys
 
                 dialog_acts.append(turn['dialog_act'])
                 golden_utts.append(turn['content'])  # slots **values**
                 gen_utt = model.generate(turn['dialog_act'])
-                gen_utts.append(gen_utt)  # slots **placeholders**
-
-                # intent_list = []
-                # for act in turn['dialog_act']:
-                #     intent_list.append(act2intent(act))
-                # dialog_acts2genutts['*'.join(intent_list)].append(gen_utt)
-                # dialog_acts2goldutts['*'.join(intent_list)].append(turn['content'])
+                gen_utts.append(gen_utt)  # slots **values**
 
         with open('dialog_acts_%s.pkl' % data_key, 'wb') as fda:
             pkl.dump(dialog_acts, fda)
@@ -290,5 +281,4 @@ if __name__ == '__main__':
     # err = get_err_slot(dialog_acts, gen_slots)
     # print('ERR:', err)
 
-    print("BLEU-4: %.4f" % bleu4)
     print('Model on {} session {} sentences data_key={}'.format(len(test_data), sen_num, data_key))

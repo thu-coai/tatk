@@ -206,7 +206,7 @@ sys_multi_intent_dict = defaultdict(list)
 role = None
 dialogue_id = 1
 for dialogue in train_data.values():
-    print('Processing the %dth dialogue' % dialogue_id)
+    # print('Processing the %dth dialogue' % dialogue_id)
     dialogue_id += 1
     for round in dialogue['messages']:
         # original content
@@ -234,7 +234,7 @@ for dialogue in train_data.values():
             intent_list.append(intent)
 
             # content replacement
-            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and '无' not in intent:
+            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and not intent.endswith('无'):
                 if act[3] in content or (facility and facility in content):
                     intent_frequency[intent] += 1
 
@@ -304,11 +304,10 @@ for require_role in ['sys', 'usr']:
     len(vocab_dict)
 
     vocab_dict = {word: frequency for word, frequency in vocab_dict.items() if vocab_dict[word] > 3}
-    vocab_dict['UNK_token'] = 4356 - len(vocab_dict)
     len(vocab_dict)
 
     with open(os.path.join(output_data_dir, 'vocab.txt'), 'w', encoding='utf-8') as fvocab:
-        fvocab.write('PAD_token\nSOS_token\nEOS_token\n')
+        fvocab.write('PAD_token\nSOS_token\nEOS_token\nUNK_token\n')
         for key, value in sorted(vocab_dict.items(), key=lambda x: int(x[1])):
             if key.strip():
                 fvocab.write(key + '\t' + str(value) + '\n')
@@ -335,12 +334,13 @@ for require_role in ['sys', 'usr']:
     all_text_dict = defaultdict(dict)
     feat_dict = defaultdict(dict)
     template_list = []
+    unk_sen_num = []
 
     for split in ['train', 'valid', 'test']:
         for idx, dialogue in data[split].items():
             dialogue_id += 1
-            if (dialogue_id % 500 == 0):
-                print('Processing the %dth dialogue' % dialogue_id)
+            # if (dialogue_id % 500 == 0):
+            #     print('Processing the %dth dialogue' % dialogue_id)
             round_id = 0
             for round in dialogue['messages']:
                 # original content
@@ -379,7 +379,7 @@ for require_role in ['sys', 'usr']:
                     # content replacement
                     value = 'none'
                     freq = 'none'
-                    if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and '无' not in intent:
+                    if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and not intent.endswith('无'):
                         if act[3] in content or (facility and facility in content):
                             # value to be replaced
                             if '酒店设施' in intent:
@@ -415,6 +415,10 @@ for require_role in ['sys', 'usr']:
                             feat_value = [new_act[2] + '+' + new_act[3], freq, value]
                         except:
                             print(new_act)
+                    elif intent.endswith('无'):
+                        feat_value = [new_act[2] + '+无', freq, value]
+                    elif intent.endswith('免费'):
+                        feat_value = [new_act[2] + '+免费', freq, value]
                     else:
                         feat_value = [new_act[2], freq, value]
 
@@ -424,6 +428,9 @@ for require_role in ['sys', 'usr']:
 
                 # save to text.json
                 split_delex = split_delex_sentence(content)
+                unk_sen = [word if word in vocab_dict else 'UNK_token' for word in
+                       re.split(r'\s+', split_delex) if word]
+                unk_sen_num.append('UNK_token' in unk_sen)
                 text_dict[split][idx][round_id] = {
                     "delex": split_delex,
                     "ori": ori_content
@@ -432,6 +439,8 @@ for require_role in ['sys', 'usr']:
                     "delex": split_delex,
                     "ori": ori_content
                 }
+
+    print('unk sen ratio', sum(unk_sen_num)*1.0/len(unk_sen_num))
 
     with open(os.path.join(output_data_dir, 'text.json'), 'w', encoding='utf-8') as f:
         json.dump(all_text_dict, f, indent=4, sort_keys=True, ensure_ascii=False)

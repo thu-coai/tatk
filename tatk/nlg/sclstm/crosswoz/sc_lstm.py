@@ -5,6 +5,7 @@ from copy import deepcopy
 from collections import defaultdict
 from pprint import pprint
 import torch
+import re
 
 from tatk.util.file_util import cached_path
 from tatk.nlg.sclstm.multiwoz.loader.dataset_woz import SimpleDatasetWoz
@@ -124,7 +125,7 @@ class SCLSTM(NLG):
             # content replacement
             value = 'none'
             freq = 'none'
-            if act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent:
+            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and not intent.endswith('无'):
                 if '酒店设施' in intent:
                     value = facility
                 else:
@@ -147,6 +148,10 @@ class SCLSTM(NLG):
                     feat_value = [new_act[2] + '+' + new_act[3], freq, value]
                 except:
                     print(new_act)
+            elif intent.endswith('无'):
+                feat_value = [new_act[2] + '+无', freq, value]
+            elif intent.endswith('免费'):
+                feat_value = [new_act[2] + '+免费', freq, value]
             else:
                 feat_value = [new_act[2], freq, value]
             feat_dict[feat_key] = feat_dict.get(feat_key, [])
@@ -207,6 +212,7 @@ class SCLSTM(NLG):
         return slots[0]
 
     def _value_replace(self, sentences, dialog_act):
+        ori_sen = deepcopy(sentences)
         dialog_act = deepcopy(dialog_act)
         intent_frequency = defaultdict(int)
         for act in dialog_act:
@@ -233,7 +239,13 @@ class SCLSTM(NLG):
             print('\n\nValue replacement not completed!!! Current sentence: %s' % sentences)
             print('Current DA:')
             pprint(dialog_act)
-            raise Exception
+            print('ori sen', ori_sen)
+            pattern = re.compile(r'(\[[^\[^\]]+\])')
+            slots = pattern.findall(sentences)
+            for slot in slots:
+                sentences = sentences.replace(slot, ' ')
+            print('after replace:', sentences)
+            # raise Exception
         return sentences
 
     def _prepare_intent_string(self, cur_act):
@@ -268,33 +280,9 @@ class SCLSTM(NLG):
         
         delex = self.generate_delex(meta)
 
-        return self._value_replace(delex[0].replace(' ', ''), meta)
+        return self._value_replace(delex[0].replace('UNK_token', '').replace(' ', ''), meta)
+
 
 if __name__ == '__main__':
     model_sys = SCLSTM(is_user=False)
-    print(model_sys.generate([
-                    [
-                        "Inform",
-                        "餐馆",
-                        "名称",
-                        "护国寺小吃店（护国寺总店）"
-                    ],
-                    [
-                        "Inform",
-                        "餐馆",
-                        "推荐菜",
-                        "羊杂汤"
-                    ],
-                    [
-                        "Inform",
-                        "餐馆",
-                        "评分",
-                        "4.3分"
-                    ],
-                    [
-                        "NoOffer",
-                        "餐馆",
-                        "none",
-                        "none"
-                    ]
-                ]))
+    print(model_sys.generate([['Inform', '餐馆', '人均消费', '74元'], ['Inform', '餐馆', '电话', '人均消费']]))
