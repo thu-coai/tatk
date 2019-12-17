@@ -8,8 +8,6 @@ import jieba
 from collections import defaultdict
 import os
 import pickle as pkl
-from pprint import pprint
-import numpy as np
 from nltk.translate.bleu_score import corpus_bleu, SmoothingFunction
 from pprint import pprint
 from tatk.nlg.template.crosswoz.nlg import TemplateNLG
@@ -78,6 +76,7 @@ def value_replace(sentences, dialog_act):
         slots = pattern.findall(sentences)
         for slot in slots:
             sentences = sentences.replace(slot, ' ')
+        print('after replace:', sentences)
         # raise Exception('\n\nValue replacement not completed!!! Current sentence: %s' % sentences)
     return sentences
 
@@ -106,7 +105,7 @@ def get_bleu4(dialog_acts, golden_utts, gen_utts, data_key):
             intent_frequency[intent] += 1
 
             # utt content replacement
-            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and '无' not in intent:
+            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and not intent.endswith('无'):
                 if act[3] in utt or (facility and facility in utt):
                     # value to be replaced
                     if '酒店设施' in intent:
@@ -160,66 +159,72 @@ def get_bleu4(dialog_acts, golden_utts, gen_utts, data_key):
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print("usage:")
+        print("\t python evaluate.py data_key")
+        print("\t data_key=usr/sys")
+        sys.exit()
+    data_key = sys.argv[1]
+    assert data_key == 'usr' or data_key == 'sys'
+
+    model = TemplateNLG(is_user=(data_key=='usr'), mode='auto_manual')
+
     archive = zipfile.ZipFile('../../../../data/crosswoz/test.json.zip', 'r')
     test_data = json.load(archive.open('test.json'))
 
-    for data_key in ['sys', 'usr']:
-        print('data_key: ', data_key)
+    dialog_acts = []
+    golden_utts = []
+    gen_utts = []
+    gen_slots = []
+    intent_list = []
+    dialog_acts2genutts = defaultdict(list)
 
-        dialog_acts = []
-        golden_utts = []
-        gen_utts = []
-        gen_slots = []
-        intent_list = []
-        dialog_acts2genutts = defaultdict(list)
+    sen_num = 0
+    sess_num = 0
 
-        sen_num = 0
-        sess_num = 0
+    # if os.path.isfile('dialog_acts_%s.pkl' % data_key) and os.path.isfile(
+    #         'golden_utts_%s.pkl' % data_key) and os.path.isfile('gen_utts_%s.pkl' % data_key):
+    #     with open('dialog_acts_%s.pkl' % data_key, 'rb') as fda:
+    #         dialog_acts = pkl.load(fda)
+    #     with open('golden_utts_%s.pkl' % data_key, 'rb') as fgold:
+    #         golden_utts = pkl.load(fgold)
+    #     with open('gen_utts_%s.pkl' % data_key, 'rb') as fgen:
+    #         gen_utts = pkl.load(fgen)
+    #     for no, sess in list(test_data.items()):
+    #         sess_num += 1
+    #         for turn in sess['messages']:
+    #             if turn['role'] == 'usr' and data_key == 'sys':
+    #                 continue
+    #             elif turn['role'] == 'sys' and data_key == 'usr':
+    #                 continue
+    #             sen_num += 1
+    #     print('sen_num: ', sen_num)
+    #     print('Loaded from existing data!')
+    # else:
+    if True:
+        for no, sess in list(test_data.items()):
+            sess_num += 1
+            print('[%d/%d]' % (sess_num, len(test_data)))
+            for turn in sess['messages']:
+                if turn['role'] == 'usr' and data_key == 'sys':
+                    continue
+                elif turn['role'] == 'sys' and data_key == 'usr':
+                    continue
+                sen_num += 1
 
-        if os.path.isfile('dialog_acts_%s.pkl' % data_key) and os.path.isfile(
-                        'golden_utts_%s.pkl' % data_key) and os.path.isfile('gen_utts_%s.pkl' % data_key):
-            with open('dialog_acts_%s.pkl' % data_key, 'rb') as fda:
-                dialog_acts = pkl.load(fda)
-            with open('golden_utts_%s.pkl' % data_key, 'rb') as fgold:
-                golden_utts = pkl.load(fgold)
-            with open('gen_utts_%s.pkl' % data_key, 'rb') as fgen:
-                gen_utts = pkl.load(fgen)
-            for no, sess in list(test_data.items()):
-                sess_num += 1
-                for turn in sess['messages']:
-                    if turn['role'] == 'usr' and data_key == 'sys':
-                        continue
-                    elif turn['role'] == 'sys' and data_key == 'usr':
-                        continue
-                    sen_num += 1
-            print('sen_num: ', sen_num)
-            print('Loaded from existing data!')
-        else:
-            template_nlg = TemplateNLG(is_user=data_key == 'usr', mode='auto_manual')
-            for no, sess in list(test_data.items()):
-                sess_num += 1
-                print('[%d/%d]' % (sess_num, len(test_data)))
-                for turn in sess['messages']:
-                    if turn['role'] == 'usr' and data_key == 'sys':
-                        continue
-                    elif turn['role'] == 'sys' and data_key == 'usr':
-                        continue
-                    sen_num += 1
+                dialog_acts.append(turn['dialog_act'])
+                golden_utts.append(turn['content'])  # slots **values**
+                gen_utt = model.generate(turn['dialog_act'])
+                gen_utts.append(gen_utt)  # slots **values**
 
-                    dialog_acts.append(turn['dialog_act'])
-                    golden_utts.append(turn['content'])  # slots **values**
+        with open('dialog_acts_%s.pkl' % data_key, 'wb') as fda:
+            pkl.dump(dialog_acts, fda)
+        with open('golden_utts_%s.pkl' % data_key, 'wb') as fgold:
+            pkl.dump(golden_utts, fgold)
+        with open('gen_utts_%s.pkl' % data_key, 'wb') as fgen:
+            pkl.dump(gen_utts, fgen)
 
-                    gen_utts.append(template_nlg.generate(turn['dialog_act']))  # slots **values**
-
-            with open('dialog_acts_%s.pkl' % data_key, 'wb') as fda:
-                pkl.dump(dialog_acts, fda)
-            with open('golden_utts_%s.pkl' % data_key, 'wb') as fgold:
-                pkl.dump(golden_utts, fgold)
-            with open('gen_utts_%s.pkl' % data_key, 'wb') as fgen:
-                pkl.dump(gen_utts, fgen)
-
-        bleu4 = get_bleu4(dialog_acts, golden_utts, gen_utts, data_key)
-        print("Calculate bleu-4")
-        print("BLEU-4: %.4f" % bleu4)
-        print("BLEU-4: %.4f" % bleu4)
-        print('Model on {} session {} sentences data_key={}'.format(len(test_data), sen_num, data_key))
+    bleu4 = get_bleu4(dialog_acts, golden_utts, gen_utts, data_key)
+    print("Calculate bleu-4")
+    print("BLEU-4: %.4f" % bleu4)
+    print('Model on {} session {} sentences data_key={}'.format(len(test_data), sen_num, data_key))

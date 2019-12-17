@@ -437,7 +437,8 @@ def example():
 
 
 if __name__ == '__main__':
-    print(TemplateNLG(is_user=False).generate([
+    nlg = TemplateNLG(is_user=False)
+    print(nlg.generate([
         [
             "Inform",
             "餐馆",
@@ -454,7 +455,33 @@ if __name__ == '__main__':
             "Inform",
             "餐馆",
             "评分",
-            "4.3分"
+            "无"
+        ],
+        [
+            "NoOffer",
+            "餐馆",
+            "none",
+            "none"
+        ]
+    ]))
+    print(nlg.generate([
+        [
+            "Inform",
+            "餐馆",
+            "名称",
+            "护国寺小吃店（护国寺总店）"
+        ],
+        [
+            "Inform",
+            "餐馆",
+            "推荐菜",
+            "羊杂汤"
+        ],
+        [
+            "Inform",
+            "餐馆",
+            "评分",
+            "无"
         ],
         [
             "NoOffer",

@@ -1,17 +1,14 @@
 import json
-from pprint import pprint
 from collections import defaultdict
-import re
-import numpy as np
-import pandas as pd
 from copy import copy
-import operator
 import functools
 import zipfile
+
 
 def read_zipped_json(filepath, filename):
     archive = zipfile.ZipFile(filepath, 'r')
     return json.load(archive.open(filename))
+
 
 file_path = '../../../../data/crosswoz/train.json.zip'
 data = read_zipped_json(file_path, 'train.json')
@@ -219,7 +216,7 @@ for dialogue in data.values():
             intent_list.append(intent)
 
             # content replacement
-            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and '无' not in intent:
+            if (act[0] in ['Inform', 'Recommend'] or '酒店设施' in intent) and not intent.endswith('无'):
                 if act[3] in content or (facility and facility in content):
                     intent_frequency[intent] += 1
 
