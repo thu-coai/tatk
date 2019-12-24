@@ -2,15 +2,13 @@ import os
 import zipfile
 import json
 import torch
-from transformers import BertConfig
-from unidecode import unidecode
 
 from tatk.util.file_util import cached_path
 from tatk.nlu.nlu import NLU
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
-from tatk.nlu.jointBERT.multiwoz.postprocess import recover_intent
-from tatk.nlu.jointBERT.multiwoz.preprocess import preprocess
+from tatk.nlu.jointBERT.crosswoz.postprocess import recover_intent
+from tatk.nlu.jointBERT.crosswoz.preprocess import preprocess
 
 
 class BERTNLU(NLU):
@@ -22,9 +20,10 @@ class BERTNLU(NLU):
         root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         data_dir = os.path.join(root_dir, config['data_dir'])
         output_dir = os.path.join(root_dir, config['output_dir'])
+        config['model']['pretrained_weights'] = os.path.join(root_dir, config['model']['pretrained_weights'])
 
         if not os.path.exists(os.path.join(data_dir, 'intent_vocab.json')):
-            preprocess(mode)
+            preprocess(mode, os.path.join(root_dir, 'bert-chinese-wwm-ext/'))
 
         intent_vocab = json.load(open(os.path.join(data_dir, 'intent_vocab.json')))
         tag_vocab = json.load(open(os.path.join(data_dir, 'tag_vocab.json')))
@@ -33,8 +32,6 @@ class BERTNLU(NLU):
 
         print('intent num:', len(intent_vocab))
         print('tag num:', len(tag_vocab))
-
-        bert_config = BertConfig.from_pretrained(config['model']['pretrained_weights'])
 
         best_model_path = os.path.join(output_dir, 'pytorch_model.bin')
         if not os.path.exists(best_model_path):
@@ -46,7 +43,7 @@ class BERTNLU(NLU):
             archive.extractall(root_dir)
             archive.close()
         print('Load from', best_model_path)
-        model = JointBERT(bert_config, config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
+        model = JointBERT(config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
         model.load_state_dict(torch.load(os.path.join(output_dir, 'pytorch_model.bin'), DEVICE))
         model.to(DEVICE)
         model.eval()
@@ -56,13 +53,13 @@ class BERTNLU(NLU):
         print("BERTNLU loaded")
 
     def predict(self, utterance, context=list()):
-        ori_word_seq = unidecode(utterance).split()
+        ori_word_seq = self.dataloader.tokenizer.tokenize(utterance)
         ori_tag_seq = ['O'] * len(ori_word_seq)
         context_seq = self.dataloader.tokenizer.encode('[CLS] ' + ' [SEP] '.join(context[-3:]))
         intents = []
         da = {}
 
-        word_seq, tag_seq, new2ori = self.dataloader.bert_tokenize(ori_word_seq, ori_tag_seq)
+        word_seq, tag_seq, new2ori = ori_word_seq, ori_tag_seq, None
         batch_data = [[ori_word_seq, ori_tag_seq, intents, da, context_seq,
                        new2ori, word_seq, self.dataloader.seq_tag2id(tag_seq), self.dataloader.seq_intent2id(intents)]]
 
@@ -74,8 +71,9 @@ class BERTNLU(NLU):
                                                         context_mask_tensor=context_mask_tensor)
         intent = recover_intent(self.dataloader, intent_logits[0], slot_logits[0], tag_mask_tensor[0],
                                 batch_data[0][0], batch_data[0][-4])
-        dialog_act = {}
-        for act, slot, value in intent:
-            dialog_act.setdefault(act, [])
-            dialog_act[act].append([slot, value])
-        return dialog_act
+        return intent
+
+
+if __name__ == '__main__':
+    nlu = BERTNLU('all', 'crosswoz_all_context.json', None)
+    print(nlu.predict("北京布提克精品酒店酒店是什么类型，有健身房吗？", ['你好，给我推荐一个评分是5分，价格在100-200元的酒店。', '推荐您去北京布提克精品酒店。']))

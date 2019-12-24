@@ -9,7 +9,7 @@ from tatk.util.file_util import cached_path
 from tatk.nlu.nlu import NLU
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
-from tatk.nlu.jointBERT.multiwoz.postprocess import recover_intent
+from tatk.nlu.jointBERT.postprocess import recover_intent
 from tatk.nlu.jointBERT.multiwoz.preprocess import preprocess
 
 
@@ -36,7 +36,7 @@ class BERTNLU(NLU):
 
         bert_config = BertConfig.from_pretrained(config['model']['pretrained_weights'])
 
-        best_model_path = os.path.join(output_dir, 'pytorch_model.bin')
+        best_model_path = os.path.join(output_dir, 'bestcheckpoint.tar')
         if not os.path.exists(best_model_path):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)

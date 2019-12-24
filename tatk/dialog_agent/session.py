@@ -119,6 +119,7 @@ class BiSession(Session):
             self.evaluator.add_sys_da(self.user_agent.get_in_da())
             self.evaluator.add_usr_da(self.user_agent.get_out_da())
         session_over = self.user_agent.is_terminated()
+        self.sys_agent.tracker.state['terminated'] = session_over
         # if session_over and self.evaluator:
             # prec, rec, f1 = self.evaluator.inform_F1()
             # print('inform prec. {} rec. {} F1 {}'.format(prec, rec, f1))

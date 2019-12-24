@@ -3,9 +3,9 @@ import torch
 
 
 def is_slot_da(da):
-    tag_da = {'Inform', 'Select', 'Recommend', 'NoOffer', 'NoBook', 'OfferBook', 'OfferBooked', 'Book'}
-    not_tag_slot = {'Internet', 'Parking', 'none'}
-    if da[0].split('-')[1] in tag_da and da[1] not in not_tag_slot:
+    tag_da = {'Inform', 'Recommend'}
+    not_tag_slot = '酒店设施'
+    if da[0] in tag_da and not_tag_slot not in da[2]:
         return True
     return False
 
@@ -14,9 +14,7 @@ def calculateF1(predict_golden):
     TP, FP, FN = 0, 0, 0
     for item in predict_golden:
         predicts = item['predict']
-        predicts = [[x[0], x[1], x[2].lower()] for x in predicts]
         labels = item['golden']
-        labels = [[x[0], x[1], x[2].lower()] for x in labels]
         for ele in predicts:
             if ele in labels:
                 TP += 1
@@ -32,33 +30,37 @@ def calculateF1(predict_golden):
     return precision, recall, F1
 
 
-def tag2triples(word_seq, tag_seq):
+def tag2das(word_seq, tag_seq):
     assert len(word_seq)==len(tag_seq)
-    triples = []
+    das = []
     i = 0
     while i < len(tag_seq):
         tag = tag_seq[i]
         if tag.startswith('B'):
-            intent, slot = tag[2:].split('+')
+            intent, domain, slot = tag[2:].split('+')
             value = word_seq[i]
             j = i + 1
             while j < len(tag_seq):
                 if tag_seq[j].startswith('I') and tag_seq[j][2:] == tag[2:]:
-                    value += ' ' + word_seq[j]
+                    # tag_seq[j][2:].split('+')[-1]==slot or tag_seq[j][2:] == tag[2:]
+                    if word_seq[j].startswith('##'):
+                        value += word_seq[j][2:]
+                    else:
+                        value += word_seq[j]
                     i += 1
                     j += 1
                 else:
                     break
-            triples.append((intent, slot, value))
+            das.append([intent, domain, slot, value])
         i += 1
-    return triples
+    return das
 
 
-def intent2triples(intent_seq):
+def intent2das(intent_seq):
     triples = []
     for intent in intent_seq:
-        intent, slot, value = re.split('[+*]', intent)
-        triples.append((intent, slot, value))
+        intent, domain, slot, value = re.split('\+', intent)
+        triples.append([intent, domain, slot, value])
     return triples
 
 
@@ -66,22 +68,17 @@ def recover_intent(dataloader, intent_logits, tag_logits, tag_mask_tensor, ori_w
     # tag_logits = [sequence_length, tag_dim]
     # intent_logits = [intent_dim]
     # tag_mask_tensor = [sequence_length]
-    # new2ori = {(new_idx:old_idx),...} (after removing [CLS] and [SEP]
     max_seq_len = tag_logits.size(0)
-    intents = []
+    das = []
     for j in range(dataloader.intent_dim):
         if intent_logits[j] > 0:
-            intent, slot, value = re.split('[+*]', dataloader.id2intent[j])
-            intents.append((intent, slot, value))
+            intent, domain, slot, value = re.split('\+', dataloader.id2intent[j])
+            das.append([intent, domain, slot, value])
     tags = []
-    for j in range(1, max_seq_len-1):
+    for j in range(1 , max_seq_len -1):
         if tag_mask_tensor[j] == 1:
             value, tag_id = torch.max(tag_logits[j], dim=-1)
             tags.append(dataloader.id2tag[tag_id.item()])
-    recover_tags = []
-    for i, tag in enumerate(tags):
-        if new2ori[i] >= len(recover_tags):
-            recover_tags.append(tag)
-    tag_intent = tag2triples(ori_word_seq, recover_tags)
-    intents += tag_intent
-    return intents
+    tag_intent = tag2das(ori_word_seq, tags)
+    das += tag_intent
+    return das

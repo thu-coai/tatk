@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import random
-from transformers import *
+from transformers import BertTokenizer
 import math
 from collections import Counter
 
@@ -25,7 +25,7 @@ class Dataloader:
         self.data = {}
         self.intent_weight = [1] * len(self.intent2id)
 
-    def load_data(self, data, data_key):
+    def load_data(self, data, data_key, cut_sen_len, use_bert_tokenizer=True):
         """
         sample representation: [list of words, list of tags, list of intents, original dialog act]
         :param data_key: train/val/test
@@ -36,20 +36,25 @@ class Dataloader:
         max_sen_len, max_context_len = 0, 0
         sen_len = []
         context_len = []
-        cut_sen_len = 40
         for d in self.data[data_key]:
             max_sen_len = max(max_sen_len, len(d[0]))
             sen_len.append(len(d[0]))
             # d = (tokens, tags, intents, da2triples(turn["dialog_act"], context(list of str))
-            d[0] = d[0][:cut_sen_len]
-            d[1] = d[1][:cut_sen_len]
-            d[4] = [' '.join(s.split()[:cut_sen_len]) for s in d[4]]
+            if cut_sen_len > 0:
+                d[0] = d[0][:cut_sen_len]
+                d[1] = d[1][:cut_sen_len]
+                d[4] = [' '.join(s.split()[:cut_sen_len]) for s in d[4]]
 
             d[4] = self.tokenizer.encode('[CLS] ' + ' [SEP] '.join(d[4]))
             max_context_len = max(max_context_len, len(d[4]))
             context_len.append(len(d[4]))
 
-            word_seq, tag_seq, new2ori = self.bert_tokenize(d[0], d[1])
+            if use_bert_tokenizer:
+                word_seq, tag_seq, new2ori = self.bert_tokenize(d[0], d[1])
+            else:
+                word_seq = d[0]
+                tag_seq = d[1]
+                new2ori = None
             d.append(new2ori)
             d.append(word_seq)
             d.append(self.seq_tag2id(tag_seq))
@@ -101,7 +106,7 @@ class Dataloader:
     def seq_id2intent(self, ids):
         return [self.id2intent[x] for x in ids]
 
-    def _pad_batch(self, batch_data):
+    def pad_batch(self, batch_data):
         batch_size = len(batch_data)
         max_seq_len = max([len(x[-3]) for x in batch_data]) + 2
         word_mask_tensor = torch.zeros((batch_size, max_seq_len), dtype=torch.long)
@@ -133,10 +138,10 @@ class Dataloader:
 
     def get_train_batch(self, batch_size):
         batch_data = random.choices(self.data['train'], k=batch_size)
-        return self._pad_batch(batch_data)
+        return self.pad_batch(batch_data)
 
     def yield_batches(self, batch_size, data_key):
         batch_num = math.ceil(len(self.data[data_key]) / batch_size)
         for i in range(batch_num):
             batch_data = self.data[data_key][i * batch_size:(i + 1) * batch_size]
-            yield self._pad_batch(batch_data), batch_data, len(batch_data)
+            yield self.pad_batch(batch_data), batch_data, len(batch_data)
