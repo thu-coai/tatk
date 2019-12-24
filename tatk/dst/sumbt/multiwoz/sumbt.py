@@ -68,7 +68,7 @@ class MultiWozSUMBT(SUMBTTracker):
         if N_GPU > 0:
             torch.cuda.manual_seed_all(SEED)
 
-    def train(self, load_model=False):
+    def train(self, load_model=False, start_epoch=0, start_step=0):
         if load_model:
             self.load_weights()
 
@@ -186,14 +186,16 @@ class MultiWozSUMBT(SUMBTTracker):
 
         logger.info("Training...")
 
-        global_step = 0
+        global_step = start_step
         last_update = None
         best_loss = None
         model = self.belief_tracker
         if not TENSORBOARD:
             summary_writer = None
+        else:
+            summary_writer = SummaryWriter("./tensorboard_summary/logs_1214/" )
 
-        for epoch in trange(int(EPOCHS), desc="Epoch"):
+        for epoch in trange(start_epoch, int(EPOCHS), desc="Epoch"):
             # Train
             model.train()
             tr_loss = 0
@@ -322,11 +324,11 @@ class MultiWozSUMBT(SUMBTTracker):
                 best_loss = dev_loss
                 best_acc = dev_acc
 
-                logger.info("*** Model Updated: Epoch=%d, Validation Loss=%.6f, Validation Acc=%.6f ***" % (
-                last_update, best_loss, best_acc))
+                logger.info("*** Model Updated: Epoch=%d, Validation Loss=%.6f, Validation Acc=%.6f, global_step=%d ***" % (
+                last_update, best_loss, best_acc, global_step))
             else:
-                logger.info("*** Model NOT Updated: Epoch=%d, Validation Loss=%.6f, Validation Acc=%.6f  ***" % (
-                epoch, dev_loss, dev_acc))
+                logger.info("*** Model NOT Updated: Epoch=%d, Validation Loss=%.6f, Validation Acc=%.6f, global_step=%d  ***" % (
+                epoch, dev_loss, dev_acc, global_step))
 
             if last_update + PATIENCE <= epoch:
                 break
@@ -480,6 +482,6 @@ def eval_all_accs(pred_slot, labels, accuracies):
 if __name__ == "__main__":
 
     sumbt = MultiWozSUMBT()
-    sumbt.train(load_model=True)
+    sumbt.train(load_model=False, start_epoch=0, start_step=0)
     # submt.test()
 
