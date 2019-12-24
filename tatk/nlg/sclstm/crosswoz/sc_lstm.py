@@ -73,6 +73,8 @@ class SCLSTM(NLG):
         assert os.path.isfile(model_path)
         self.model.load_state_dict(torch.load(model_path))
         self.model.eval()
+        for name, param in self.model.named_parameters():
+            print(name, param.shape, param.device, param.requires_grad)
         if use_cuda:
             self.model.cuda()
 
@@ -116,7 +118,7 @@ class SCLSTM(NLG):
             if cur_act[0] == 'Select':
                 cur_act[2] = '源领域+' + cur_act[3]
             intent = '+'.join(cur_act[:-1])
-            if '+'.join(cur_act) == 'Inform+景点+门票+免费' or cur_act[-1] == '无':
+            if '+'.join(cur_act) == 'Inform+景点+门票+免费' or str(cur_act[-1]) == '无':
                 intent = '+'.join(cur_act)
             intent_list.append(intent)
 
@@ -235,16 +237,16 @@ class SCLSTM(NLG):
             sentences = sentences.replace('[' + intent + ']', act[3])
             sentences = sentences.replace('[' + intent + '1]', act[3])  # if multiple same intents and this is 1st
 
-        if '[' in sentences and ']' in sentences:
-            print('\n\nValue replacement not completed!!! Current sentence: %s' % sentences)
-            print('Current DA:')
-            pprint(dialog_act)
-            print('ori sen', ori_sen)
-            pattern = re.compile(r'(\[[^\[^\]]+\])')
-            slots = pattern.findall(sentences)
-            for slot in slots:
-                sentences = sentences.replace(slot, ' ')
-            print('after replace:', sentences)
+        # if '[' in sentences and ']' in sentences:
+        #     print('\n\nValue replacement not completed!!! Current sentence: %s' % sentences)
+        #     print('Current DA:')
+        #     pprint(dialog_act)
+        #     print('ori sen', ori_sen)
+        #     pattern = re.compile(r'(\[[^\[^\]]+\])')
+        #     slots = pattern.findall(sentences)
+        #     for slot in slots:
+        #         sentences = sentences.replace(slot, ' ')
+        #     print('after replace:', sentences)
             # raise Exception
         return sentences
 
@@ -276,6 +278,7 @@ class SCLSTM(NLG):
         return intent
     
     def generate(self, meta):
+        meta = [[str(x[0]), str(x[1]), str(x[2]), str(x[3]).lower()] for x in meta]
         meta = deepcopy(meta)
         
         delex = self.generate_delex(meta)
@@ -284,5 +287,5 @@ class SCLSTM(NLG):
 
 
 if __name__ == '__main__':
-    model_sys = SCLSTM(is_user=False)
-    print(model_sys.generate([['Inform', '餐馆', '人均消费', '74元'], ['Inform', '餐馆', '电话', '人均消费']]))
+    model_sys = SCLSTM(is_user=True, use_cuda=True)
+    print(model_sys.generate([['Inform', '餐馆', '人均消费', '100-150元'], ['Request', '餐馆', '电话', '']]))

@@ -43,9 +43,9 @@ $ python evaluate.py [usr|sys]
 
 ## Data
 
-We use the multiwoz_zh data (./resource/\*, ./resource_usr/\*).
+We use CrossWOZ data (`tatk/data/crosswoz`).
 
-## Performance on Multiwoz_zh
+## Performance on CrossWOZ
 
 `mode` determines the data we use: if mode=`usr`, use user utterances to train; if mode=`sys`, use system utterances to train.
 
@@ -53,7 +53,7 @@ We evaluate the BLEU4 of delexicalized utterance. The references of a generated 
 
 | mode  | usr    | sys    |
 | ----- | ------ | ------ |
-| BLEU4 | 0.7872 | 0.8501 |
+| BLEU4 | 0.7858 | 0.8595 |
 
 ## Reference
 

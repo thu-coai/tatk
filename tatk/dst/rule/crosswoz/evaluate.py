@@ -13,7 +13,7 @@ def calculateJointState(predict_golden):
         predicts = item['predict']
         labels = item['golden']
         res.append(predicts==labels)
-    return sum(res) / len(res)
+    return sum(res) / len(res) if len(res) else 0.
 
 
 def calculateSlotState(predict_golden):
@@ -24,7 +24,7 @@ def calculateSlotState(predict_golden):
         for x, y in zip(predicts, labels):
             for w, z in zip(predicts[x].values(),labels[y].values()):
                 res.append(w==z)
-    return sum(res) / len(res)
+    return sum(res) / len(res) if len(res) else 0.
 
 
 def read_zipped_json(filepath, filename):

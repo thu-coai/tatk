@@ -30,7 +30,8 @@ tatk/nlg/sclstm/**/sclstm_usr.pt
 tatk/nlg/sclstm/**/sclstm_usr.res
 tatk/nlg/sclstm/**/sclstm_usr.log
 tatk/dst/sumbt/multiwoz/output/
-
+tatk/nlg/sclstm/**/generated_sens_sys.json
+tatk/nlg/template/**/generated_sens_sys.json
 # test script
 *_test.py
 

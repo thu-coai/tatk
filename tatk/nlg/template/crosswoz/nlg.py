@@ -42,6 +42,8 @@ class TemplateNLG(NLG):
         :param dialog_act: [["Request", "景点", "名称", ""], ["Inform", "景点", "门票", "免费"], ...]
         :return: a sentence
         """
+        dialog_act = [[str(x[0]), str(x[1]), str(x[2]), str(x[3]).lower()] for x in dialog_act]
+        # print(dialog_act)
         dialog_act = copy.deepcopy(dialog_act)
         mode = self.mode
         try:
@@ -79,7 +81,8 @@ class TemplateNLG(NLG):
         except Exception as e:
             print('\n\nError in processing:')
             pprint(copy.deepcopy(dialog_act))
-            raise e
+            return ''
+            # raise e
 
     def _postprocess(self, sen, last_sen=False):
         sen = sen.strip('。.，, ')
@@ -117,7 +120,7 @@ class TemplateNLG(NLG):
             print('\n\nValue replacement not completed!!! Current sentence: %s' % sentences)
             print('Current DA:')
             pprint(dialog_act)
-            raise Exception
+            # raise Exception
         return sentences
 
     def _multi_same_intent_process(self, base_intent: str, repetition: int):
@@ -174,8 +177,8 @@ class TemplateNLG(NLG):
             sentences = self._value_replace(sentences, copy.deepcopy(dialog_act))
 
         except Exception as e:  # todo address the error
-            if multi_intent not in template.keys():
-                print('\n\nIntent combination not found in auto-generation templates: \n\t%s. \nTurned into manual mode.' % multi_intent)
+            # if multi_intent not in template.keys():
+            #     print('\n\nIntent combination not found in auto-generation templates: \n\t%s. \nTurned into manual mode.' % multi_intent)
             # print(repr(e))
             raise e
         return sentences
@@ -344,6 +347,7 @@ class TemplateNLG(NLG):
             assert intent1 in intent_order[role] and intent2 in intent_order[role]
         except AssertionError:
             print(role, intent1, intent2)
+            raise AssertionError
         return intent_order[role].index(intent1) - intent_order[role].index(intent2)
 
     def _prepare_intent_string_list(self, dialog_act):
@@ -438,55 +442,4 @@ def example():
 
 if __name__ == '__main__':
     nlg = TemplateNLG(is_user=False)
-    print(nlg.generate([
-        [
-            "Inform",
-            "餐馆",
-            "名称",
-            "护国寺小吃店（护国寺总店）"
-        ],
-        [
-            "Inform",
-            "餐馆",
-            "推荐菜",
-            "羊杂汤"
-        ],
-        [
-            "Inform",
-            "餐馆",
-            "评分",
-            "无"
-        ],
-        [
-            "NoOffer",
-            "餐馆",
-            "none",
-            "none"
-        ]
-    ]))
-    print(nlg.generate([
-        [
-            "Inform",
-            "餐馆",
-            "名称",
-            "护国寺小吃店（护国寺总店）"
-        ],
-        [
-            "Inform",
-            "餐馆",
-            "推荐菜",
-            "羊杂汤"
-        ],
-        [
-            "Inform",
-            "餐馆",
-            "评分",
-            "无"
-        ],
-        [
-            "NoOffer",
-            "餐馆",
-            "none",
-            "none"
-        ]
-    ]))
+    print(nlg.generate([['Inform', '地铁', '目的地', '云峰山'], ['Request', '地铁', '出发地', '']]))

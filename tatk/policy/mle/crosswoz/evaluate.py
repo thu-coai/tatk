@@ -5,6 +5,9 @@ from tatk.util.crosswoz.state import default_state
 from tatk.policy.rule.crosswoz.rule_simulator import Simulator
 from tatk.dialog_agent import PipelineAgent, BiSession
 from tatk.util.crosswoz.lexicalize import delexicalize_da
+from tatk.nlu.jointBERT.crosswoz.nlu import BERTNLU
+from tatk.nlg.template.crosswoz.nlg import TemplateNLG
+from tatk.nlg.sclstm.crosswoz.sc_lstm import SCLSTM
 import os
 import zipfile
 import json
@@ -33,10 +36,10 @@ def calculateF1(predict_golden):
         for quad in labels:
             if quad not in predicts:
                 FN += 1
-    # print(TP, FP, FN)
-    precision = 1.0 * TP / (TP + FP)
-    recall = 1.0 * TP / (TP + FN)
-    F1 = 2.0 * precision * recall / (precision + recall)
+    print(TP, FP, FN)
+    precision = 1.0 * TP / (TP + FP) if (TP + FP) else 0.
+    recall = 1.0 * TP / (TP + FN) if (TP + FN) else 0.
+    F1 = 2.0 * precision * recall / (precision + recall) if (precision + recall) else 0.
     return precision, recall, F1
 
 
@@ -64,6 +67,7 @@ def evaluate_corpus_f1(policy, data, goal_type=None):
                 # print(golden_da)
                 # print(predict_da)
                 # print()
+                # if 'Select' in [x[0] for x in sess['messages'][i - 1]['dialog_act']]:
                 da_predict_golden.append({
                     'predict': predict_da,
                     'golden': golden_da
@@ -79,30 +83,40 @@ def evaluate_corpus_f1(policy, data, goal_type=None):
     print('delex precision/recall/f1:', calculateF1(delex_da_predict_golden))
 
 
-def evaluate_simulation(policy):
+def end2end_evaluate_simulation(policy):
+    nlu = BERTNLU('all', 'crosswoz_all_context.json', None)
+    nlg_usr = TemplateNLG(is_user=True, mode='auto_manual')
+    nlg_sys = TemplateNLG(is_user=False, mode='auto_manual')
+    # nlg_usr = SCLSTM(is_user=True, use_cuda=False)
+    # nlg_sys = SCLSTM(is_user=False, use_cuda=False)
     usr_policy = Simulator()
-    usr_agent = PipelineAgent(None, None, usr_policy, None)
+    usr_agent = PipelineAgent(nlu, None, usr_policy, nlg_usr, name='usr')
     sys_policy = policy
     sys_dst = RuleDST()
-    sys_agent = PipelineAgent(None, sys_dst, sys_policy, None)
+    sys_agent = PipelineAgent(nlu, sys_dst, sys_policy, nlg_sys, name='sys')
     sess = BiSession(sys_agent=sys_agent, user_agent=usr_agent)
-
-    # random_seed = 2019
-    # random.seed(random_seed)
-    # np.random.seed(random_seed)
-    # torch.manual_seed(random_seed)
 
     task_success = {'All': list(), '单领域': list(), '独立多领域': list(), '独立多领域+交通': list(), '不独立多领域': list(),
                     '不独立多领域+交通': list()}
     simulate_sess_num = 100
     repeat = 5
+    random_seed = 2019
+    random.seed(random_seed)
+    np.random.seed(random_seed)
+    torch.manual_seed(random_seed)
+    random_seeds = [random.randint(1, 2**32-1) for _ in range(simulate_sess_num * repeat * 10000)]
     while True:
-        sys_response = []
+        sys_response = ''
+        random_seed = random_seeds[0]
+        random.seed(random_seed)
+        np.random.seed(random_seed)
+        torch.manual_seed(random_seed)
+        random_seeds.pop(0)
         sess.init_session()
         # print(usr_policy.goal_type)
         if len(task_success[usr_policy.goal_type]) == simulate_sess_num*repeat:
             continue
-        for i in range(20):
+        for i in range(15):
             sys_response, user_response, session_over, reward = sess.next_turn(sys_response)
             # print('user:', user_response)
             # print('sys:', sys_response)
@@ -117,6 +131,13 @@ def evaluate_simulation(policy):
             task_success[usr_policy.goal_type].append(0)
         print([len(x) for x in task_success.values()])
         # print(min([len(x) for x in task_success.values()]))
+        if len(task_success['All']) % 100 == 0:
+            for k, v in task_success.items():
+                print(k)
+                for i in range(repeat):
+                    samples = v[i * simulate_sess_num:(i + 1) * simulate_sess_num]
+                    print(sum(samples), len(samples), (sum(samples) / len(samples)) if len(samples) else 0)
+                print('avg', (sum(v) / len(v)) if len(v) else 0)
         if min([len(x) for x in task_success.values()]) == simulate_sess_num*repeat:
             break
         # pprint(usr_policy.original_goal)
@@ -125,8 +146,73 @@ def evaluate_simulation(policy):
     for k, v in task_success.items():
         print(k)
         for i in range(repeat):
-            samples = v[i*simulate_sess_num:(i+1)*simulate_sess_num]
-            print(sum(samples),len(samples),sum(samples)/len(samples))
+            samples = v[i * simulate_sess_num:(i + 1) * simulate_sess_num]
+            print(sum(samples), len(samples), (sum(samples) / len(samples)) if len(samples) else 0)
+        print('avg', (sum(v) / len(v)) if len(v) else 0)
+
+
+def da_evaluate_simulation(policy):
+    usr_policy = Simulator()
+    usr_agent = PipelineAgent(None, None, usr_policy, None, name='usr')
+    sys_policy = policy
+    sys_dst = RuleDST()
+    sys_agent = PipelineAgent(None, sys_dst, sys_policy, None, name='sys')
+    sess = BiSession(sys_agent=sys_agent, user_agent=usr_agent)
+
+    task_success = {'All': list(), '单领域': list(), '独立多领域': list(), '独立多领域+交通': list(), '不独立多领域': list(),
+                    '不独立多领域+交通': list()}
+    simulate_sess_num = 100
+    repeat = 5
+    random_seed = 2019
+    random.seed(random_seed)
+    np.random.seed(random_seed)
+    torch.manual_seed(random_seed)
+    random_seeds = [random.randint(1, 2**32-1) for _ in range(simulate_sess_num * repeat * 10000)]
+    while True:
+        sys_response = []
+        random_seed = random_seeds[0]
+        random.seed(random_seed)
+        np.random.seed(random_seed)
+        torch.manual_seed(random_seed)
+        random_seeds.pop(0)
+        sess.init_session()
+        # print(usr_policy.goal_type)
+        if len(task_success[usr_policy.goal_type]) == simulate_sess_num*repeat:
+            continue
+        for i in range(15):
+            sys_response, user_response, session_over, reward = sess.next_turn(sys_response)
+            # print('user:', user_response)
+            # print('sys:', sys_response)
+            # print(session_over, reward)
+            # print()
+            if session_over is True:
+                # pprint(sys_agent.tracker.state)
+                task_success['All'].append(1)
+                task_success[usr_policy.goal_type].append(1)
+                break
+        else:
+            task_success['All'].append(0)
+            task_success[usr_policy.goal_type].append(0)
+        print([len(x) for x in task_success.values()])
+        # print(min([len(x) for x in task_success.values()]))
+        if len(task_success['All']) % 100 == 0:
+            for k, v in task_success.items():
+                print(k)
+                for i in range(repeat):
+                    samples = v[i * simulate_sess_num:(i + 1) * simulate_sess_num]
+                    print(sum(samples), len(samples), (sum(samples) / len(samples)) if len(samples) else 0)
+                print('avg', (sum(v) / len(v)) if len(v) else 0)
+        if min([len(x) for x in task_success.values()]) == simulate_sess_num*repeat:
+            break
+        # pprint(usr_policy.original_goal)
+        # pprint(task_success)
+    print('task_success')
+    for k, v in task_success.items():
+        print(k)
+        for i in range(repeat):
+            samples = v[i * simulate_sess_num:(i + 1) * simulate_sess_num]
+            print(sum(samples), len(samples), (sum(samples) / len(samples)) if len(samples) else 0)
+        print('avg', (sum(v) / len(v)) if len(v) else 0)
 
 
 if __name__ == '__main__':
@@ -139,7 +225,8 @@ if __name__ == '__main__':
     policy = MLE()
     # policy = PPO(dataset='CrossWOZ', is_train=True,pretrain_model_path='../../../tatk/policy/mle/crosswoz/save/best')
     # policy = PPO(dataset='CrossWOZ')
-    for goal_type in ['单领域','独立多领域','独立多领域+交通','不独立多领域','不独立多领域+交通',None]:
-        print(goal_type)
-        evaluate_corpus_f1(policy, test_data, goal_type=goal_type)
-    evaluate_simulation(policy)
+    # for goal_type in ['单领域','独立多领域','独立多领域+交通','不独立多领域','不独立多领域+交通',None]:
+    #     print(goal_type)
+    #     evaluate_corpus_f1(policy, test_data, goal_type=goal_type)
+    # da_evaluate_simulation(policy)
+    end2end_evaluate_simulation(policy)
