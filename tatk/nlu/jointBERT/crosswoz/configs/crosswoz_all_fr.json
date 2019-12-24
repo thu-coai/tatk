@@ -11,7 +11,7 @@
     "finetune": false,
     "context": false,
     "context_grad": false,
-    "pretrained_weights": "bert-chinese-wwm-ext/",
+    "pretrained_weights": "hfl/chinese-bert-wwm-ext",
     "check_step": 1000,
     "max_step": 40000,
     "batch_size": 100,
