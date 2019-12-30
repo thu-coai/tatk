@@ -13,6 +13,7 @@ __pycache__
 data/**/train.json
 data/**/val.json
 data/**/test.json
+data/crosswoz/*
 data/camrest/CamRest676_v2.json
 data/multiwoz/annotated_user_da_with_span_full.json
 data/schema/dstc8-schema-guided-dialogue-master
@@ -28,7 +29,10 @@ tatk/nlg/sclstm/**/sclstm.log
 tatk/nlg/sclstm/**/sclstm_usr.pt
 tatk/nlg/sclstm/**/sclstm_usr.res
 tatk/nlg/sclstm/**/sclstm_usr.log
-
+tatk/nlu/jointBERT/**/output/
+tatk/dst/sumbt/multiwoz/output/
+tatk/nlg/sclstm/**/generated_sens_sys.json
+tatk/nlg/template/**/generated_sens_sys.json
 # test script
 *_test.py
 
@@ -47,6 +51,6 @@ dist
 tatk.egg-info
 
 # configs
-configs
+
 
 .ipynb_checkpoints

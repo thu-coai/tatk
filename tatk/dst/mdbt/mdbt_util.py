@@ -793,6 +793,53 @@ def process_history(sessions, word_vectors, ontology):
     # print("\tMDBT: The data contains about {} dialogues".format(len(dialogues)))
     return dialogues, actual_dialogues
 
+def load_woz_data_new(data, word_vectors, ontology, url=False):
+    '''Ported from load_woz_data, using tatk.util.dataloader pkg
+
+    :param data: the data to load
+    :param word_vectors: word embeddings
+    :param ontology: list of domain-slot-value
+    :param url: Is the data coming from a url, default true
+    :return: list(num of turns, user_input vectors, system_response vectors, labels)
+    '''
+    if url:
+        data = json.load(open(url, mode='r', encoding='utf8'))
+    dialogues = []
+    actual_dialogues = []
+    for dialogue in data:
+        turn_ids = []
+        for key in dialogue.keys():
+            if key.isdigit():
+                turn_ids.append(int(key))
+            elif dialogue[key] and key not in domains:
+                continue
+        turn_ids.sort()
+        num_turns = len(turn_ids)
+        user_vecs = []
+        sys_vecs = []
+        turn_labels = []
+        turn_domain_labels = []
+        add = False
+        good = True
+        pre_sys = np.zeros([max_utterance_length, vector_dimension], dtype="float32")
+        for key in turn_ids:
+            turn = dialogue[str(key)]
+            user_v, sys_v, labels, domain_labels = process_turn(turn, word_vectors, ontology)
+            if good and (user_v.shape[0] > max_utterance_length or pre_sys.shape[0] > max_utterance_length):
+                good = False
+                break
+            user_vecs.append(user_v)
+            sys_vecs.append(pre_sys)
+            turn_labels.append(labels)
+            turn_domain_labels.append(domain_labels)
+            if not add and sum(labels) > 0:
+                add = True
+            pre_sys = sys_v
+        if add and good:
+            dialogues.append((num_turns, user_vecs, sys_vecs, turn_labels, turn_domain_labels))
+            actual_dialogues.append(dialogue)
+    # print("\tMDBT: The data contains about {} dialogues".format(len(dialogues)))
+    return dialogues, actual_dialogues
 
 def load_woz_data(data, word_vectors, ontology, url=True):
     '''Load the woz3 data and extract feature vectors

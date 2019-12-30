@@ -11,7 +11,9 @@ import zipfile
 
 from tatk.dst.mdbt.mdbt import MDBT
 from tatk.dst.mdbt.mdbt_util import model_definition, load_word_vectors, load_ontology, \
-    load_woz_data, track_dialogue, generate_batch, evaluate_model
+    load_woz_data_new, track_dialogue, generate_batch, evaluate_model
+from tatk.util.dataloader.module_dataloader import AgentDSTDataloader
+from tatk.util.dataloader.dataset_dataloader import MultiWOZDataloader
 from tatk.util.file_util import cached_path
 
 train_batch_size = 1
@@ -21,7 +23,7 @@ device = "gpu"
 start_batch = 0
 
 class MultiWozMDBT(MDBT):
-    def __init__(self, data_dir='configs'):
+    def __init__(self, data_dir='configs', data=None):
         """Constructor of MultiWOzMDBT class.
         Args:
             data_dir (str): The path of data dir, where the root path is tatk/dst/mdbt/multiwoz.
@@ -29,11 +31,13 @@ class MultiWozMDBT(MDBT):
         self.file_url = 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/mdbt_multiwoz_sys.zip'
         local_path = os.path.dirname(os.path.abspath(__file__))
         self.data_dir = os.path.join(local_path, data_dir)  # abstract data path
+
         self.validation_url = os.path.join(self.data_dir, 'data/validate.json')
-        self.word_vectors_url = os.path.join(self.data_dir, 'word-vectors/paragram_300_sl999.txt')
         self.training_url = os.path.join(self.data_dir, 'data/train.json')
-        self.ontology_url = os.path.join(self.data_dir, 'data/ontology.json')
         self.testing_url = os.path.join(self.data_dir, 'data/test.json')
+
+        self.word_vectors_url = os.path.join(self.data_dir, 'word-vectors/paragram_300_sl999.txt')
+        self.ontology_url = os.path.join(self.data_dir, 'data/ontology.json')
         self.model_url = os.path.join(self.data_dir, 'models/model-1')
         self.graph_url = os.path.join(self.data_dir, 'graphs/graph-1')
         self.results_url = os.path.join(self.data_dir, 'results/log-1.txt')
@@ -50,8 +54,9 @@ class MultiWozMDBT(MDBT):
         self.ontology, self.ontology_vectors, self.slots = load_ontology(self.ontology_url, self.word_vectors)
 
         # Load and process the training data
-        self.dialogues, self.actual_dialogues = load_woz_data(self.testing_url, self.word_vectors, self.ontology)
-        self.no_dialogues = len(self.dialogues)
+        self.test_dialogues, self.actual_dialogues = load_woz_data_new(data['test'], self.word_vectors,
+                                                                   self.ontology, url=self.testing_url)
+        self.no_dialogues = len(self.test_dialogues)
 
         super(MultiWozMDBT, self).__init__(self.ontology_vectors, self.ontology, self.slots, self.data_dir)
 
@@ -256,7 +261,7 @@ class MultiWozMDBT(MDBT):
                 batch_size = self.no_dialogues - batch_id * train_batch_size
 
             batch_user, batch_sys, batch_labels, batch_domain_labels, batch_user_uttr_len, batch_sys_uttr_len, \
-            batch_no_turns = generate_batch(self.dialogues, batch_id, batch_size, len(self.ontology))
+            batch_no_turns = generate_batch(self.test_dialogues, batch_id, batch_size, len(self.ontology))
 
             [da, sa, va, vf, pr, re, pred, true_pred, y_pred] = sess.run(
                 [domain_accuracy, slot_accuracy, value_accuracy,
@@ -363,4 +368,9 @@ def test_model():
 #     shutil.copyfile(os.path.join(data_dir, target_file), zip_file_path)
 #     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
 #         zip_ref.extractall(data_dir)
+if __name__ == '__main__':
+    loader = AgentDSTDataloader(MultiWOZDataloader())
+    data = loader.load_data()
+    model = MultiWozMDBT(data=data)
+
 
