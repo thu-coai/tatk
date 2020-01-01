@@ -166,7 +166,7 @@ if __name__ == '__main__':
     # template NLG
     # nlg_usr = TemplateNLG(is_user=True)
     # assemble
-    simulator = PipelineAgent(None, None, policy_usr, None)
+    simulator = PipelineAgent(None, None, policy_usr, None, 'simulator')
 
     env = Environment(None, simulator, None, dst_sys)
 
