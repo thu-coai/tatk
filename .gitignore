@@ -38,6 +38,7 @@ tatk/nlg/template/**/generated_sens_sys.json
 
 # log
 **/log/**
+*.log
 
 # save
 **/save/**

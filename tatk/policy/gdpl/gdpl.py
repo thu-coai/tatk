@@ -9,7 +9,6 @@ from tatk.policy.policy import Policy
 from tatk.policy.rlmodule import MultiDiscretePolicy, Value
 from tatk.util.train_util import init_logging_handler
 from tatk.policy.vector.vector_multiwoz import MultiWozVector
-from tatk.policy.gdpl.estimator import RewardEstimator
 import sys
 
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
@@ -46,7 +45,6 @@ class GDPL(Policy):
         if is_train:
             self.policy_optim = optim.RMSprop(self.policy.parameters(), lr=cfg['lr'])
             self.value_optim = optim.Adam(self.value.parameters(), lr=cfg['lr'])
-            self.rewarder = RewardEstimator(self.vector, cfg, False)
         
     def predict(self, state):
         """
@@ -110,9 +108,9 @@ class GDPL(Policy):
 
         return A_sa, v_target
     
-    def update(self, epoch, batchsz, s, a, next_s, mask):
+    def update(self, epoch, batchsz, s, a, next_s, mask, rewarder):
         # update reward estimator
-        self.rewarder.update_irl((s, a, next_s), batchsz, epoch)
+        rewarder.update_irl((s, a, next_s), batchsz, epoch)
         
         # get estimated V(s) and PI_old(s, a)
         # actually, PI_old(s, a) can be saved when interacting with env, so as to save the time of one forward elapsed
@@ -121,7 +119,7 @@ class GDPL(Policy):
         log_pi_old_sa = self.policy.get_log_prob(s, a).detach()
         
         # estimate advantage and v_target according to GAE and Bellman Equation
-        r = self.rewarder.estimate(s, a, next_s, log_pi_old_sa).detach()
+        r = rewarder.estimate(s, a, next_s, log_pi_old_sa).detach()
         A_sa, v_target = self.est_adv(r, v, mask)
         
         for i in range(self.update_round):
@@ -198,8 +196,6 @@ class GDPL(Policy):
         logging.info('<<dialog policy>> epoch {}: saved network to mdl'.format(epoch))
     
     def load(self, filename):
-        self.rewarder.load_irl(filename)
-        
         value_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_ppo.val.mdl')
         if os.path.exists(value_mdl):
             self.value.load_state_dict(torch.load(value_mdl))

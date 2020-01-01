@@ -13,10 +13,15 @@ from tatk.dialog_agent.env import Environment
 from tatk.dst.rule.multiwoz import RuleDST
 from tatk.policy.rule.multiwoz import Rule
 from tatk.policy.gdpl import GDPL
+from tatk.policy.gdpl import RewardEstimator
 from tatk.policy.rlmodule import Memory, Transition
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+try:
+    mp = mp.get_context('spawn')
+except RuntimeError:
+    pass
 
 def sampler(pid, queue, evt, env, policy, batchsz):
     """
@@ -129,7 +134,7 @@ def sample(env, policy, batchsz, process_num):
     return buff.get_batch()
 
 
-def update(env, policy, batchsz, epoch, process_num):
+def update(env, policy, batchsz, epoch, process_num, rewarder):
     # sample data asynchronously
     batch = sample(env, policy, batchsz, process_num)
 
@@ -141,10 +146,8 @@ def update(env, policy, batchsz, epoch, process_num):
     next_s = torch.from_numpy(np.stack(batch.next_state)).to(device=DEVICE)
     mask = torch.Tensor(np.stack(batch.mask)).to(device=DEVICE)
     batchsz_real = s.size(0)
-    
-    
 
-    policy.update(epoch, batchsz_real, s, a, next_s, mask)
+    policy.update(epoch, batchsz_real, s, a, next_s, mask, rewarder)
 
 
 if __name__ == '__main__':
@@ -154,6 +157,7 @@ if __name__ == '__main__':
     dst_sys = RuleDST()
     # rule policy
     policy_sys = GDPL(True)
+    rewarder = RewardEstimator(policy_sys.vector, False)
     # template NLG
     # nlg_sys = TemplateNLG(is_user=False)
 
@@ -173,6 +177,5 @@ if __name__ == '__main__':
     batchsz = 1024
     epoch = 5
     process_num = 8
-    mp.set_start_method('spawn')
     for i in range(epoch):
-        update(env, policy_sys, batchsz, i, process_num)
+        update(env, policy_sys, batchsz, i, process_num, rewarder)

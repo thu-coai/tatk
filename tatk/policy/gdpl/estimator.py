@@ -4,6 +4,7 @@
 """
 import os
 import logging
+import json
 import numpy as np
 import torch
 import torch.nn as nn
@@ -16,9 +17,10 @@ from tatk.policy.mle.multiwoz.loader import ActMLEPolicyDataLoaderMultiWoz
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class RewardEstimator(object):
-    def __init__(self, vector, cfg, pretrain=False):
-        
-        self.irl = AIRL(cfg, vector).to(device=DEVICE)
+    def __init__(self, vector, pretrain=False):
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json'), 'r') as f:
+            cfg = json.load(f)
+        self.irl = AIRL(cfg['gamma'], cfg['hi_dim'], vector.state_dim, vector.da_dim).to(device=DEVICE)
         
         self.bce_loss = nn.BCEWithLogitsLoss()
         self.step = 0
@@ -51,7 +53,7 @@ class RewardEstimator(object):
     def irl_loop(self, data_real, data_gen):
         s_real, a_real, next_s_real = to_device(data_real)
         s, a, next_s = data_gen
-            
+        
         # train with real data
         weight_real = self.irl(s_real, a_real, next_s_real)
         loss_real = -weight_real.mean()
@@ -219,16 +221,16 @@ class AIRL(nn.Module):
     """
     label: 1 for real, 0 for generated
     """
-    def __init__(self, cfg, vector):
+    def __init__(self, gamma, h_dim, s_dim, a_dim):
         super(AIRL, self).__init__()
         
-        self.gamma = cfg['gamma']
-        self.g = nn.Sequential(nn.Linear(vector.state_dim+vector.da_dim, cfg['hi_dim']),
+        self.gamma = gamma
+        self.g = nn.Sequential(nn.Linear(s_dim+a_dim, h_dim),
                                nn.ReLU(),
-                               nn.Linear(cfg['hi_dim'], 1))
-        self.h = nn.Sequential(nn.Linear(vector.state_dim, cfg['hi_dim']),
+                               nn.Linear(h_dim, 1))
+        self.h = nn.Sequential(nn.Linear(s_dim, h_dim),
                                nn.ReLU(),
-                               nn.Linear(cfg['hi_dim'], 1))
+                               nn.Linear(h_dim, 1))
     
     def forward(self, s, a, next_s):
         """

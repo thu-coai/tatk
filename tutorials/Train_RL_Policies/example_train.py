@@ -19,6 +19,10 @@ from tatk.nlg.template.multiwoz import TemplateNLG
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+try:
+    mp = mp.get_context('spawn')
+except RuntimeError:
+    pass
 
 def sampler(pid, queue, evt, env, policy, batchsz):
     """
@@ -173,6 +177,5 @@ if __name__ == '__main__':
     batchsz = 1024
     epoch = 5
     process_num = 8
-    mp.set_start_method('spawn')
     for i in range(epoch):
         update(env, policy_sys, batchsz, i, process_num)
