@@ -10,7 +10,7 @@
   "model": {
     "finetune": true,
     "context": true,
-    "context_grad": false,
+    "context_grad": true,
     "pretrained_weights": "hfl/chinese-bert-wwm-ext",
     "check_step": 1000,
     "max_step": 40000,

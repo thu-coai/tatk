@@ -27,6 +27,8 @@ if __name__ == '__main__':
     log_dir = config['log_dir']
     DEVICE = config['DEVICE']
 
+    set_seed(config['seed'])
+
     if 'multiwoz' in data_dir:
         print('-'*20 + 'dataset:multiwoz' + '-'*20)
         from tatk.nlu.jointBERT.multiwoz.postprocess import is_slot_da, calculateF1, recover_intent

@@ -94,7 +94,7 @@ class PipelineAgent(Agent):
 
         # get dialog act
         if self.nlu_model is not None:
-            self.input_action = self.nlu_model.predict(observation, context=self.history[:-1])
+            self.input_action = self.nlu_model.predict(observation, context=[x[1] for x in self.history[:-1]])
         else:
             self.input_action = observation
 
