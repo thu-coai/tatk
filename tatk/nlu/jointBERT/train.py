@@ -6,7 +6,7 @@ import random
 import numpy as np
 import zipfile
 import torch
-from transformers import AdamW, WarmupLinearSchedule
+from transformers import AdamW, get_linear_schedule_with_warmup
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
 
@@ -29,6 +29,8 @@ if __name__ == '__main__':
     output_dir = config['output_dir']
     log_dir = config['log_dir']
     DEVICE = config['DEVICE']
+
+    set_seed(config['seed'])
 
     if 'multiwoz' in data_dir:
         print('-'*20 + 'dataset:multiwoz' + '-'*20)
@@ -72,8 +74,8 @@ if __name__ == '__main__':
         ]
         optimizer = AdamW(optimizer_grouped_parameters, lr=config['model']['learning_rate'],
                           eps=config['model']['adam_epsilon'])
-        scheduler = WarmupLinearSchedule(optimizer, warmup_steps=config['model']['warmup_steps'],
-                                         t_total=config['model']['max_step'])
+        scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=config['model']['warmup_steps'],
+                                                    num_training_steps=config['model']['max_step'])
     else:
         for n, p in model.named_parameters():
             if 'bert' in n:
@@ -88,7 +90,6 @@ if __name__ == '__main__':
     check_step = config['model']['check_step']
     batch_size = config['model']['batch_size']
     model.zero_grad()
-    set_seed(config['seed'])
     train_slot_loss, train_intent_loss = 0, 0
     best_val_f1 = 0.
 

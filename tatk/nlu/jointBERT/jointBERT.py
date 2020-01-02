@@ -57,7 +57,7 @@ class JointBERT(nn.Module):
         sequence_output = outputs[0]
         pooled_output = outputs[1]
 
-        if self.context and context_seq_tensor is not None:
+        if self.context and (context_seq_tensor is not None):
             if not self.finetune or not self.context_grad:
                 with torch.no_grad():
                     context_output = self.bert(input_ids=context_seq_tensor, attention_mask=context_mask_tensor)[1]

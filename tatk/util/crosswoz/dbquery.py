@@ -120,7 +120,7 @@ class Database(object):
                         low = 1
                     else:
                         print(value)
-                        assert 0
+                        # assert 0
                 cur_query_form[slot] = [low, high]
             else:
                 cur_query_form[slot] = value

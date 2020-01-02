@@ -53,7 +53,7 @@ def calculateF1(predict_golden, goal_type=None, intent=None, domain=None, slot=N
 
 
 if __name__ == '__main__':
-    predict_golden = json.load(open('output/all_fr/output.json',encoding='utf-8'))
+    predict_golden = json.load(open('output/all_context/output.json',encoding='utf-8'))
     print('all', calculateF1(predict_golden))
     goal_types = get_goal_type(read_zipped_json('../../../../data/crosswoz/test.json.zip', 'test.json',),mode='all')
     type_predict_golden = {}

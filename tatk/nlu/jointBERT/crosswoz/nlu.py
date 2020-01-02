@@ -20,10 +20,9 @@ class BERTNLU(NLU):
         root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         data_dir = os.path.join(root_dir, config['data_dir'])
         output_dir = os.path.join(root_dir, config['output_dir'])
-        config['model']['pretrained_weights'] = os.path.join(root_dir, config['model']['pretrained_weights'])
 
         if not os.path.exists(os.path.join(data_dir, 'intent_vocab.json')):
-            preprocess(mode, os.path.join(root_dir, 'bert-chinese-wwm-ext/'))
+            preprocess(mode, config['model']['pretrained_weights'])
 
         intent_vocab = json.load(open(os.path.join(data_dir, 'intent_vocab.json')))
         tag_vocab = json.load(open(os.path.join(data_dir, 'tag_vocab.json')))

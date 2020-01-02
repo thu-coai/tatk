@@ -99,7 +99,7 @@ def end2end_evaluate_simulation(policy):
     task_success = {'All': list(), '单领域': list(), '独立多领域': list(), '独立多领域+交通': list(), '不独立多领域': list(),
                     '不独立多领域+交通': list()}
     simulate_sess_num = 100
-    repeat = 5
+    repeat = 10
     random_seed = 2019
     random.seed(random_seed)
     np.random.seed(random_seed)
@@ -134,10 +134,12 @@ def end2end_evaluate_simulation(policy):
         if len(task_success['All']) % 100 == 0:
             for k, v in task_success.items():
                 print(k)
+                all_samples = []
                 for i in range(repeat):
                     samples = v[i * simulate_sess_num:(i + 1) * simulate_sess_num]
+                    all_samples += samples
                     print(sum(samples), len(samples), (sum(samples) / len(samples)) if len(samples) else 0)
-                print('avg', (sum(v) / len(v)) if len(v) else 0)
+                print('avg', (sum(all_samples) / len(all_samples)) if len(all_samples) else 0)
         if min([len(x) for x in task_success.values()]) == simulate_sess_num*repeat:
             break
         # pprint(usr_policy.original_goal)
@@ -145,10 +147,12 @@ def end2end_evaluate_simulation(policy):
     print('task_success')
     for k, v in task_success.items():
         print(k)
+        all_samples = []
         for i in range(repeat):
             samples = v[i * simulate_sess_num:(i + 1) * simulate_sess_num]
+            all_samples += samples
             print(sum(samples), len(samples), (sum(samples) / len(samples)) if len(samples) else 0)
-        print('avg', (sum(v) / len(v)) if len(v) else 0)
+        print('avg', (sum(all_samples) / len(all_samples)) if len(all_samples) else 0)
 
 
 def da_evaluate_simulation(policy):
@@ -162,7 +166,7 @@ def da_evaluate_simulation(policy):
     task_success = {'All': list(), '单领域': list(), '独立多领域': list(), '独立多领域+交通': list(), '不独立多领域': list(),
                     '不独立多领域+交通': list()}
     simulate_sess_num = 100
-    repeat = 5
+    repeat = 10
     random_seed = 2019
     random.seed(random_seed)
     np.random.seed(random_seed)
@@ -198,10 +202,12 @@ def da_evaluate_simulation(policy):
         if len(task_success['All']) % 100 == 0:
             for k, v in task_success.items():
                 print(k)
+                all_samples = []
                 for i in range(repeat):
                     samples = v[i * simulate_sess_num:(i + 1) * simulate_sess_num]
+                    all_samples += samples
                     print(sum(samples), len(samples), (sum(samples) / len(samples)) if len(samples) else 0)
-                print('avg', (sum(v) / len(v)) if len(v) else 0)
+                print('avg', (sum(all_samples) / len(all_samples)) if len(all_samples) else 0)
         if min([len(x) for x in task_success.values()]) == simulate_sess_num*repeat:
             break
         # pprint(usr_policy.original_goal)
@@ -209,10 +215,12 @@ def da_evaluate_simulation(policy):
     print('task_success')
     for k, v in task_success.items():
         print(k)
+        all_samples = []
         for i in range(repeat):
             samples = v[i * simulate_sess_num:(i + 1) * simulate_sess_num]
+            all_samples += samples
             print(sum(samples), len(samples), (sum(samples) / len(samples)) if len(samples) else 0)
-        print('avg', (sum(v) / len(v)) if len(v) else 0)
+        print('avg', (sum(all_samples) / len(all_samples)) if len(all_samples) else 0)
 
 
 if __name__ == '__main__':
