@@ -4,6 +4,7 @@ import torch
 import torch.utils.data as data
 from tatk.util.multiwoz.state import default_state
 from tatk.policy.vector.dataset import ActDataset
+from tatk.util.dataloader.dataset_dataloader import MultiWOZDataloader
 from tatk.util.dataloader.module_dataloader import ActPolicyDataloader
 
 class ActMLEPolicyDataLoader():
@@ -13,16 +14,19 @@ class ActMLEPolicyDataLoader():
         
     def _build_data(self, root_dir, processed_dir):        
         self.data = {}
+        data_loader = ActPolicyDataloader(dataset_dataloader=MultiWOZDataloader())
         for part in ['train', 'val', 'test']:
             self.data[part] = []
-            raw_data = ActPolicyDataloader(data_key=part, role='sys')
+            raw_data = data_loader.load_data(data_key=part, role='system')[part]
             
-            for turn in raw_data:
+            for belief_state, context_dialog_act, terminal, dialog_act in \
+                zip(raw_data['belief_state'], raw_data['context_dialog_act'], raw_data['terminal'], raw_data['dialog_act']):
                 state = default_state()
-                state['user_action'] = turn['context_dialog_act'][-1]
-                state['system_action'] = turn['context_dialog_act'][-2]
-                state['terminal'] = turn['terminal']
-                action = turn['dialog_act']
+                state['belief_state'] = belief_state
+                state['user_action'] = context_dialog_act[-1]
+                state['system_action'] = context_dialog_act[-2] if len(context_dialog_act) > 1 else {}
+                state['terminal'] = terminal
+                action = dialog_act
                 self.data[part].append([self.vector.state_vectorize(state),
                          self.vector.action_vectorize(action)])
         

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jul 14 16:14:07 2019
+Created on Tue Dec 31 10:57:51 2019
 @author: truthless
 """
 import sys, os
@@ -10,12 +10,11 @@ import torch
 from torch import multiprocessing as mp
 from tatk.dialog_agent.agent import PipelineAgent
 from tatk.dialog_agent.env import Environment
-from tatk.nlu.svm.multiwoz import SVMNLU
 from tatk.dst.rule.multiwoz import RuleDST
 from tatk.policy.rule.multiwoz import Rule
-from tatk.policy.ppo import PPO
+from tatk.policy.gdpl import GDPL
+from tatk.policy.gdpl import RewardEstimator
 from tatk.policy.rlmodule import Memory, Transition
-from tatk.nlg.template.multiwoz import TemplateNLG
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -59,7 +58,7 @@ def sampler(pid, queue, evt, env, policy, batchsz):
             a = policy.predict(s)
 
             # interact with env
-            next_s, r, done = env.step(a)
+            next_s, _, done = env.step(a)
 
             # a flag indicates ending or not
             mask = 0 if done else 1
@@ -68,7 +67,7 @@ def sampler(pid, queue, evt, env, policy, batchsz):
             next_s_vec = torch.Tensor(policy.vector.state_vectorize(next_s))
 
             # save to queue
-            buff.push(s_vec.numpy(), policy.vector.action_vectorize(a), r, next_s_vec.numpy(), mask)
+            buff.push(s_vec.numpy(), policy.vector.action_vectorize(a), 0, next_s_vec.numpy(), mask)
 
             # update per step
             s = next_s
@@ -135,7 +134,7 @@ def sample(env, policy, batchsz, process_num):
     return buff.get_batch()
 
 
-def update(env, policy, batchsz, epoch, process_num):
+def update(env, policy, batchsz, epoch, process_num, rewarder):
     # sample data asynchronously
     batch = sample(env, policy, batchsz, process_num)
 
@@ -144,11 +143,11 @@ def update(env, policy, batchsz, epoch, process_num):
     # batch.reward/ batch.mask: ([1], [1]...)
     s = torch.from_numpy(np.stack(batch.state)).to(device=DEVICE)
     a = torch.from_numpy(np.stack(batch.action)).to(device=DEVICE)
-    r = torch.from_numpy(np.stack(batch.reward)).to(device=DEVICE)
+    next_s = torch.from_numpy(np.stack(batch.next_state)).to(device=DEVICE)
     mask = torch.Tensor(np.stack(batch.mask)).to(device=DEVICE)
     batchsz_real = s.size(0)
 
-    policy.update(epoch, batchsz_real, s, a, r, mask)
+    policy.update(epoch, batchsz_real, s, a, next_s, mask, rewarder)
 
 
 if __name__ == '__main__':
@@ -157,7 +156,8 @@ if __name__ == '__main__':
     # simple rule DST
     dst_sys = RuleDST()
     # rule policy
-    policy_sys = PPO(True)
+    policy_sys = GDPL(True)
+    rewarder = RewardEstimator(policy_sys.vector, False)
     # template NLG
     # nlg_sys = TemplateNLG(is_user=False)
 
@@ -178,4 +178,4 @@ if __name__ == '__main__':
     epoch = 5
     process_num = 8
     for i in range(epoch):
-        update(env, policy_sys, batchsz, i, process_num)
+        update(env, policy_sys, batchsz, i, process_num, rewarder)
