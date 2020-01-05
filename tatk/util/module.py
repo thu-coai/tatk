@@ -1,15 +1,13 @@
-"""Natural language understanding interface."""
-from abc import ABC, abstractmethod
+"""module interface."""
+from abc import ABC
 
 
 class Module(ABC):
 
-    # @abstractmethod
     def train(self, *args, **kwargs):
         """Model training entry point"""
         pass
 
-    # @abstractmethod
     def test(self, *args, **kwargs):
         """Model testing entry point"""
         pass

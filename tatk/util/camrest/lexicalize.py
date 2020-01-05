@@ -1,32 +1,28 @@
 from copy import deepcopy
 
-def delexicalize_da(meta, requestable):
-    meta = deepcopy(meta)
-    for k, v in meta.items():
-        intent = k
-        if intent in requestable:
-            for pair in v:
-                pair.insert(1, '?')
-        else:
-            counter = {}
-            for pair in v:
-                if pair[0] == 'none':
-                    pair.insert(1, 'none')
-                else:
-                    if pair[0] in counter:
-                        counter[pair[0]] += 1
-                    else:
-                        counter[pair[0]] = 1
-                    pair.insert(1, str(counter[pair[0]]))
-    return meta
 
-def flat_da(meta):
-    meta = deepcopy(meta)
-    flaten = []
-    for k, v in meta.items():
-        for pair in v:
-            flaten.append('-'.join((k, pair[0], str(pair[1]))))
+def delexicalize_da(da, requestable):
+    delexicalized_da = []
+    counter = {}
+    for intent, slot, value in da:
+        if intent in requestable:
+            v = '?'
+        else:
+            if slot == 'none':
+                v = 'none'
+            else:
+                k = '-'.join([intent, slot])
+                counter.setdefault(k, 0)
+                counter[k] += 1
+                v = str(counter[k])
+        delexicalized_da.append([intent, slot, v])
+    return delexicalized_da
+
+
+def flat_da(delexicalized_da):
+    flaten = ['-'.join(x) for x in delexicalized_da]
     return flaten
+
 
 def deflat_da(meta):
     meta = deepcopy(meta)
@@ -39,9 +35,10 @@ def deflat_da(meta):
         dialog_act[k].append([s, v])
     return dialog_act
 
+
 def lexicalize_da(meta, entities, state, requestable):
     meta = deepcopy(meta)
-    
+
     for k, v in meta.items():
         intent = k
         if intent in requestable:
@@ -64,5 +61,9 @@ def lexicalize_da(meta, entities, state, requestable):
                     if len(entities) > n and pair[0] in entities[n]:
                         pair[1] = entities[n][pair[0]]
                     else:
-                        pair[1] = 'none'    
-    return meta
+                        pair[1] = 'none'
+    tuples = []
+    for intent, svs in meta.items():
+        for slot, value in svs:
+            tuples.append([intent, slot, value])
+    return tuples

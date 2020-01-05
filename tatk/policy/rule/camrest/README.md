@@ -22,7 +22,7 @@ state = {'user_action': {'inform': [['name', 'Chiquito Restaurant Bar'],
   'phone': '',
   'pricerange': 'expensive'},
  'request_state': {},
- 'terminal': False,
+ 'terminated': False,
  'history': []}
 
 # Please call `init_session` before a new session, this clears policy's history info.

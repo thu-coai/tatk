@@ -61,7 +61,7 @@ class VHUS_Trainer():
         for i, a_weight in enumerate(a_weights):
             loss_a += self.nll_loss(a_weight, targets_a[:, i])
         loss_a /= i
-        loss_t = self.bce_loss(t_weights, batch_input['terminal'])
+        loss_t = self.bce_loss(t_weights, batch_input['terminated'])
         loss_a += self.alpha * kl_gaussian(argu)
         return loss_a, loss_t
         
@@ -178,7 +178,7 @@ class VHUS_Trainer():
             a_FN += FN
                     
             t = t_weights.ge(0).cpu().tolist()
-            targets_t = batch_input['terminal'].cpu().long().tolist()
+            targets_t = batch_input['terminated'].cpu().long().tolist()
             judge = np.array(t) == np.array(targets_t)
             t_corr += judge.sum()
             t_tot += judge.size

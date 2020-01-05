@@ -4,13 +4,8 @@ Dataloader base class. Every dataset should inherit this class and implement its
 from abc import ABC, abstractmethod
 import os
 import json
-import zipfile
 from pprint import pprint
-
-
-def read_zipped_json(filepath, filename):
-    archive = zipfile.ZipFile(filepath, 'r')
-    return json.load(archive.open(filename))
+from tatk.util.file_util import read_zipped_json
 
 
 class DatasetDataloader(ABC):
@@ -47,7 +42,7 @@ class MultiWOZDataloader(DatasetDataloader):
                   ontology = False,
                   session_id=False,
                   span_info=False,
-                  terminal=False,
+                  terminated=False,
                   goal=False
                   ):
 
@@ -56,13 +51,13 @@ class MultiWOZDataloader(DatasetDataloader):
             for domain_intent, svs in dialog_act.items():
                 for slot, value in svs:
                     domain, intent = domain_intent.split('-')
-                    tuples.append((domain, intent, slot, value))
+                    tuples.append([intent, domain, slot, value])
             return tuples
 
         assert role in ['system', 'user', 'all']
         info_list = list(filter(eval, ['utterance', 'dialog_act', 'context', 'context_dialog_act', 'belief_state',
                                        'last_opponent_utterance', 'last_self_utterance', 'session_id', 'span_info',
-                                       'terminal', 'goal']))
+                                       'terminated', 'goal']))
         self.data = {'train': {}, 'val': {}, 'test': {}, 'role': role}
         if data_key=='all':
             data_key_list = ['train', 'val', 'test']
@@ -107,8 +102,8 @@ class MultiWOZDataloader(DatasetDataloader):
                         self.data[data_key]['session_id'].append(sess_id)
                     if span_info:
                         self.data[data_key]['span_info'].append(turn['span_info'])
-                    if terminal:
-                        self.data[data_key]['terminal'].append(i+2 >= len(sess['log']))
+                    if terminated:
+                        self.data[data_key]['terminated'].append(i+2 >= len(sess['log']))
                     if goal:
                         self.data[data_key]['goal'].append(sess['goal'])
                     cur_context.append(text)
@@ -124,6 +119,3 @@ if __name__ == '__main__':
     m = MultiWOZDataloader()
     pprint(m.load_data(role='system', context=True, context_dialog_act=True, belief_state=True,
                        last_opponent_utterance=True, last_self_utterance=True, context_window_size=0, span_info=False))
-    # m.load_data(role='system', context=True, context_window_size=5, context_dialog_act=True, belief_state=True,
-    #                    last_opponent_utterance=True, last_self_utterance=True, span_info=False)
-    a = 0

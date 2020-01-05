@@ -36,7 +36,7 @@ assert state == {'user_action': {'inform': [['name', 'Chiquito Restaurant Bar'],
   'phone': '',
   'pricerange': 'expensive'},
  'request_state': {},
- 'terminal': False,
+ 'terminated': False,
  'history': []}
 
 # Please call `init_session` before a new dialog. This initializes the attribute `state` of tracker with a default state, which `tatk.util.camrest.state.default_state` returns. But You needn't call it before the first dialog, because tracker gets a default state in its constructor.
@@ -52,7 +52,7 @@ assert state == {'user_action': {},
   'phone': '',
   'pricerange': 'expensive'},
  'request_state': {},
- 'terminal': False,
+ 'terminated': False,
  'history': []}
 
 ```

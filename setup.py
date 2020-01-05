@@ -41,7 +41,7 @@ setup(
         'numpy>=1.15.0',
         'scipy',
         'scikit-learn==0.20.3',
-        'transformers',
+        'transformers>=2.3.0',
         'tensorflow==1.14',
         'tensorboard>=1.14.0',
         'tensorboardX==1.7',

@@ -30,5 +30,5 @@ class UserPolicyVHUS(UserPolicyVHUSAbstract):
         self.load(archive_file, model_file, config['load'])
 
     def predict(self, state):
-        usr_action, terminal = super().predict(state)
-        return capital(usr_action), terminal
+        usr_action, terminated = super().predict(state)
+        return capital(usr_action), terminated

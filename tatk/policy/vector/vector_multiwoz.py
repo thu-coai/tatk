@@ -151,7 +151,7 @@ class MultiWozVector(Vector):
 
         degree = self.pointer(state['belief_state'])
 
-        final = 1. if state['terminal'] else 0.
+        final = 1. if state['terminated'] else 0.
 
         state_vec = np.r_[opp_act_vec, last_act_vec, belief_state, book, degree, final]
         assert len(state_vec) == self.state_dim

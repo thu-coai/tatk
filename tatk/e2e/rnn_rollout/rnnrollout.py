@@ -175,7 +175,7 @@ class RNNRolloutAgent(Agent):
 
             is_selection = len(move) == 1 and \
                            self.model.word_dict.get_word(
-                               move.data[0][0]) == '<selection>'  # whether the candidate is a terminal
+                               move.data[0][0]) == '<selection>'  # whether the candidate is a terminated
 
             score = 0
             for _ in range(self.nrollout):
@@ -186,7 +186,7 @@ class RNNRolloutAgent(Agent):
                 combined_sents.append(torch.cat([self.model.word2var('YOU:').unsqueeze(1), move], 0))
 
                 last_lang_h = move_lang_h
-                if not is_selection:  # if not terminal
+                if not is_selection:  # if not terminated
                     # Complete the conversation with rollout_length samples
                     # _, rollout, _, rollout_lang_hs = self.model.write(
                     #     move_lang_h, self.ctx_h, self.rollout_len, self.args.temperature,

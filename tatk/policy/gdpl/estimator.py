@@ -254,7 +254,7 @@ class ActEstimatorDataLoaderMultiWoz(ActMLEPolicyDataLoaderMultiWoz):
         for i, item in enumerate(self.data[part]):
             s.append(torch.Tensor(item[0]))
             a.append(torch.Tensor(item[1]))
-            if item[0][-1]: #terminal
+            if item[0][-1]: #terminated
                 next_s.append(torch.Tensor(item[0]))
             else:
                 next_s.append(torch.Tensor(self.data[part][i+1][0]))

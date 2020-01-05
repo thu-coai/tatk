@@ -60,7 +60,7 @@ assert state == {'user_action': {'Hotel-Inform': [['Area', 'east'], ['Stars', '4
                                      'arriveBy': '',
                                      'departure': ''}}},
  'request_state': {},
- 'terminal': False,
+ 'terminated': False,
  'history': []}
 
 # Please call `init_session` before a new dialog. This initializes the attribute `state` of tracker with a default state, which `tatk.util.multiwoz.state.default_state` returns. But You needn't call it before the first dialog, because tracker gets a default state in its constructor.
@@ -102,7 +102,7 @@ assert state == {'user_action': {'Train-Inform': [['Arrive', '19:45']]},
     'arriveBy': '19:45',
     'departure': ''}}},
  'request_state': {},
- 'terminal': False,
+ 'terminated': False,
  'history': []}
 
 ```

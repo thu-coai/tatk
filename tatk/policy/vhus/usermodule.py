@@ -58,7 +58,7 @@ class VHUS(nn.Module):
         self.logvar_net_last = nn.Linear(cfg['hu_dim'], cfg['hu_dim'])
         self.concat_net = nn.Linear(cfg['hu_dim']*2, cfg['hu_dim'])
         
-        self.terminal_net = nn.Sequential(nn.Linear(cfg['hu_dim'], cfg['hu_dim']),
+        self.terminated_net = nn.Sequential(nn.Linear(cfg['hu_dim'], cfg['hu_dim']),
                                           nn.ReLU(),
                                           nn.Linear(cfg['hu_dim'], 1))
         self.usr_decoder = Decoder(voc_usr_size, cfg['max_ulen'], cfg['eu_dim'], cfg['hu_dim'])
@@ -86,7 +86,7 @@ class VHUS(nn.Module):
         teacher = 1 if origin_responses is not None else 0
         a_weights, _, _ = self.usr_decoder(inputs=origin_responses, encoder_hidden=hidden.unsqueeze(0), \
                                            teacher_forcing_ratio=teacher)
-        t_weights = self.terminal_net(context).squeeze(1)
+        t_weights = self.terminated_net(context).squeeze(1)
         
         return a_weights, t_weights, (mu_last, logvar_last, mu, logvar)
     
@@ -109,9 +109,9 @@ class VHUS(nn.Module):
             if a == self.usr_decoder.eos_id:
                 break
             usr_a.append(a)
-        terminal = t_weights.ge(0).item()
+        terminated = t_weights.ge(0).item()
         
-        return usr_a, terminal
+        return usr_a, terminated
     
 class Encoder(nn.Module):
     def __init__(self, vocab_size, embed_size, hidden_size, input_dropout_p=0, dropout_p=0, n_layers=1, 
