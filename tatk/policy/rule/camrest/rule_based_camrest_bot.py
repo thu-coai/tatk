@@ -4,7 +4,7 @@ import random
 from copy import deepcopy
 
 from tatk.policy.policy import Policy
-from tatk.util.camrest.dbquery import query
+from tatk.util.camrest.dbquery import Database
 
 # Alphabet used to generate Ref number
 alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -17,6 +17,7 @@ class RuleBasedCamrestBot(Policy):
     def __init__(self):
         Policy.__init__(self)
         self.last_state = {}
+        self.db = Database()
 
     def init_session(self):
         self.last_state = {}
@@ -82,7 +83,7 @@ class RuleBasedCamrestBot(Policy):
 
         constraints = state.items()
 
-        kb_result = query(constraints)
+        kb_result = self.db.query(constraints)
         self.kb_result = deepcopy(kb_result)
 
         # print("\tConstraint: " + "{}".format(constraints))

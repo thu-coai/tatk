@@ -10,7 +10,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from tatk.util.multiwoz.dbquery import query
+from tatk.util.multiwoz.dbquery import Database
 
 domains = {'attraction', 'hotel', 'restaurant', 'train', 'taxi', 'hospital', 'police'}
 days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -146,6 +146,7 @@ class GoalGenerator:
         """
         self.goal_model_path = goal_model_path
         self.corpus_path = corpus_path
+        self.db = Database()
         self.boldify = do_boldify if boldify else null_boldify
         if os.path.exists(self.goal_model_path):
             self.ind_slot_dist, self.ind_slot_value_dist, self.domain_ordering_dist, self.book_dist = pickle.load(
@@ -377,11 +378,11 @@ class GoalGenerator:
                             domain_goal['fail_book']['day'] = days[(days.index(domain_goal['book']['day']) + 1) % 7]
 
             # fail_info
-            if 'info' in domain_goal and len(query(domain, domain_goal['info'].items())) == 0:
+            if 'info' in domain_goal and len(self.db.query(domain, domain_goal['info'].items())) == 0:
                 num_trial = 0
                 while num_trial < 100:
                     adjusted_info = self._adjust_info(domain, domain_goal['info'])
-                    if len(query(domain, adjusted_info.items())) > 0:
+                    if len(self.db.query(domain, adjusted_info.items())) > 0:
                         if domain == 'train':
                             domain_goal['info'] = adjusted_info
                         else:
@@ -431,7 +432,7 @@ class GoalGenerator:
                 'area' in user_goal['restaurant']['info'] and 'area' in user_goal['attraction']['info']:
             adjusted_restaurant_goal = deepcopy(user_goal['restaurant']['info'])
             adjusted_restaurant_goal['area'] = user_goal['attraction']['info']['area']
-            if len(query('restaurant', adjusted_restaurant_goal.items())) > 0 and random.random() < 0.5:
+            if len(self.db.query('restaurant', adjusted_restaurant_goal.items())) > 0 and random.random() < 0.5:
                 user_goal['restaurant']['info']['area'] = user_goal['attraction']['info']['area']
 
         # match day and people of restaurant and hotel
@@ -462,7 +463,7 @@ class GoalGenerator:
                     (days.index(user_goal['hotel']['book']['day']) + int(
                         user_goal['hotel']['book']['stay'])) % 7]
             # In case, we have no query results with adjusted train goal, we simply drop the train goal.
-            if len(query('train', user_goal['train']['info'].items())) == 0:
+            if len(self.db.query('train', user_goal['train']['info'].items())) == 0:
                 del user_goal['train']
                 domain_ordering = tuple(list(domain_ordering).remove('train'))
 
