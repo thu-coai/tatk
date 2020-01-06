@@ -23,7 +23,8 @@
       "class_path": "tatk.nlu.svm.multiwoz.nlu.SVMNLU",
       "data_set": "multiwoz",
       "ini_params": {"mode": "usr"},
-      "enable": false
+      "enable": true,
+      "max_core": 2
     }
   },
 
@@ -32,13 +33,15 @@
     "rule-cam":
     {
       "class_path": "tatk.dst.rule.camrest.state_tracker.RuleDST",
-      "data_set": "camrest"
+      "data_set": "camrest",
+      "max_core": 2
     },
 
     "rule-mul":
     {
       "class_path": "tatk.dst.rule.multiwoz.state_tracker.RuleDST",
-      "data_set": "multiwoz"
+      "data_set": "multiwoz",
+      "max_core": 2
     }
 
   },
@@ -49,29 +52,40 @@
     {
       "class_path": "tatk.policy.mle.camrest.mle.MLE",
       "data_set": "camrest",
-      "ini_params": {}
+      "ini_params": {},
+      "max_core": 2
+    },
+    "rule-cam":
+    {
+      "class_path": "tatk.policy.rule.camrest.rule_based_camrest_bot.RuleBasedCamrestBot",
+      "data_set": "camrest",
+      "ini_params": {},
+      "max_core": 2
     },
     "mle-mul":
     {
       "class_path": "tatk.policy.mle.multiwoz.mle.MLE",
       "data_set": "multiwoz",
-      "ini_params": {}
+      "ini_params": {},
+      "max_core": 2
     }
   },
 
   "nlg":
   {
-    "tmp-cam-usr-manual":
+    "tmp-cam-sys-manual":
     {
       "class_path": "tatk.nlg.template.camrest.nlg.TemplateNLG",
       "data_set": "camrest",
-      "ini_params": {"is_user": true}
+      "ini_params": {"is_user": false},
+      "max_core": 2
     },
-    "tmp-cam-usr-auto_manual":
+    "tmp-cam-sys-auto_manual":
     {
       "class_path": "tatk.nlg.template.camrest.nlg.TemplateNLG",
       "data_set": "camrest",
-      "ini_params": {"is_user": true, "mode": "auto_manual"}
+      "ini_params": {"is_user": false, "mode": "auto_manual"},
+      "max_core": 2
     }
   }
 }

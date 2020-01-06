@@ -38,8 +38,7 @@ class SessionCtrl(object):
 
     def __new_data(self, nlu, dst, policy, nlg):
         return {
-            'nlu': nlu, 'dst': dst, 'policy': policy, 'nlg': nlg,
-            'cache': []
+            'model_map': {'nlu': nlu, 'dst': dst, 'policy': policy, 'nlg': nlg}, 'turns': []
         }
 
     def __new_token(self):
