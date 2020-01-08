@@ -140,11 +140,11 @@ def get_config(filepath: str = None) -> dict:
         conf['nlu'][model]['class'] = cls
 
     # DST
-    from tatk.dst import Tracker
+    from tatk.dst import DST
     for (model, infos) in conf['dst'].items():
         cls_path = infos.get('class_path', '')
         cls = map_class(cls_path)
-        assert issubclass(cls, Tracker), '\'%s\' is not a %s class' % (cls_path, 'dst')
+        assert issubclass(cls, DST), '\'%s\' is not a %s class' % (cls_path, 'dst')
         assert issubclass(cls, Module), '\'%s\' is not a %s class' % (cls_path, 'Module')
         conf['dst'][model]['class'] = cls
 

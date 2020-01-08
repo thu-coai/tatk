@@ -1,5 +1,5 @@
 from tatk.nlu import NLU
-from tatk.dst import Tracker
+from tatk.dst import DST
 from tatk.policy import Policy
 from tatk.nlg import NLG
 from tatk.dialog_agent import Agent, PipelineAgent

@@ -4,11 +4,11 @@ import os
 
 from tatk.util.multiwoz.state import default_state
 from tatk.dst.rule.multiwoz.dst_util import normalize_value
-from tatk.dst.state_tracker import Tracker
+from tatk.dst.state_tracker import DST
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA
 
 
-class RuleDST(Tracker):
+class RuleDST(DST):
     """Rule based DST which trivially updates new values from NLU result to states.
 
     Attributes:
@@ -18,7 +18,7 @@ class RuleDST(Tracker):
             It helps check whether ``user_act`` has correct content.
     """
     def __init__(self):
-        Tracker.__init__(self)
+        DST.__init__(self)
         self.state = default_state()
         path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
         path = os.path.join(path,'data/multiwoz/value_dict.json')

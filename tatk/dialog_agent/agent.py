@@ -1,7 +1,7 @@
 """Dialog agent interface and classes."""
 from abc import ABC, abstractmethod
 from tatk.nlu import NLU
-from tatk.dst import Tracker
+from tatk.dst import DST
 from tatk.policy import Policy
 from tatk.nlg import NLG
 
@@ -57,7 +57,7 @@ class PipelineAgent(Agent):
            =====   =====    ======  ===     ==      ===
     """
 
-    def __init__(self, nlu_model: NLU, tracker: Tracker, policy: Policy, nlg_model: NLG, name: str):
+    def __init__(self, nlu_model: NLU, dst: DST, policy: Policy, nlg_model: NLG, name: str):
         """The constructor of PipelineAgent class.
 
         Here are some special combination cases:
@@ -71,7 +71,7 @@ class PipelineAgent(Agent):
             nlu_model (NLU):
                 The natural langauge understanding module of agent.
 
-            tracker (Tracker):
+            dst (DST):
                 The dialog state tracker of agent.
 
             policy (Policy):
@@ -82,7 +82,7 @@ class PipelineAgent(Agent):
         """
         super(PipelineAgent, self).__init__(name=name)
         self.nlu_model = nlu_model
-        self.tracker = tracker
+        self.tracker = dst
         self.policy = policy
         self.nlg_model = nlg_model
         self.history = []

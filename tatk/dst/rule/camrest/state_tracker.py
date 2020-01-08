@@ -1,9 +1,9 @@
-from tatk.dst.state_tracker import Tracker
+from tatk.dst.state_tracker import DST
 from tatk.util.camrest.state import default_state
 import copy
 
 
-class RuleDST(Tracker):
+class RuleDST(DST):
     """Rule based DST which trivially updates new values from NLU result to states.
 
     Attributes:
