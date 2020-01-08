@@ -1,6 +1,6 @@
 import pytest
 import abc
-from tatk.dst.state_tracker import DST
+from tatk.dst.dst import DST
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA
 from tatk.util.multiwoz.state import default_state
 

@@ -4,7 +4,7 @@ import os
 
 from tatk.util.multiwoz.state import default_state
 from tatk.dst.rule.multiwoz.dst_util import normalize_value
-from tatk.dst.state_tracker import DST
+from tatk.dst.dst import DST
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA
 
 

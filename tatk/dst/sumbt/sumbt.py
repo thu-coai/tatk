@@ -17,7 +17,7 @@ from pytorch_pretrained_bert.tokenization import BertTokenizer
 
 from tatk.dst.rule.multiwoz import normalize_value
 from tatk.util.multiwoz.state import default_state
-from tatk.dst.state_tracker import DST
+from tatk.dst.dst import DST
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 from tatk.dst.sumbt.config.config import *
 

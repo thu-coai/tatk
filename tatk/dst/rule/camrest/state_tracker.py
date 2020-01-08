@@ -1,4 +1,4 @@
-from tatk.dst.state_tracker import DST
+from tatk.dst.dst import DST
 from tatk.util.camrest.state import default_state
 import copy
 

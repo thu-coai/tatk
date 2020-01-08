@@ -1,0 +1,18 @@
+"""Dialog State Tracker Interface"""
+from tatk.util.module import Module
+
+
+class DST(Module):
+    """Base class for dialog state tracker models."""
+
+    def update(self, action):
+        """ Update the internal dialog state variable.
+
+        Args:
+            action (str or list of tuples):
+                The type is str when DST is word-level (such as NBT), and list of tuples when it is DA-level.
+        Returns:
+            new_state (dict):
+                Updated dialog state, with the same form of previous state.
+        """
+        pass

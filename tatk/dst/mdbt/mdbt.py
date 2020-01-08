@@ -8,7 +8,7 @@ from tatk.dst.mdbt.mdbt_util import model_definition, \
     track_dialogue, generate_batch, process_history
 from tatk.dst.rule.multiwoz import normalize_value
 from tatk.util.multiwoz.state import default_state
-from tatk.dst.state_tracker import DST
+from tatk.dst.dst import DST
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 
 from os.path import dirname

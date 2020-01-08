@@ -1,4 +1,4 @@
-from tatk.dst.state_tracker import DST
+from tatk.dst.dst import DST
 from tatk.util.crosswoz.state import default_state
 from tatk.util.crosswoz.dbquery import Database
 from copy import deepcopy

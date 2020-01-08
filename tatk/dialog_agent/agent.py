@@ -57,7 +57,7 @@ class PipelineAgent(Agent):
            =====   =====    ======  ===     ==      ===
     """
 
-    def __init__(self, nlu_model: NLU, dst: DST, policy: Policy, nlg_model: NLG, name: str):
+    def __init__(self, nlu: NLU, dst: DST, policy: Policy, nlg: NLG, name: str):
         """The constructor of PipelineAgent class.
 
         Here are some special combination cases:
@@ -68,7 +68,7 @@ class PipelineAgent(Agent):
             2. If you want to aggregate DST and Policy as a single module, set tracker to None.
 
         Args:
-            nlu_model (NLU):
+            nlu (NLU):
                 The natural langauge understanding module of agent.
 
             dst (DST):
@@ -77,14 +77,14 @@ class PipelineAgent(Agent):
             policy (Policy):
                 The dialog policy module of agent.
 
-            nlg_model (NLG):
+            nlg (NLG):
                 The natural langauge generator module of agent.
         """
         super(PipelineAgent, self).__init__(name=name)
-        self.nlu_model = nlu_model
+        self.nlu = nlu
         self.tracker = dst
         self.policy = policy
-        self.nlg_model = nlg_model
+        self.nlg = nlg
         self.history = []
         self.init_session()
 
@@ -93,8 +93,8 @@ class PipelineAgent(Agent):
         self.history.append(['opponent', observation])
 
         # get dialog act
-        if self.nlu_model is not None:
-            self.input_action = self.nlu_model.predict(observation, context=[x[1] for x in self.history[:-1]])
+        if self.nlu is not None:
+            self.input_action = self.nlu.predict(observation, context=[x[1] for x in self.history[:-1]])
         else:
             self.input_action = observation
 
@@ -108,8 +108,8 @@ class PipelineAgent(Agent):
         self.output_action = self.policy.predict(state)
 
         # get model response
-        if self.nlg_model is not None:
-            model_response = self.nlg_model.generate(self.output_action)
+        if self.nlg is not None:
+            model_response = self.nlg.generate(self.output_action)
         else:
             model_response = self.output_action
 
@@ -128,14 +128,14 @@ class PipelineAgent(Agent):
 
     def init_session(self):
         """Init the attributes of DST and Policy module."""
-        if self.nlu_model is not None:
-            self.nlu_model.init_session()
+        if self.nlu is not None:
+            self.nlu.init_session()
         if self.tracker is not None:
             self.tracker.init_session()
         if self.policy is not None:
             self.policy.init_session()
-        if self.nlg_model is not None:
-            self.nlg_model.init_session()
+        if self.nlg is not None:
+            self.nlg.init_session()
 
     def get_in_da(self):
         return self.input_action
