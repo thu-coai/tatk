@@ -15,7 +15,7 @@ class NLU(Module):
                 Previous utterances.
 
         Returns:
-            action (list of tuples):
+            action (list of list):
                 The dialog act of utterance.
         """
         return []

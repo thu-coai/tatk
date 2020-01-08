@@ -49,7 +49,7 @@ def tag2triples(word_seq, tag_seq):
                     j += 1
                 else:
                     break
-            triples.append((intent, slot, value))
+            triples.append([intent, slot, value])
         i += 1
     return triples
 
@@ -58,7 +58,7 @@ def intent2triples(intent_seq):
     triples = []
     for intent in intent_seq:
         intent, slot, value = re.split('[+*]', intent)
-        triples.append((intent, slot, value))
+        triples.append([intent, slot, value])
     return triples
 
 
@@ -72,7 +72,7 @@ def recover_intent(dataloader, intent_logits, tag_logits, tag_mask_tensor, ori_w
     for j in range(dataloader.intent_dim):
         if intent_logits[j] > 0:
             intent, slot, value = re.split('[+*]', dataloader.id2intent[j])
-            intents.append((intent, slot, value))
+            intents.append([intent, slot, value])
     tags = []
     for j in range(1, max_seq_len-1):
         if tag_mask_tensor[j] == 1:

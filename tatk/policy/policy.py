@@ -13,7 +13,7 @@ class Policy(Module):
                 when the DST and Policy module are separated, the type of state is tuple.
                 else when they are aggregated together, the type of state is dict (dialog act).
         Returns:
-            action (list of tuples):
+            action (list of list):
                 The next dialog action.
         """
         return []
