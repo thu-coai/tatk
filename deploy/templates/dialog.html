@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/bootstrap-theme.css">
     <link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+
+    <script src="/static/js/jquery-1.11.1.min.js" type="text/javascript"></script>
     <script src="/static/js/bootstrap.js" type="text/javascript"></script>
     <script src="/static/js/bootstrap.min.js" type="text/javascript"></script>
     <script src="/static/js/npm.js" type="text/javascript"></script>
@@ -185,7 +187,7 @@
                 </select>
             </div>
             <div class="module_output">
-                {# <textarea :rows={output_rows} id="stem_source" class="form-control module_output_area"></textarea>#}
+                {# <textarea :rows={output_rows} class="form-control module_output_area"></textarea>#}
                 <pre @input="input(event)" id="nlu_output" class="form-control module_output_area"
                      contenteditable="true">{nlu_output}</pre>
             </div>
@@ -202,7 +204,7 @@
                 </select>
             </div>
             <div class="module_output">
-                {# <textarea :rows={output_rows} id="stem_source" class="form-control module_output_area"
+                {# <textarea :rows={output_rows} class="form-control module_output_area"
                              v-model="dst_output"></textarea>#}
                 <pre @input="input(event)" id="dst_output" class="form-control module_output_area"
                      contenteditable="true">{dst_output}</pre>
@@ -220,7 +222,7 @@
                 </select>
             </div>
             <div class="module_output">
-                {# <textarea :rows={output_rows} id="stem_source" class="form-control module_output_area"
+                {# <textarea :rows={output_rows} class="form-control module_output_area"
                              v-model="policy_output"></textarea>#}
                 <pre @input="input(event)" id="policy_output" class="form-control module_output_area"
                      contenteditable="true">{policy_output}</pre>
@@ -238,7 +240,7 @@
                 </select>
             </div>
             <div class="module_output">
-                {# <textarea :rows={output_rows} id="stem_source" class="form-control module_output_area"
+                {# <textarea :rows={output_rows} class="form-control module_output_area"
                              v-model="nlg_output"></textarea>#}
                 <pre @input="input(event)" id="nlg_output" class="form-control module_output_area"
                      contenteditable="true">{nlg_output}</pre>
@@ -316,10 +318,7 @@
         },
         mounted: function () {
             this.scroll_auto();
-            var ontology = localStorage.getItem('ontology');
-            if (ontology === null) {
-                this.load_ontology();
-            }
+            this.load_ontology();
         },
         created: function () {
         },
@@ -338,28 +337,20 @@
                 var token = localStorage.getItem('token');
                 if (token === null) {
                     // alert('register');
-                    ajax1 = this.register();
-                    var self = this;
-                    $.when(ajax1).done(function() {
-                        self.response();
-                    })
+                    this.register();
+                    this.response();
                 } else {
-                    ajax2 = this.response();
-                    var self = this;
-                    $.when(ajax2).done(function() {
-                        self.scroll_auto();
-                    });
+                    this.response();
+                    this.scroll_auto();
                 }
                 // b.removeAttribute("disabled");
                 // alert('submt done');
             },
             scroll_auto: function () {
                 // alert('scroll_auto')
-                this.$nextTick(() => {
-                    var his = document.getElementById('conv_history_div');
-                    // alert(his.scrollHeight);
-                    his.scrollTop = his.scrollHeight;
-                })
+                var his = document.getElementById('conv_history_div');
+                // alert(his.scrollHeight);
+                his.scrollTop = his.scrollHeight;
             },
             update_vals: function () {
                 // alert('update_vals')
@@ -411,6 +402,7 @@
                         "Content-Type": "application/json;charset=utf-8"
                     },
                     contentType: 'application/json; charset=utf-8',
+                    async: false,
                     data: JSON.stringify({
                         "token": token,
                         "input_module": "nlu",
@@ -445,6 +437,12 @@
             register: function() {
                 // alert('register')
                 var self = this;
+                // alert(JSON.stringify({
+                //         "nlu": self.nlu === null? null:self.model_dict[self.nlu],
+                //         "policy": self.policy === null? null:self.model_dict[self.policy],
+                //         "dst": self.dst === null? null:self.model_dict[self.dst],
+                //         "nlg": self.nlg === null? null:self.model_dict[self.nlg]
+                //     }))
                 return $.ajax({
                     type: 'POST',
                     url: '/tatk/register',
@@ -453,6 +451,7 @@
                         "Content-Type": "application/json;charset=utf-8"
                     },
                     contentType: 'application/json; charset=utf-8',
+                    async: false,
                     data: JSON.stringify({
                         "nlu": self.nlu === null? null:self.model_dict[self.nlu],
                         "policy": self.policy === null? null:self.model_dict[self.policy],
@@ -463,7 +462,7 @@
                         var status = data.status;
                         if (status === 'ok') {
                             var token = data.token;
-                            localStorage.setItem('token', token);
+                            localStorage.setItem('tatk_token', token);
                             // alert('register ok');
                         } else {
                             alert(data.error_msg);
@@ -478,7 +477,7 @@
             close: function() {
                 // alert('close')
                 var self = this;
-                var token = localStorage.getItem('token');
+                var token = localStorage.getItem('tatk_token');
                 if (token === null) {
                     // alert(1);
                     var self = this;
@@ -531,6 +530,7 @@
                         "Content-Type": "application/json;charset=utf-8"
                     },
                     contentType: 'application/json; charset=utf-8',
+                    async: false,
                     data: JSON.stringify({}),
                     success: function (data) {
                         this.module_dict = {};
@@ -555,7 +555,7 @@
                             self.dst_list = self.module_dict.dst;
                             self.policy_list = self.module_dict.policy;
                             self.nlg_list = self.module_dict.nlg;
-                            localStorage.setAttribute("ontology", true);
+                            localStorage.setItem("ontology", true);
                         } else {
                             alert(data.error_msg);
                         }
