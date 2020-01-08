@@ -7,5 +7,6 @@ from tatk.dialog_agent import Session, BiSession, DealornotSession
 
 from os.path import abspath, dirname
 
+
 def get_root_path():
     return dirname(dirname(abspath(__file__)))
