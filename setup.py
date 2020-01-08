@@ -46,7 +46,8 @@ setup(
         'tensorboard>=1.14.0',
         'tensorboardX==1.7',
         'requests',
-        'simplejson'
+        'simplejson',
+        'unidecode'
     ],
     extras_require={
         'develop': [

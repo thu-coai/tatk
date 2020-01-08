@@ -61,7 +61,8 @@ class MultiWOZDataloader(DatasetDataloader):
 
         assert role in ['system', 'user', 'all']
         info_list = list(filter(eval, ['utterance', 'dialog_act', 'context', 'context_dialog_act', 'belief_state',
-                                       'last_opponent_utterance', 'last_self_utterance', 'session_id', 'span_info']))
+                                       'last_opponent_utterance', 'last_self_utterance', 'session_id', 'span_info',
+                                       'terminal', 'goal']))
         self.data = {'train': {}, 'val': {}, 'test': {}, 'role': role}
         if data_key=='all':
             data_key_list = ['train', 'val', 'test']
@@ -109,7 +110,7 @@ class MultiWOZDataloader(DatasetDataloader):
                     if terminal:
                         self.data[data_key]['terminal'].append(i+2 >= len(sess['log']))
                     if goal:
-                        self.data[data_key]['key'].append(sess['goal'])
+                        self.data[data_key]['goal'].append(sess['goal'])
                     cur_context.append(text)
                     cur_context_dialog_act.append(da)
         if ontology:

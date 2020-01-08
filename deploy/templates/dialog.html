@@ -437,12 +437,12 @@
             register: function() {
                 // alert('register')
                 var self = this;
-                alert(JSON.stringify({
-                        "nlu": self.nlu === null? null:self.model_dict[self.nlu],
-                        "policy": self.policy === null? null:self.model_dict[self.policy],
-                        "dst": self.dst === null? null:self.model_dict[self.dst],
-                        "nlg": self.nlg === null? null:self.model_dict[self.nlg]
-                    }))
+                // alert(JSON.stringify({
+                //         "nlu": self.nlu === null? null:self.model_dict[self.nlu],
+                //         "policy": self.policy === null? null:self.model_dict[self.policy],
+                //         "dst": self.dst === null? null:self.model_dict[self.dst],
+                //         "nlg": self.nlg === null? null:self.model_dict[self.nlg]
+                //     }))
                 return $.ajax({
                     type: 'POST',
                     url: '/tatk/register',
