@@ -27,7 +27,7 @@ def da2triples(dialog_act):
     triples = []
     for intent, svs in dialog_act.items():
         for slot, value in svs:
-            triples.append((intent, slot, value))
+            triples.append([intent, slot, value])
     return triples
 
 
@@ -39,14 +39,11 @@ if __name__ == '__main__':
         sys.exit()
     mode = sys.argv[1]
     if mode== 'usr':
-        model = SVMNLU(mode='usr',
-                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_usr.zip')
+        model = SVMNLU(mode='usr')
     elif mode== 'sys':
-        model = SVMNLU(mode='sys',
-                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_sys.zip')
+        model = SVMNLU(mode='sys')
     elif mode== 'all':
-        model = SVMNLU(mode='all',
-                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_multiwoz_all.zip')
+        model = SVMNLU(mode='all')
     else:
         raise Exception("Invalid mode")
 
@@ -73,7 +70,7 @@ if __name__ == '__main__':
                 continue
             sen_num += 1
             labels = da2triples(turn['dialog_act'])
-            predicts = da2triples(model.predict(turn['text']))
+            predicts = model.predict(turn['text'])
             for triple in predicts:
                 if triple in labels:
                     TP += 1

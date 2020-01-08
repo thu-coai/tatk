@@ -52,7 +52,7 @@ class SVMNLU(NLU):
             archive.close()
         self.c.load(model_path)
 
-    def predict(self, utterance):
+    def predict(self, utterance, context=list()):
         """
         Predict the dialog act of a natural language utterance.
 
@@ -90,7 +90,12 @@ class SVMNLU(NLU):
             else:
                 dialog_act.setdefault(intent, [])
                 dialog_act[intent].append(act['slots'][0])
-        return dialog_act
+        tuples = []
+        for domain_intent, svs in dialog_act.items():
+            for slot, value in svs:
+                domain, intent = domain_intent.split('-')
+                tuples.append([intent, domain, slot, value])
+        return tuples
 
 
 if __name__ == "__main__":
