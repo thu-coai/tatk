@@ -2,15 +2,14 @@ import os
 import zipfile
 import json
 import torch
-from transformers import BertConfig
 from unidecode import unidecode
 
 from tatk.util.file_util import cached_path
 from tatk.nlu.nlu import NLU
 from tatk.nlu.jointBERT.dataloader import Dataloader
 from tatk.nlu.jointBERT.jointBERT import JointBERT
-from tatk.nlu.jointBERT.postprocess import recover_intent
-from tatk.nlu.jointBERT.multiwoz.preprocess import preprocess
+from tatk.nlu.jointBERT.camrest.postprocess import recover_intent
+from tatk.nlu.jointBERT.camrest.preprocess import preprocess
 
 
 class BERTNLU(NLU):
@@ -34,9 +33,7 @@ class BERTNLU(NLU):
         print('intent num:', len(intent_vocab))
         print('tag num:', len(tag_vocab))
 
-        bert_config = BertConfig.from_pretrained(config['model']['pretrained_weights'])
-
-        best_model_path = os.path.join(output_dir, 'bestcheckpoint.tar')
+        best_model_path = os.path.join(output_dir, 'pytorch_model.bin')
         if not os.path.exists(best_model_path):
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
@@ -46,7 +43,7 @@ class BERTNLU(NLU):
             archive.extractall(root_dir)
             archive.close()
         print('Load from', best_model_path)
-        model = JointBERT(bert_config, config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
+        model = JointBERT(config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
         model.load_state_dict(torch.load(os.path.join(output_dir, 'pytorch_model.bin'), DEVICE))
         model.to(DEVICE)
         model.eval()
@@ -74,8 +71,4 @@ class BERTNLU(NLU):
                                                         context_mask_tensor=context_mask_tensor)
         intent = recover_intent(self.dataloader, intent_logits[0], slot_logits[0], tag_mask_tensor[0],
                                 batch_data[0][0], batch_data[0][-4])
-        dialog_act = {}
-        for act, slot, value in intent:
-            dialog_act.setdefault(act, [])
-            dialog_act[act].append([slot, value])
-        return dialog_act
+        return intent

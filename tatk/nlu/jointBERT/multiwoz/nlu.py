@@ -2,7 +2,6 @@ import os
 import zipfile
 import json
 import torch
-from transformers import BertConfig
 from unidecode import unidecode
 
 from tatk.util.file_util import cached_path
@@ -34,8 +33,6 @@ class BERTNLU(NLU):
         print('intent num:', len(intent_vocab))
         print('tag num:', len(tag_vocab))
 
-        bert_config = BertConfig.from_pretrained(config['model']['pretrained_weights'])
-
         best_model_path = os.path.join(output_dir, 'pytorch_model.bin')
         if not os.path.exists(best_model_path):
             if not os.path.exists(output_dir):
@@ -46,7 +43,7 @@ class BERTNLU(NLU):
             archive.extractall(root_dir)
             archive.close()
         print('Load from', best_model_path)
-        model = JointBERT(bert_config, config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
+        model = JointBERT(config['model'], DEVICE, dataloader.tag_dim, dataloader.intent_dim)
         model.load_state_dict(torch.load(os.path.join(output_dir, 'pytorch_model.bin'), DEVICE))
         model.to(DEVICE)
         model.eval()
@@ -72,10 +69,10 @@ class BERTNLU(NLU):
         slot_logits, intent_logits = self.model.forward(word_seq_tensor, word_mask_tensor,
                                                         context_seq_tensor=context_seq_tensor,
                                                         context_mask_tensor=context_mask_tensor)
-        intent = recover_intent(self.dataloader, intent_logits[0], slot_logits[0], tag_mask_tensor[0],
+        das = recover_intent(self.dataloader, intent_logits[0], slot_logits[0], tag_mask_tensor[0],
                                 batch_data[0][0], batch_data[0][-4])
-        dialog_act = {}
-        for act, slot, value in intent:
-            dialog_act.setdefault(act, [])
-            dialog_act[act].append([slot, value])
+        dialog_act = []
+        for intent, slot, value in das:
+            domain, intent = intent.split('-')
+            dialog_act.append([intent, domain, slot, value])
         return dialog_act
