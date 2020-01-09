@@ -82,15 +82,14 @@ class PipelineAgent(Agent):
         """
         super(PipelineAgent, self).__init__(name=name)
         self.nlu = nlu
-        self.tracker = dst
+        self.dst = dst
         self.policy = policy
         self.nlg = nlg
-        self.history = []
         self.init_session()
 
     def response(self, observation):
         """Generate agent response using the agent modules."""
-        self.history.append(['opponent', observation])
+        self.dst.state['history'].append(['opponent', observation])
 
         # get dialog act
         if self.nlu is not None:
@@ -99,8 +98,8 @@ class PipelineAgent(Agent):
             self.input_action = observation
 
         # get state
-        if self.tracker is not None:
-            state = self.tracker.update(self.input_action)
+        if self.dst is not None:
+            state = self.dst.update(self.input_action)
         else:
             state = self.input_action
 
@@ -113,7 +112,7 @@ class PipelineAgent(Agent):
         else:
             model_response = self.output_action
 
-        self.history.append([self.name, model_response])
+        self.dst.state['history'].append([self.name, model_response])
         return model_response
 
     def is_terminated(self):
@@ -130,8 +129,8 @@ class PipelineAgent(Agent):
         """Init the attributes of DST and Policy module."""
         if self.nlu is not None:
             self.nlu.init_session()
-        if self.tracker is not None:
-            self.tracker.init_session()
+        if self.dst is not None:
+            self.dst.init_session()
         if self.policy is not None:
             self.policy.init_session()
         if self.nlg is not None:

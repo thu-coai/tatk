@@ -7,6 +7,7 @@ class Policy(Module):
 
     def predict(self, state):
         """Predict the next agent action given dialog state.
+        update state['system_action'] with input action
         
         Args:
             state (tuple or dict):

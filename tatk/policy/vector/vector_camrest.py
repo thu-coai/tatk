@@ -81,7 +81,7 @@ class CamrestVector(Vector):
         """vectorize a state
 
         Args:
-            state (tuple):
+            state (dict):
                 Dialog state
             action (tuple):
                 Dialog act

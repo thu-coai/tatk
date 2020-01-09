@@ -19,6 +19,11 @@ class RuleDST(DST):
         self.state = default_state()
 
     def update(self, user_act=None):
+        """
+        update belief_state, request_state
+        :param user_act:
+        :return:
+        """
         self.state['user_action'] = user_act
         for intent, slot, value in user_act:
             if intent == "nooffer":

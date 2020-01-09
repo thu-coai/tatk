@@ -27,9 +27,12 @@ class RuleDST(DST):
         self.value_dict = json.load(open(path))
 
     def update(self, user_act=None):
-        previous_state = self.state
-        new_belief_state = copy.deepcopy(previous_state['belief_state'])
-        new_request_state = copy.deepcopy(previous_state['request_state'])
+        """
+        update belief_state, request_state
+        :param user_act:
+        :return:
+        """
+        self.state['user_action'] = user_act
         for intent, domain, slot, value in user_act:
             domain = domain.lower()
             intent = intent.lower()
@@ -40,38 +43,31 @@ class RuleDST(DST):
                 if k is None:
                     continue
                 try:
-                    assert domain in new_belief_state
+                    assert domain in self.state['belief_state']
                 except:
                     raise Exception('Error: domain <{}> not in new belief state'.format(domain))
-                domain_dic = new_belief_state[domain]
+                domain_dic = self.state['belief_state'][domain]
                 assert 'semi' in domain_dic
                 assert 'book' in domain_dic
                 if k in domain_dic['semi']:
                     nvalue = normalize_value(self.value_dict, domain, k, value)
-                    new_belief_state[domain]['semi'][k] = nvalue
+                    self.state['belief_state'][domain]['semi'][k] = nvalue
                 elif k in domain_dic['book']:
-                    new_belief_state[domain]['book'][k] = value
+                    self.state['belief_state'][domain]['book'][k] = value
                 elif k.lower() in domain_dic['book']:
-                    new_belief_state[domain]['book'][k.lower()] = value
+                    self.state['belief_state'][domain]['book'][k.lower()] = value
                 elif k == 'trainID' and domain == 'train':
-                    new_belief_state[domain]['book'][k] = normalize_value(self.value_dict, domain, k, value)
+                    self.state['belief_state'][domain]['book'][k] = normalize_value(self.value_dict, domain, k, value)
                 else:
                     # raise Exception('unknown slot name <{}> of domain <{}>'.format(k, domain))
                     with open('unknown_slot.log', 'a+') as f:
                         f.write('unknown slot name <{}> of domain <{}>\n'.format(k, domain))
             elif intent == 'request':
                 k = REF_SYS_DA[domain.capitalize()].get(slot, slot)
-                if domain not in new_request_state:
-                    new_request_state[domain] = {}
-                if k not in new_request_state[domain]:
-                    new_request_state[domain][k] = 0
-
-        new_state = copy.deepcopy(previous_state)
-        new_state['belief_state'] = new_belief_state
-        new_state['request_state'] = new_request_state
-        new_state['user_action'] = user_act
-
-        self.state = new_state
+                if domain not in self.state['request_state']:
+                    self.state['request_state'][domain] = {}
+                if k not in self.state['request_state'][domain]:
+                    self.state['request_state'][domain][k] = 0
 
         return copy.deepcopy(self.state)
 

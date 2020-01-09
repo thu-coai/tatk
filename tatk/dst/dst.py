@@ -7,6 +7,7 @@ class DST(Module):
 
     def update(self, action):
         """ Update the internal dialog state variable.
+        update state['user_action'] with input action
 
         Args:
             action (str or list of tuples):

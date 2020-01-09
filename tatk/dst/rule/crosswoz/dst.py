@@ -23,6 +23,11 @@ class RuleDST(DST):
         self.state = default_state() if not state else deepcopy(state)
 
     def update(self, usr_da=None):
+        """
+        update belief_state, cur_domain, request_slot
+        :param usr_da:
+        :return:
+        """
         self.state['user_action'] = usr_da
         sys_da = self.state['system_action']
 
