@@ -1,6 +1,5 @@
 from tatk.dst.dst import DST
 from tatk.util.camrest.state import default_state
-import copy
 
 
 class RuleDST(DST):
@@ -34,7 +33,7 @@ class RuleDST(DST):
                 self.state['belief_state'][slot] = value
             elif intent == "request":
                 self.state['request_state'][slot] = 0
-        return copy.deepcopy(self.state)
+        return self.state
 
 
 if __name__ == '__main__':

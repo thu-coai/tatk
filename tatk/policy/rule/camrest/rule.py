@@ -6,8 +6,9 @@ from tatk.policy.rule.camrest.policy_agenda_camrest import UserPolicyAgendaCamre
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class Rule(Policy):
-    
+
     def __init__(self, is_train=False, character='sys'):
         self.is_train = is_train
         self.character = character
@@ -18,7 +19,7 @@ class Rule(Policy):
             self.policy = UserPolicyAgendaCamrest()
         else:
             raise NotImplementedError('unknown character {}'.format(character))
-        
+
     def predict(self, state):
         """
         Predict an system action given state.

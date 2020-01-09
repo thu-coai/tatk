@@ -132,8 +132,14 @@ class RuleBasedMultiwozBot(Policy):
         # print("Sys action: ", DA)
 
         if DA == {}:
-            return {'general-greet': [['none', 'none']]}
-        return DA
+            DA = {'general-greet': [['none', 'none']]}
+        tuples = []
+        for domain_intent, svs in DA.items():
+            for slot, value in svs:
+                domain, intent = domain_intent.split('-')
+                tuples.append([intent, domain, slot, value])
+        state['system_action'] = tuples
+        return tuples
 
     def _update_greeting(self, user_act, state, DA):
         """ General request / inform. """

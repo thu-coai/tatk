@@ -11,8 +11,8 @@ sys_policy = RuleBasedMultiwozBot()
 
 # Policy takes dialog state as input. Please refer to tatk.util.multiwoz.state
 
-state = {'user_action': {'Hotel-Inform': [['Area', 'east'], ['Stars', '4']]},
-'system_action': {},
+state = {'user_action': [["Inform", "Hotel", "Area", "east"], ["Inform", "Hotel", "Stars", "4"]],
+'system_action': [],
  'belief_state': {'police': {'book': {'booked': []}, 'semi': {}},
                   'hotel': {'book': {'booked': [], 'people': '', 'day': '', 'stay': ''},
                             'semi': {'name': '',

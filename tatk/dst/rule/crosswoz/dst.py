@@ -89,7 +89,7 @@ class RuleDST(DST):
             elif intent == 'Request':
                 self.state['request_slots'].append([domain, slot])
 
-        return deepcopy(self.state)
+        return self.state
 
     def query(self):
         return self.database.query(self.state['belief_state'], self.state['cur_domain'])

@@ -9,6 +9,7 @@ from tatk.util.camrest.dbquery import Database
 # Alphabet used to generate Ref number
 alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
+
 class RuleBasedCamrestBot(Policy):
     ''' Rule-based bot. Implemented for Camrest dataset. '''
 
@@ -41,7 +42,7 @@ class RuleBasedCamrestBot(Policy):
             user_action = check_diff(self.last_state, state)
 
         # Debug info for check_diff function
-        
+
         last_state_cpy = copy.deepcopy(self.last_state)
         state_cpy = copy.deepcopy(state)
 
@@ -61,11 +62,9 @@ class RuleBasedCamrestBot(Policy):
             print("Predicted action: ", user_action)
         '''
 
-
         self.last_state = state
 
         for user_act in user_action:
-
             self._update_DA(user_act, user_action, state, DA)
 
         # print("Sys action: ", DA)
@@ -73,8 +72,12 @@ class RuleBasedCamrestBot(Policy):
             if not DA[intent]:
                 DA[intent] = [['none', 'none']]
 
-        return DA
-
+        tuples = []
+        for intent, svs in DA.items():
+            for slot, value in svs:
+                tuples.append([intent, slot, value])
+        state['system_action'] = tuples
+        return tuples
 
     def _update_DA(self, user_act, user_action, state, DA):
         """ Answer user's utterance about any domain other than taxi or train. """
@@ -139,7 +142,7 @@ class RuleBasedCamrestBot(Policy):
 
             # There are multiple resultes matching user's constraint
             else:
-                
+
                 # Recommend a choice from kb_list
                 if ("inform") not in DA:
                     DA["inform"] = []
@@ -158,6 +161,7 @@ class RuleBasedCamrestBot(Policy):
                     string = slot
                     if string not in ['location', 'type', 'id']:
                         DA["inform"].append([string, str(props[i][1])])
+
 
 def check_diff(last_state, state):
     # print(state)
@@ -179,18 +183,19 @@ def check_diff(last_state, state):
                 if [slot, last_state['belief_state'][slot]] \
                         not in user_action["inform"]:
                     user_action["inform"].append([slot, last_state['belief_state'][slot]])
-        
+
     return user_action
 
 
 def deduplicate(lst):
     i = 0
     while i < len(lst):
-        if lst[i] in lst[0 : i]:
+        if lst[i] in lst[0: i]:
             lst.pop(i)
             i -= 1
         i += 1
     return lst
+
 
 def generate_ref_num(length):
     """ Generate a ref num for booking. """
@@ -199,15 +204,16 @@ def generate_ref_num(length):
         string += alphabet[random.randint(0, 999999) % 36]
     return string
 
+
 def fake_state():
     user_action = {
-          "inform": [
+        "inform": [
             [
-              "pricerange",
-              "moderate"
+                "pricerange",
+                "moderate"
             ]
-          ]
-        }
+        ]
+    }
     from tatk.util.camrest.state import default_state
     init_belief_state = default_state()['belief_state']
     kb_results = [None, None]
@@ -227,13 +233,13 @@ def fake_state():
 
 def test_init_state():
     user_action = {
-          "inform": [
+        "inform": [
             [
-              "pricerange",
-              "moderate"
+                "pricerange",
+                "moderate"
             ]
-          ]
-        }
+        ]
+    }
     current_slots = dict()
     kb_results = [None, None]
     kb_results[0] = {'name': 'xxx_train', 'day': 'tuesday', 'dest': 'cam', 'phone': '123-3333', 'area': 'south'}
@@ -243,8 +249,8 @@ def test_init_state():
              'kb_results_dict': []}
     return state
 
+
 def test_run():
     policy = RuleBasedCamrestBot()
     system_act = policy.predict(fake_state())
     print(json.dumps(system_act, indent=4))
-

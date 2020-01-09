@@ -60,11 +60,14 @@ class UserPolicyAgendaCamrest(Policy):
             reward (float): Reward given by user.
         """
         self.__turn += 2
-        sys_action = state
 
-        # At the beginning of a dialog when there is no NLU.
-        if sys_action == "null":
-            sys_action = {}
+        assert isinstance(state, list)
+
+        sys_action = {}
+        for intent, slot, value in state:
+            k = intent
+            sys_action.setdefault(k, [])
+            sys_action[k].append([slot, value])
 
         if self.__turn > self.max_turn:
             self.agenda.close_session()
@@ -78,7 +81,12 @@ class UserPolicyAgendaCamrest(Policy):
         # action = self.agenda.get_action(random.randint(1, self.max_initiative))
         action = self.agenda.get_action(self.max_initiative)
 
-        return action
+        tuples = []
+        for intent, svs in action.items():
+            for slot, value in svs:
+                tuples.append([intent, slot, value])
+
+        return tuples
 
     def is_terminated(self):
         # Is there any action to say?

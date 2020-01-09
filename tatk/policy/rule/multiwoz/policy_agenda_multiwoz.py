@@ -80,11 +80,14 @@ class UserPolicyAgendaMultiWoz(Policy):
             reward (float): Reward given by user.
         """
         self.__turn += 2
-        sys_action = state
 
-        # At the beginning of a dialog when there is no NLU.
-        if sys_action == "null":
-            sys_action = {}
+        assert isinstance(state, list)
+
+        sys_action = {}
+        for intent, domain, slot, value in state:
+            k = '-'.join(domain, intent)
+            sys_action.setdefault(k,[])
+            sys_action[k].append([slot, value])
 
         if self.__turn > self.max_turn:
             self.agenda.close_session()
@@ -101,7 +104,13 @@ class UserPolicyAgendaMultiWoz(Policy):
         # transform to DA
         action = self._transform_usract_out(action)
 
-        return action
+        tuples = []
+        for domain_intent, svs in action.items():
+            for slot, value in svs:
+                domain, intent = domain_intent.split('-')
+                tuples.append([intent, domain, slot, value])
+
+        return tuples
 
     def is_terminated(self):
         # Is there any action to say?
