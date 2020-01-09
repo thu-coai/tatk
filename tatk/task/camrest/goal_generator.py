@@ -10,7 +10,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from tatk.util.multiwoz.dbquery import query
+from tatk.util.camrest.dbquery import Database
 
 days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 domain_keywords = {
@@ -49,6 +49,7 @@ class GoalGenerator:
         """
         self.goal_model_path = goal_model_path
         self.corpus_path = corpus_path
+        self.db = Database()
         if os.path.exists(self.goal_model_path):
             self.ind_slot_dist, self.ind_slot_value_dist = pickle.load(
                 open(self.goal_model_path, 'rb'))
@@ -132,11 +133,11 @@ class GoalGenerator:
                     domain_goal['reqt'] = reqt
                     
             # fail_info
-            if 'info' in domain_goal and len(query('restaurant', domain_goal['info'].items())) == 0:
+            if 'info' in domain_goal and len(self.db.query(domain_goal['info'].items())) == 0:
                 num_trial = 0
                 while num_trial < 100:
                     adjusted_info = self._adjust_info(domain_goal['info'])
-                    if len(query('restaurant', adjusted_info.items())) > 0:
+                    if len(self.db.query(adjusted_info.items())) > 0:
                         domain_goal['info'] = adjusted_info
 
                         break

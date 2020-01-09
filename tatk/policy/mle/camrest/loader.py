@@ -40,7 +40,7 @@ class ActPolicyDataLoaderCamrest(ActPolicyDataloader):
                 for i, turn in enumerate(sess):
                     state['user_action'] = turn['usr']['dialog_act']
                     if i + 1 == len(sess):
-                        state['terminal'] = True
+                        state['terminated'] = True
                     for da in turn['usr']['slu']:
                         if da['slots'][0][0] != 'slot':
                             state['belief_state'][da['slots'][0][0]] = da['slots'][0][1]

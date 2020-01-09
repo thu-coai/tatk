@@ -9,16 +9,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from torch.nn import CrossEntropyLoss
-from torch.nn import CosineEmbeddingLoss
 
 from pytorch_pretrained_bert.modeling import BertModel
 from pytorch_pretrained_bert.modeling import BertPreTrainedModel
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 
-from tatk.dst.rule.multiwoz import normalize_value
-from tatk.util.multiwoz.state import default_state
-from tatk.dst.state_tracker import Tracker
-from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
+from tatk.dst.dst import DST
 from tatk.dst.sumbt.config.config import *
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
@@ -153,7 +149,7 @@ class BeliefTracker(nn.Module):
         ### Attention layer
         self.attn = MultiHeadAttention(self.attn_head, self.bert_output_dim, dropout=0)
 
-        ### RNN Belief Tracker
+        ### RNN Belief DST
         self.nbt = None
         if TASK_NAME.find("gru") != -1:
             self.nbt = nn.GRU(input_size=self.bert_output_dim,
@@ -630,7 +626,7 @@ class Processor(DataProcessor):
         return examples
 
 
-class SUMBTTracker(Tracker):
+class SUMBTTracker(DST):
     def __init__(self):
         self.belief_tracker = BeliefTracker()
         self.batch = None  # generated with dataloader

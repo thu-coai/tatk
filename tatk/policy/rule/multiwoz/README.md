@@ -39,7 +39,7 @@ state = {'user_action': {'Hotel-Inform': [['Area', 'east'], ['Stars', '4']]},
                                      'arriveBy': '',
                                      'departure': ''}}},
  'request_state': {},
- 'terminal': False,
+ 'terminated': False,
  'history': []}
 
 # Please call `init_session` before a new session, this clears policy's history info.

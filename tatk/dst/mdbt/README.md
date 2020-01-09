@@ -1,4 +1,4 @@
-# Multi-domain Belief Tracker
+# Multi-domain Belief DST
 The multidomain belief tracker (MDBT) is a belief tracking model that
 fully utilizes semantic similarity between dialogue utterances and the
 ontology terms, which is proposed by [Ramadan et al., 2018](https://www.aclweb.org/anthology/P18-2069).

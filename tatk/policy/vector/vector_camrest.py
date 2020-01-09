@@ -4,7 +4,7 @@ import json
 import numpy as np
 from tatk.policy.vec import Vector
 from tatk.util.camrest.lexicalize import delexicalize_da, flat_da, deflat_da, lexicalize_da
-from tatk.util.camrest.dbquery import query
+from tatk.util.camrest.dbquery import Database
 
 
 class CamrestVector(Vector):
@@ -18,6 +18,7 @@ class CamrestVector(Vector):
             intents = json.load(f)
         self.informable = intents['informable']
         self.requestable = intents['requestable']
+        self.db = Database()
 
         with open(voc_file) as f:
             self.da_voc = f.read().splitlines()
@@ -54,7 +55,7 @@ class CamrestVector(Vector):
 
     def pointer(self, turn):
         constraint = turn.items()
-        entities = query(constraint)
+        entities = self.db.query(constraint)
         pointer_vector = self.one_hot_vector(len(entities))
 
         return pointer_vector
@@ -80,7 +81,7 @@ class CamrestVector(Vector):
         """vectorize a state
 
         Args:
-            state (tuple):
+            state (dict):
                 Dialog state
             action (tuple):
                 Dialog act
@@ -119,7 +120,7 @@ class CamrestVector(Vector):
 
         degree = self.pointer(state['belief_state'])
 
-        final = 1. if state['terminal'] else 0.
+        final = 1. if state['terminated'] else 0.
 
         state_vec = np.r_[opp_act_vec, last_act_vec, inform, degree, final]
         return state_vec
@@ -139,7 +140,7 @@ class CamrestVector(Vector):
                 act_array.append(self.vec2act[i])
         action = deflat_da(act_array)
         constraint = self.state.items()
-        entities = query(constraint)
+        entities = self.db.query(constraint)
         action = lexicalize_da(action, entities, self.state, self.requestable)
         return action
 

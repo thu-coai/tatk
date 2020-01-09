@@ -22,7 +22,7 @@ def padding_data(data):
     origin_responses_length = []
     goals_length = []
     goals = []
-    terminal = []
+    terminated = []
 
     ''' start padding '''
     max_goal_length = max([len(sess_goal) for sess_goal in batch_goals]) # G
@@ -30,12 +30,12 @@ def padding_data(data):
     # usr begins the session
     max_sentence_num = max(max(sentence_num)-1, 1) # S
         
-    # goal & terminal
+    # goal & terminated
     for i, l in enumerate(sentence_num):
         goals_length += [len(batch_goals[i])] * l
         goals_padded = list(batch_goals[i]) + [0] * (max_goal_length - len(batch_goals[i]))
         goals += [goals_padded] * l
-        terminal += [0] * (l-1) + [1]
+        terminated += [0] * (l-1) + [1]
         
     # usr
     for sess in batch_usrdas:
@@ -72,7 +72,7 @@ def padding_data(data):
     batch_input['posts'] = torch.LongTensor(posts) # [B, S, P]
     batch_input['goals_length'] = torch.LongTensor(goals_length) # [B]
     batch_input['goals'] = torch.LongTensor(goals) # [B, G]
-    batch_input['terminal'] = torch.Tensor(terminal) # [B]
+    batch_input['terminated'] = torch.Tensor(terminated) # [B]
     
     return batch_input
 

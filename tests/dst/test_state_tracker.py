@@ -1,15 +1,15 @@
 import pytest
 import abc
-from tatk.dst.state_tracker import Tracker
+from tatk.dst.dst import DST
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA
 from tatk.util.multiwoz.state import default_state
 
 
 def test_tracker():
     with pytest.raises(TypeError):
-        Tracker()
-    assert hasattr(Tracker, "update")
-    assert hasattr(Tracker, "init_session")
+        DST()
+    assert hasattr(DST, "update")
+    assert hasattr(DST, "init_session")
 
 
 class BaseTestTracker(abc.ABC):
@@ -18,8 +18,8 @@ class BaseTestTracker(abc.ABC):
     Note: instance of BaseTestTracker's subclass should have attribute `tracker`
     """
     def setup_method(self):
-        assert hasattr(self, 'tracker')
-        assert isinstance(self.tracker, Tracker)
+        assert hasattr(self, 'dst')
+        assert isinstance(self.dst, DST)
 
     @abc.abstractmethod
     def _check_result(self, state):
@@ -168,10 +168,10 @@ class BaseTestMultiwozTracker(BaseTestTracker):
 
     def _check_result(self, state):
         assert isinstance(state, dict)
-        KEYS = "user_action", "system_action", "belief_state", "request_state", "terminal", "history"
+        KEYS = "user_action", "system_action", "belief_state", "request_state", "terminated", "history"
         for key in KEYS:
             assert key in state
-        user_action, system_action, belief_state, request_state, terminal, history = map(state.get, KEYS)
+        user_action, system_action, belief_state, request_state, terminated, history = map(state.get, KEYS)
 
         # check user_action
         self._check_action(user_action)
@@ -195,8 +195,8 @@ class BaseTestMultiwozTracker(BaseTestTracker):
                 assert isinstance(value, str)
                 assert slot in self.__class__.domain_slots[domain]
 
-        # check terminal
-        assert isinstance(terminal, bool)
+        # check terminated
+        assert isinstance(terminated, bool)
 
         # check history
         assert isinstance(history, list)

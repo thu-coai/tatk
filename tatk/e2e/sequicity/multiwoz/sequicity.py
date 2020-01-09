@@ -38,7 +38,8 @@ def denormalize(uttr):
 
 class Sequicity(Agent):
     def __init__(self,
-                 model_file=DEFAULT_MODEL_URL):
+                 model_file=DEFAULT_MODEL_URL,
+                 name='Sequicity'):
         """
         Sequicity initialization
 
@@ -49,6 +50,7 @@ class Sequicity(Agent):
         Example:
             sequicity = Sequicity()
         """
+        super(Sequicity, self).__init__(name=name)
         config_file = DEFAULT_CONFIG_FILE
         c = json.load(open(config_file))
         cfg.init_handler(c['tsdf_init'])

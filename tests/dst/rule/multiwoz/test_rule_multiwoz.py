@@ -1,5 +1,5 @@
 from tests.dst.test_state_tracker import BaseTestMultiwozTracker
-from tatk.dst.rule.multiwoz.state_tracker import RuleDST
+from tatk.dst.rule.multiwoz.dst import RuleDST
 
 
 class TestRuleDST(BaseTestMultiwozTracker):

@@ -34,7 +34,7 @@ class SVMNLU(NLU):
             nlu = SVMNLU(mode='usr')
         """
         assert mode == 'usr' or mode == 'sys' or mode == 'all'
-        model_file = 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camresst_{}.zip'.format(mode)
+        model_file = 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_{}.zip'.format(mode)
         config_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'configs/camrest_{}.cfg'.format(mode))
         self.config = configparser.ConfigParser()
         self.config.read(config_file)
@@ -52,7 +52,7 @@ class SVMNLU(NLU):
             archive.close()
         self.c.load(model_path)
 
-    def predict(self, utterance, a):
+    def predict(self, utterance, context=list()):
         """
         Predict the dialog act of a natural language utterance.
 
@@ -89,7 +89,11 @@ class SVMNLU(NLU):
             else:
                 dialog_act.setdefault(intent, [])
                 dialog_act[intent].append(act['slots'][0])
-        return dialog_act
+        tuples = []
+        for intent, svs in dialog_act.items():
+            for slot, value in svs:
+                tuples.append([intent, slot, value])
+        return tuples
 
 
 if __name__ == "__main__":

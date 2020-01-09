@@ -27,7 +27,7 @@ def da2triples(dialog_act):
     triples = []
     for intent, svs in dialog_act.items():
         for slot, value in svs:
-            triples.append((intent, slot, value))
+            triples.append([intent, slot, value])
     return triples
 
 
@@ -39,14 +39,11 @@ if __name__ == '__main__':
         sys.exit()
     mode = sys.argv[1]
     if mode== 'usr':
-        model = SVMNLU(mode='usr',
-                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_usr.zip')
+        model = SVMNLU(mode='usr')
     elif mode== 'sys':
-        model = SVMNLU(mode='sys',
-                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_sys.zip')
+        model = SVMNLU(mode='sys')
     elif mode== 'all':
-        model = SVMNLU(mode='all',
-                       model_file='https://tatk-data.s3-ap-northeast-1.amazonaws.com/svm_camrest_all.zip')
+        model = SVMNLU(mode='all')
     else:
         raise Exception("Invalid mode")
 
@@ -70,7 +67,7 @@ if __name__ == '__main__':
             if mode == 'usr' or mode == 'all':
                 sen_num += 1
                 labels = da2triples(turn['usr']['dialog_act'])
-                predicts = da2triples(model.predict(turn['usr']['transcript']))
+                predicts = model.predict(turn['usr']['transcript'])
                 for triple in predicts:
                     if triple in labels:
                         TP += 1
@@ -82,7 +79,7 @@ if __name__ == '__main__':
             if mode == 'sys' or mode == 'all':
                 sen_num += 1
                 labels = da2triples(turn['sys']['dialog_act'])
-                predicts = da2triples(model.predict(turn['sys']['sent']))
+                predicts = model.predict(turn['sys']['sent'])
                 for triple in predicts:
                     if triple in labels:
                         TP += 1

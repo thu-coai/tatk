@@ -134,14 +134,3 @@ class RestaurantGenerator:
         #     goal['需求信息'].append(["预订订单号", ""])
 
         return goal
-
-
-if __name__ == '__main__':
-    database_dir = '../database/'
-    database = {
-        'attraction': json.load(open(database_dir + 'attraction_db.json', encoding='utf-8')),
-        'hotel': json.load(open(database_dir + 'hotel_db.json', encoding='utf-8')),
-        'restaurant': json.load(open(database_dir + 'restaurant_db.json', encoding='utf-8')),
-    }
-    generator = RestaurantGenerator(database['restaurant'])
-    print(generator.generate())

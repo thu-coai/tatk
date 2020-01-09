@@ -66,21 +66,13 @@ To make the new model consistent with **tatk**, we should follow the DST interfa
 
 
 ```python
-class Tracker(metaclass=ABCMeta):
+class DST(metaclass=ABCMeta):
     """Base class for dialog state tracker models."""
 
     @abstractmethod
     def update(self, dialog_act):
-        """ Update the internal dialog state variable.
-
-        Args:
-            dialog_act (str or dict):
-                The type is str when Tracker is word-level (such as NBT), and dict when it is DA-level.
-        Returns:
-            new_state (tuple):
-                Updated dialog state, with the same form of previous state.
-        """
-        pass
+        """ DST
+ pass
 
     @abstractmethod
     def init_session(self):
@@ -89,13 +81,13 @@ class Tracker(metaclass=ABCMeta):
 
 ### Add New Model
 
-In order to add new Model to **tatk**, we should inherit the `Tracker` class above. This file should be place under `tatk/tatk/dst/rule/camrest`. Thus we can use `from tatk.dst.rule.camrest import RuleDST` to import the new model.
+In order to add new Model to **tatk**, we should inherit the `DST` class above. This file should be place under `tatk/tatk/dst/rule/camrest`. Thus we can use `from tatk.dst.rule.camrest import RuleDST` to import the new model.
 
 
 ```python
 from tatk.util.camrest.state import default_state
 
-class RuleDST(Tracker):
+class RuleDST(DST):
     def __init__(self):
         ## model initialization here, feel free to change the arguments
         self.state = default_state()

@@ -5,16 +5,18 @@ import torch
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 def init_logging_handler(log_dir, extra=''):
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
     current_time = time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime())
 
     stderr_handler = logging.StreamHandler()
-    file_handler = logging.FileHandler('{}/log_{}.txt'.format(log_dir, current_time+extra))
+    file_handler = logging.FileHandler('{}/log_{}.txt'.format(log_dir, current_time + extra))
     logging.basicConfig(handlers=[stderr_handler, file_handler])
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
+
 
 def to_device(data):
     if type(data) == dict:

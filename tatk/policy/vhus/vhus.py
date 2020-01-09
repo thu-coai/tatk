@@ -40,10 +40,10 @@ class UserPolicyVHUSAbstract(Policy):
         sys_seq_len = torch.LongTensor([max(len(sen), 1) for sen in self.sys_da_id_stack])
         max_sen_len = sys_seq_len.max().item()
         sys_seq = torch.LongTensor(padding(self.sys_da_id_stack, max_sen_len))
-        usr_a, terminal = self.user.select_action(self.goal_input, self.goal_len_input, sys_seq, sys_seq_len)
+        usr_a, terminated = self.user.select_action(self.goal_input, self.goal_len_input, sys_seq, sys_seq_len)
         usr_action = self.manager.usrseq2da(self.manager.id2sentence(usr_a), self.goal)
 
-        return usr_action, terminal
+        return usr_action, terminated
 
     def load(self, archive_file, model_file, filename):
         if not os.path.isfile(archive_file):

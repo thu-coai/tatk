@@ -4,7 +4,7 @@ import random
 from copy import deepcopy
 
 from tatk.policy.policy import Policy
-from tatk.util.multiwoz.dbquery import query
+from tatk.util.multiwoz.dbquery import Database
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 
 SELECTABLE_SLOTS = {
@@ -45,6 +45,7 @@ class RuleBasedMultiwozBot(Policy):
     def __init__(self):
         Policy.__init__(self)
         self.last_state = {}
+        self.db = Database()
 
     def init_session(self):
         self.last_state = {}
@@ -191,7 +192,7 @@ class RuleBasedMultiwozBot(Policy):
             if state['belief_state'][domain.lower()]['semi'][slot] != "":
                 constraints.append([slot, state['belief_state'][domain.lower()]['semi'][slot]])
 
-        kb_result = query(domain.lower(), constraints)
+        kb_result = self.db.query(domain.lower(), constraints)
         self.kb_result[domain] = deepcopy(kb_result)
 
         # print("\tConstraint: " + "{}".format(constraints))
@@ -371,7 +372,7 @@ class RuleBasedMultiwozBot(Policy):
             else:
                 constraints.append([prop, state['belief_state']['train']['semi'][prop]])
 
-        kb_result = query('train', constraints)
+        kb_result = self.db.query('train', constraints)
         self.kb_result['Train'] = deepcopy(kb_result)
 
         # print(constraints)

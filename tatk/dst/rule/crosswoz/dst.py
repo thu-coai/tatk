@@ -1,4 +1,4 @@
-from tatk.dst.state_tracker import Tracker
+from tatk.dst.dst import DST
 from tatk.util.crosswoz.state import default_state
 from tatk.util.crosswoz.dbquery import Database
 from copy import deepcopy
@@ -6,7 +6,7 @@ from collections import Counter
 from pprint import pprint
 
 
-class RuleDST(Tracker):
+class RuleDST(DST):
     """Rule based DST which trivially updates new values from NLU result to states.
 
     Attributes:
@@ -23,6 +23,11 @@ class RuleDST(Tracker):
         self.state = default_state() if not state else deepcopy(state)
 
     def update(self, usr_da=None):
+        """
+        update belief_state, cur_domain, request_slot
+        :param usr_da:
+        :return:
+        """
         self.state['user_action'] = usr_da
         sys_da = self.state['system_action']
 

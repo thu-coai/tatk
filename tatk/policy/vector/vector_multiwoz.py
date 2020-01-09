@@ -6,7 +6,7 @@ from tatk.policy.vec import Vector
 from tatk.util.multiwoz.lexicalize import delexicalize_da, flat_da, deflat_da, lexicalize_da
 from tatk.util.multiwoz.state import default_state
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_USR_DA
-from tatk.util.multiwoz.dbquery import query
+from tatk.util.multiwoz.dbquery import Database
 
 mapping = {'restaurant': {'addr': 'address', 'area': 'area', 'food': 'food', 'name': 'name', 'phone': 'phone',
                           'post': 'postcode', 'price': 'pricerange'},
@@ -35,6 +35,7 @@ class MultiWozVector(Vector):
             intents = json.load(f)
         self.informable = intents['informable']
         self.requestable = intents['requestable']
+        self.db = Database()
 
         with open(voc_file) as f:
             self.da_voc = f.read().splitlines()
@@ -68,7 +69,7 @@ class MultiWozVector(Vector):
             for k, v in turn[domain.lower()]['semi'].items():
                 if k in mapping[domain.lower()]:
                     constraint.append((mapping[domain.lower()][k], v))
-            entities = query(domain.lower(), constraint)
+            entities = self.db.query(domain.lower(), constraint)
             pointer_vector = self.one_hot_vector(len(entities), domain, pointer_vector)
 
         return pointer_vector
@@ -110,7 +111,7 @@ class MultiWozVector(Vector):
         """vectorize a state
 
         Args:
-            state (tuple):
+            state (dict):
                 Dialog state
             action (tuple):
                 Dialog act
@@ -151,7 +152,7 @@ class MultiWozVector(Vector):
 
         degree = self.pointer(state['belief_state'])
 
-        final = 1. if state['terminal'] else 0.
+        final = 1. if state['terminated'] else 0.
 
         state_vec = np.r_[opp_act_vec, last_act_vec, belief_state, book, degree, final]
         assert len(state_vec) == self.state_dim
@@ -180,7 +181,7 @@ class MultiWozVector(Vector):
                 for k, v in self.state[domain.lower()]['semi'].items():
                     if k in mapping[domain.lower()]:
                         constraint.append((mapping[domain.lower()][k], v))
-                entities[domain] = query(domain.lower(), constraint)
+                entities[domain] = self.db.query(domain.lower(), constraint)
         action = lexicalize_da(action, entities, self.state, self.requestable)
         return action
 

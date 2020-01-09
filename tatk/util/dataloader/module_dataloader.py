@@ -4,7 +4,7 @@ from tatk.util.dataloader.dataset_dataloader import DatasetDataloader, MultiWOZD
 
 
 class ModuleDataloader(ABC):
-    def __init__(self, dataset_dataloader:DatasetDataloader):
+    def __init__(self, dataset_dataloader: DatasetDataloader):
         self.dataset_dataloader = dataset_dataloader
 
     @abstractmethod
@@ -27,6 +27,7 @@ class MultiTurnNLUDataloader(ModuleDataloader):
         kwargs.setdefault('context_window_size', 3)
         return self.dataset_dataloader.load_data(*args, **kwargs)
 
+
 class AgentDSTDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
         kwargs.setdefault('context', True)
@@ -37,6 +38,7 @@ class AgentDSTDataloader(ModuleDataloader):
         kwargs.setdefault('ontology', True)
         return self.dataset_dataloader.load_data(*args, **kwargs)
 
+
 class UserDSTDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
         kwargs.setdefault('context', True)
@@ -46,23 +48,26 @@ class UserDSTDataloader(ModuleDataloader):
         kwargs.setdefault('last_self_utterance', True)
         return self.dataset_dataloader.load_data(*args, **kwargs)
 
+
 class ActPolicyDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
         kwargs.setdefault('belief_state', True)
         kwargs.setdefault('dialog_act', True)
-        kwargs.setdefault('terminal', True)
+        kwargs.setdefault('terminated', True)
         kwargs.setdefault('context_dialog_act', True)
         kwargs.setdefault('context_window_size', 2)
         return self.dataset_dataloader.load_data(*args, **kwargs)
-    
+
+
 class ActUserPolicyDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
         kwargs.setdefault('goal', True)
         kwargs.setdefault('dialog_act', True)
-        kwargs.setdefault('terminal', True)
+        kwargs.setdefault('terminated', True)
         kwargs.setdefault('context_dialog_act', True)
         kwargs.setdefault('context_window_size', 2)
         return self.dataset_dataloader.load_data(*args, **kwargs)
+
 
 class WordPolicyDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):
@@ -71,6 +76,7 @@ class WordPolicyDataloader(ModuleDataloader):
         kwargs.setdefault('context', True)
         kwargs.setdefault('context_window_size', 3)
         return self.dataset_dataloader.load_data(*args, **kwargs)
+
 
 class SingleTurnNLGDataloader(ModuleDataloader):
     def load_data(self, *args, **kwargs):

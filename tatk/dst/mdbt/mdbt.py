@@ -8,7 +8,7 @@ from tatk.dst.mdbt.mdbt_util import model_definition, \
     track_dialogue, generate_batch, process_history
 from tatk.dst.rule.multiwoz import normalize_value
 from tatk.util.multiwoz.state import default_state
-from tatk.dst.state_tracker import Tracker
+from tatk.dst.dst import DST
 from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 
 from os.path import dirname
@@ -20,12 +20,12 @@ device = "gpu"
 start_batch = 0
 
 
-class MDBT(Tracker):
+class MDBT(DST):
     """
     A multi-domain belief tracker, adopted from https://github.com/osmanio2/multi-domain-belief-tracking.
     """
     def __init__(self, ontology_vectors, ontology, slots, data_dir):
-        Tracker.__init__(self)
+        DST.__init__(self)
         # data profile
         self.data_dir = data_dir
         self.validation_url = os.path.join(self.data_dir, 'data/validate.json')
