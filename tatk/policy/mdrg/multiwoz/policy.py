@@ -296,8 +296,8 @@ def populate_template(template, top_results, num_results, state):
                                 for s in ['destination', 'departure']:
                                     if s in state[d]['semi']:
                                         response.append(state[d]['semi'][s])
-                                        raise
-                        except:
+                                        raise Exception
+                        except Exception:
                             pass
                         else:
                             response.append(token)
@@ -335,8 +335,8 @@ def populate_template(template, top_results, num_results, state):
                                 for s in ['arriveBy', 'leaveAt']:
                                     if s in state[d]['semi']:
                                         response.append(state[d]['semi'][s])
-                                        raise
-                        except:
+                                        raise Exception
+                        except Exception:
                             pass
                         else:
                             response.append(token)

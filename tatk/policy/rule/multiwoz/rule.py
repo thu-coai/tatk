@@ -6,12 +6,13 @@ from tatk.policy.rule.multiwoz.policy_agenda_multiwoz import UserPolicyAgendaMul
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class Rule(Policy):
-    
+
     def __init__(self, is_train=False, character='sys'):
         self.is_train = is_train
         self.character = character
-        
+
         if character == 'sys':
             self.policy = RuleBasedMultiwozBot()
         elif character == 'usr':

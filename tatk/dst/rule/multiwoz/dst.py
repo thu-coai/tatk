@@ -1,4 +1,3 @@
-import copy
 import json
 import os
 
@@ -69,7 +68,7 @@ class RuleDST(DST):
                 if k not in self.state['request_state'][domain]:
                     self.state['request_state'][domain][k] = 0
 
-        return copy.deepcopy(self.state)
+        return self.state
 
     def init_session(self):
         """Initialize ``self.state`` with a default state, which ``tatk.util.multiwoz.state.default_state`` returns."""

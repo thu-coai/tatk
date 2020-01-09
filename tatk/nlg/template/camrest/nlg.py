@@ -38,6 +38,12 @@ class TemplateNLG(NLG):
         Returns:
             generated sentence
         """
+        action = {}
+        for intent, slot, value in dialog_acts:
+            k = intent
+            action.setdefault(k, [])
+            action[k].append([slot, value])
+        dialog_acts = action
         mode = self.mode
         try:
             is_user = self.is_user
@@ -226,7 +232,7 @@ def test():
 
 def example():
     # dialog act
-    dialog_acts = {'inform': [['pricerange', 'cheap'], ['area', 'west']]}
+    dialog_acts = [['inform', 'pricerange', 'cheap'], ['inform', 'area', 'west']]
     print(dialog_acts)
 
     # system model for manual, auto, auto_manual

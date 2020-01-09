@@ -4,7 +4,7 @@ import os
 import json
 import zipfile
 from tatk.util.file_util import cached_path
-from tatk.policy.policy import Policy
+from tatk.policy.mle.mle import MLEAbstract
 from tatk.policy.rlmodule import MultiDiscretePolicy
 from tatk.policy.vector.vector_crosswoz import CrossWozVector
 
@@ -14,7 +14,7 @@ DEFAULT_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mo
 DEFAULT_ARCHIVE_FILE = os.path.join(DEFAULT_DIRECTORY, "mle_policy_crosswoz.zip")
 
 
-class MLE(Policy):
+class MLE(MLEAbstract):
 
     def __init__(self,
                  archive_file=DEFAULT_ARCHIVE_FILE,
@@ -41,30 +41,4 @@ class MLE(Policy):
         if not os.path.exists(os.path.join(model_dir, 'best_mle.pol.mdl')):
             archive = zipfile.ZipFile(archive_file, 'r')
             archive.extractall(model_dir)
-        self.load(cfg['load'])
-
-    def predict(self, state):
-        """
-        Predict an system action given state.
-        Args:
-            state (dict): Dialog state. Please refer to util/state.py
-        Returns:
-            action : System act, with the form of (act_type, {slot_name_1: value_1, slot_name_2, value_2, ...})
-        """
-        s_vec = torch.Tensor(self.vector.state_vectorize(state))
-        a = self.policy.select_action(s_vec.to(device=DEVICE), False).cpu()
-        action = self.vector.action_devectorize(a.numpy())
-
-        return action
-
-    def init_session(self):
-        """
-        Restore after one session
-        """
-        pass
-
-    def load(self, filename):
-        policy_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_mle.pol.mdl')
-        if os.path.exists(policy_mdl):
-            self.policy.load_state_dict(torch.load(policy_mdl))
-            print('<<dialog policy>> loaded checkpoint from file: {}'.format(policy_mdl))
+        self.load(archive_file, model_file, cfg['load'])
