@@ -87,7 +87,8 @@ def load_config_file(filepath: str = None) -> dict:
 
         # check every model
         for model in conf[module].keys():
-            assert isinstance(conf[module][model], dict), 'Incorrect type for \'%s\'->\'%s\' in config file \'%s\'' % (module, model, filepath)
+            assert isinstance(conf[module][model], dict), 'Incorrect type for \'%s\'->\'%s\' in config file \'%s\'' % (
+            module, model, filepath)
             # set default
             conf[module][model].setdefault('ini_params', {})
             conf[module][model].setdefault('model_name', model)
