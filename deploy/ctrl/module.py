@@ -38,6 +38,7 @@ class ModuleCtrl(object):
             raise DeployError('Unknow model id \'%s\'' % model_id, module=self.module_name)
         return ret
 
+
 if __name__ == '__main__':
     from deploy.config import get_config
 
