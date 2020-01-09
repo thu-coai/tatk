@@ -85,7 +85,7 @@ class UserPolicyAgendaMultiWoz(Policy):
 
         sys_action = {}
         for intent, domain, slot, value in state:
-            k = '-'.join(domain, intent)
+            k = '-'.join([domain, intent])
             sys_action.setdefault(k,[])
             sys_action[k].append([slot, value])
 
