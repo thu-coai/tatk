@@ -5,7 +5,7 @@ import zipfile
 import torch
 import torch.utils.data as data
 from tatk.util.crosswoz.state import default_state
-from tatk.dst.rule.crosswoz.state_tracker import RuleDST
+from tatk.dst.rule.crosswoz.dst import RuleDST
 from tatk.policy.vector.vector_crosswoz import CrossWozVector
 from copy import deepcopy
 

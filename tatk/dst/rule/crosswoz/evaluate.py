@@ -2,7 +2,7 @@ import json
 import zipfile
 from collections import Counter
 from pprint import pprint
-from tatk.dst.rule.crosswoz.state_tracker import RuleDST
+from tatk.dst.rule.crosswoz.dst import RuleDST
 from tatk.util.crosswoz.state import default_state
 from copy import deepcopy
 

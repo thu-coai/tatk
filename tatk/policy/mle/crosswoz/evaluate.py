@@ -1,6 +1,6 @@
 from tatk.policy.mle.crosswoz.mle import MLE
 from tatk.policy.ppo.ppo import PPO
-from tatk.dst.rule.crosswoz.state_tracker import RuleDST
+from tatk.dst.rule.crosswoz.dst import RuleDST
 from tatk.util.crosswoz.state import default_state
 from tatk.policy.rule.crosswoz.rule_simulator import Simulator
 from tatk.dialog_agent import PipelineAgent, BiSession
