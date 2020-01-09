@@ -1,18 +1,10 @@
-import csv
-import os
 import logging
-import argparse
 import random
-import collections
 from tqdm import tqdm, trange
-import json
-
-import pdb
 
 import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
-from torch.utils.data.distributed import DistributedSampler
 
 from pytorch_pretrained_bert.optimization import BertAdam
 

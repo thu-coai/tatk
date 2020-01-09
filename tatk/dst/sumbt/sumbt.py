@@ -9,16 +9,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from torch.nn import CrossEntropyLoss
-from torch.nn import CosineEmbeddingLoss
 
 from pytorch_pretrained_bert.modeling import BertModel
 from pytorch_pretrained_bert.modeling import BertPreTrainedModel
 from pytorch_pretrained_bert.tokenization import BertTokenizer
 
-from tatk.dst.rule.multiwoz import normalize_value
-from tatk.util.multiwoz.state import default_state
 from tatk.dst.dst import DST
-from tatk.util.multiwoz.multiwoz_slot_trans import REF_SYS_DA, REF_USR_DA
 from tatk.dst.sumbt.config.config import *
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
