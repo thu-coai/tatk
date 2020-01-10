@@ -133,6 +133,9 @@ class Sequicity(Agent):
                     value = venue[word]
                     if value != '?':
                         l_origin.append(value)
+            elif word.endswith('reference]'):
+                if 'ref' in venue:
+                    l_origin.append(venue['ref'])
             else:
                 l_origin.append(word)
         sys = ' '.join(l_origin)
