@@ -52,9 +52,7 @@ class UserPolicyAgendaMultiWoz(Policy):
         self.max_turn = 40
         self.max_initiative = 4
 
-        self.goal_generator = GoalGenerator(corpus_path=os.path.join(os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-            'data/multiwoz/annotated_user_da_with_span_full.json'))
+        self.goal_generator = GoalGenerator()
 
         self.__turn = 0
         self.goal = None
@@ -797,35 +795,3 @@ class Agenda(object):
         text += '<stack btm>\n'
         text += '-----agenda-----\n'
         return text
-
-
-def test():
-    user_simulator = UserPolicyAgendaMultiWoz()
-    user_simulator.init_session()
-
-    test_turn(user_simulator, {"Train-Request": [["Dest", "?"], ["Day", "?"]]})
-    test_turn(user_simulator, {"Train-Request": [["Depart", "?"], ["Leave", "?"]]})
-    test_turn(user_simulator, {"Train-Request": [["Dest", "?"]]})
-    test_turn(user_simulator, {"Train-Inform": [["Ticket", "300"]]})
-    test_turn(user_simulator, {"Train-Inform": [["Arrive", "10:30"]]})
-    test_turn(user_simulator, {"Train-Inform": [["Id", "9999"]]})
-    test_turn(user_simulator, {"Booking-Request": [["Day", "123"], ["Time", "no"]]})
-    test_turn(user_simulator, {"Hotel-Request": [["Addr", "?"]], "Hotel-Inform": [["Internet", "yes"]]})
-    test_turn(user_simulator, {"Hotel-Request": [["Type", "?"], ["Parking", "?"]]})
-    test_turn(user_simulator, {"Hotel-Nooffer": [["Stars", "3"]], "Hotel-Request": [["Parking", "?"]]})
-    test_turn(user_simulator, {"Hotel-Select": [["Area", "aa"], ["Area", "bb"], ["Area", "cc"], ['Choice', 3]]})
-    test_turn(user_simulator, {"Hotel-Offerbooked": [["Ref", "12345"]]})
-
-
-def test_turn(user_simulator, sys_action):
-    print('input:', sys_action)
-    # action, session_over, reward = user_simulator.predict({'system_action': sys_action})
-    action, session_over = user_simulator.predict({'system_action': sys_action})
-    print('----------------------------------')
-    print('sys_action :' + str(sys_action))
-    print('user_action:' + str(action))
-    print('over       :' + str(session_over))
-    # print('reward     :' + str(reward))
-    print(user_simulator.goal)
-    print(user_simulator.agenda)
-

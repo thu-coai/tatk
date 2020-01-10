@@ -29,3 +29,6 @@ if __name__ == '__main__':
     for e in range(cfg['epoch']):
         env.imitating(e)
         best = env.imit_test(e, best)
+
+    #env.load('model/best_simulator.mdl')
+    env.test()
