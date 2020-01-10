@@ -48,7 +48,8 @@ setup(
         'tensorboardX==1.7',
         'requests',
         'simplejson',
-        'unidecode'
+        'unidecode',
+        'jieba'
     ],
     extras_require={
         'develop': [
