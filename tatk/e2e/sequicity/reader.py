@@ -285,7 +285,7 @@ class _ReaderBase:
         for cons_idx_list in z_samples:
             constraints = set()
             for cons in cons_idx_list:
-                if type(cons) is not str:
+                if not isinstance(cons, str):
                     cons = self.vocab.decode(cons)
                 if cons == 'EOS_Z1':
                     break
@@ -712,14 +712,14 @@ class KvretReader(_ReaderBase):
     def _get_entity_dict(self, entity_data):
         entity_dict = {}
         for k in entity_data:
-            if type(entity_data[k][0]) is str:
+            if isinstance(entity_data[k][0], str):
                 for entity in entity_data[k]:
                     entity = self._lemmatize(self._tokenize(entity))
                     entity_dict[entity] = k
                     if k in ['event', 'poi_type']:
                         entity_dict[entity.split()[0]] = k
                         self.abbr_dict[entity.split()[0]] = entity
-            elif type(entity_data[k][0]) is dict:
+            elif isinstance(entity_data[k][0], dict):
                 for entity_entry in entity_data[k]:
                     for entity_type, entity in entity_entry.items():
                         entity_type = 'poi_type' if entity_type == 'type' else entity_type
@@ -750,7 +750,7 @@ class KvretReader(_ReaderBase):
         for i,cons_idx_list in enumerate(z_samples):
             constraints = set()
             for cons in cons_idx_list:
-                if type(cons) is not str:
+                if not isinstance(cons, str):
                     cons = self.vocab.decode(cons)
                 if cons == 'EOS_Z1':
                     break
@@ -899,7 +899,7 @@ class MultiWozReader(_ReaderBase):
     def _get_clean_db(self, raw_db_data):
         for entry in raw_db_data:
             for k, v in list(entry.items()):
-                if type(v) != str or v == '?':
+                if not isinstance(v, str) or v == '?':
                     entry.pop(k)
 
     def _construct(self, train_json_path, dev_json_path, test_json_path, db_json_path):
