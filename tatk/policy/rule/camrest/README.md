@@ -10,11 +10,11 @@ sys_policy = RuleBasedCamrestBot()
 
 # Policy takes dialog state as input. Please refer to tatk.util.camrest.state
 
-state = {'user_action': {'inform': [['name', 'Chiquito Restaurant Bar'],
-   ['pricerange', 'expensive'],
-   ['area', 'south'],
-   ['food', 'mexican']]},
- 'system_action': {},
+state = {'user_action': [['inform', 'name', 'Chiquito Restaurant Bar'],
+    ['inform', 'pricerange', 'expensive'],
+    ['inform', 'area', 'south'],
+    ['inform', 'food', 'mexican']],
+ 'system_action': [],
  'belief_state': {'address': '',
   'area': 'south',
   'food': 'mexican',
@@ -29,7 +29,7 @@ state = {'user_action': {'inform': [['name', 'Chiquito Restaurant Bar'],
 sys_policy.init_session()
     
 # method `predict` takes state output from tracker, and generates system's dialog act.
-sys_da = sys_policy.predict(state)}
+sys_da = sys_policy.predict(state)
 ```
 
 # Agenda Policy

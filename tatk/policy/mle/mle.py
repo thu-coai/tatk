@@ -7,12 +7,13 @@ from tatk.util.file_util import cached_path
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class MLEAbstract(Policy):
-    
+
     def __init__(self, archive_file, model_file):
         self.vector = None
         self.policy = None
-                
+
     def predict(self, state):
         """
         Predict an system action given state.
@@ -24,7 +25,7 @@ class MLEAbstract(Policy):
         s_vec = torch.Tensor(self.vector.state_vectorize(state))
         a = self.policy.select_action(s_vec.to(device=DEVICE), False).cpu()
         action = self.vector.action_devectorize(a.numpy())
-        
+        state['system_action'] = action
         return action
 
     def init_session(self):
@@ -32,7 +33,7 @@ class MLEAbstract(Policy):
         Restore after one session
         """
         pass
-    
+
     def load(self, archive_file, model_file, filename):
         if not os.path.isfile(archive_file):
             if not model_file:
@@ -44,7 +45,7 @@ class MLEAbstract(Policy):
         if not os.path.exists(os.path.join(model_dir, 'best_mle.pol.mdl')):
             archive = zipfile.ZipFile(archive_file, 'r')
             archive.extractall(model_dir)
-        
+
         policy_mdl = os.path.join(os.path.dirname(os.path.abspath(__file__)), filename + '_mle.pol.mdl')
         if os.path.exists(policy_mdl):
             self.policy.load_state_dict(torch.load(policy_mdl))

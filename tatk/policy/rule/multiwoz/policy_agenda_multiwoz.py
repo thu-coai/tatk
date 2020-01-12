@@ -52,9 +52,7 @@ class UserPolicyAgendaMultiWoz(Policy):
         self.max_turn = 40
         self.max_initiative = 4
 
-        self.goal_generator = GoalGenerator(corpus_path=os.path.join(os.path.dirname(
-            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))),
-            'data/multiwoz/annotated_user_da_with_span_full.json'))
+        self.goal_generator = GoalGenerator()
 
         self.__turn = 0
         self.goal = None
@@ -80,11 +78,14 @@ class UserPolicyAgendaMultiWoz(Policy):
             reward (float): Reward given by user.
         """
         self.__turn += 2
-        sys_action = state
 
-        # At the beginning of a dialog when there is no NLU.
-        if sys_action == "null":
-            sys_action = {}
+        assert isinstance(state, list)
+
+        sys_action = {}
+        for intent, domain, slot, value in state:
+            k = '-'.join([domain, intent])
+            sys_action.setdefault(k,[])
+            sys_action[k].append([slot, value])
 
         if self.__turn > self.max_turn:
             self.agenda.close_session()
@@ -101,7 +102,13 @@ class UserPolicyAgendaMultiWoz(Policy):
         # transform to DA
         action = self._transform_usract_out(action)
 
-        return action
+        tuples = []
+        for domain_intent, svs in action.items():
+            for slot, value in svs:
+                domain, intent = domain_intent.split('-')
+                tuples.append([intent, domain, slot, value])
+
+        return tuples
 
     def is_terminated(self):
         # Is there any action to say?
@@ -250,6 +257,26 @@ def check_if_time(value):
     if not groups:
         return False
     return True
+
+
+def check_constraint(slot, val_usr, val_sys):
+    try:
+        if slot == 'arriveBy':
+            val1 = int(val_usr.split(':')[0]) * 100 + int(val_usr.split(':')[1])
+            val2 = int(val_sys.split(':')[0]) * 100 + int(val_sys.split(':')[1])
+            if val1 < val2:
+                return True
+        elif slot == 'leaveAt':
+            val1 = int(val_usr.split(':')[0]) * 100 + int(val_usr.split(':')[1])
+            val2 = int(val_sys.split(':')[0]) * 100 + int(val_sys.split(':')[1])
+            if val1 > val2:
+                return True
+        else:
+            if val_usr != val_sys:
+                return True
+        return False
+    except:
+        return False
 
 
 class Goal(object):
@@ -533,7 +560,7 @@ class Agenda(object):
                 self._push_item(domain + '-inform', slot, g_fail_info[slot])
                 info_right = False
 
-            elif not g_fail_info and slot in g_info and value != g_info[slot]:
+            elif not g_fail_info and slot in g_info and check_constraint(slot, g_info[slot], value):
                 self._push_item(domain + '-inform', slot, g_info[slot])
                 info_right = False
 
@@ -768,35 +795,3 @@ class Agenda(object):
         text += '<stack btm>\n'
         text += '-----agenda-----\n'
         return text
-
-
-def test():
-    user_simulator = UserPolicyAgendaMultiWoz()
-    user_simulator.init_session()
-
-    test_turn(user_simulator, {"Train-Request": [["Dest", "?"], ["Day", "?"]]})
-    test_turn(user_simulator, {"Train-Request": [["Depart", "?"], ["Leave", "?"]]})
-    test_turn(user_simulator, {"Train-Request": [["Dest", "?"]]})
-    test_turn(user_simulator, {"Train-Inform": [["Ticket", "300"]]})
-    test_turn(user_simulator, {"Train-Inform": [["Arrive", "10:30"]]})
-    test_turn(user_simulator, {"Train-Inform": [["Id", "9999"]]})
-    test_turn(user_simulator, {"Booking-Request": [["Day", "123"], ["Time", "no"]]})
-    test_turn(user_simulator, {"Hotel-Request": [["Addr", "?"]], "Hotel-Inform": [["Internet", "yes"]]})
-    test_turn(user_simulator, {"Hotel-Request": [["Type", "?"], ["Parking", "?"]]})
-    test_turn(user_simulator, {"Hotel-Nooffer": [["Stars", "3"]], "Hotel-Request": [["Parking", "?"]]})
-    test_turn(user_simulator, {"Hotel-Select": [["Area", "aa"], ["Area", "bb"], ["Area", "cc"], ['Choice', 3]]})
-    test_turn(user_simulator, {"Hotel-Offerbooked": [["Ref", "12345"]]})
-
-
-def test_turn(user_simulator, sys_action):
-    print('input:', sys_action)
-    # action, session_over, reward = user_simulator.predict({'system_action': sys_action})
-    action, session_over = user_simulator.predict({'system_action': sys_action})
-    print('----------------------------------')
-    print('sys_action :' + str(sys_action))
-    print('user_action:' + str(action))
-    print('over       :' + str(session_over))
-    # print('reward     :' + str(reward))
-    print(user_simulator.goal)
-    print(user_simulator.agenda)
-

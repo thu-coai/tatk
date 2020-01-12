@@ -28,8 +28,6 @@ booking_info = {'Train': ['People'],
                 'Restaurant': ['Time', 'Day', 'People'],
                 'Hotel': ['Stay', 'Day', 'People']}
 
-# Alphabet used to generate Ref number
-alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 # Judge if user has confirmed a unique choice, according to different domain
 token = {'Attraction': ['Name', 'Addr', ''],
@@ -132,8 +130,14 @@ class RuleBasedMultiwozBot(Policy):
         # print("Sys action: ", DA)
 
         if DA == {}:
-            return {'general-greet': [['none', 'none']]}
-        return DA
+            DA = {'general-greet': [['none', 'none']]}
+        tuples = []
+        for domain_intent, svs in DA.items():
+            for slot, value in svs:
+                domain, intent = domain_intent.split('-')
+                tuples.append([intent, domain, slot, value])
+        state['system_action'] = tuples
+        return tuples
 
     def _update_greeting(self, user_act, state, DA):
         """ General request / inform. """
@@ -419,7 +423,10 @@ class RuleBasedMultiwozBot(Policy):
             if domain in booking_info and slot[0] in booking_info[domain]:
                 if 'Booking-Book' not in DA:
                     if domain in self.kb_result and len(self.kb_result[domain]) > 0:
-                        DA['Booking-Book'] = [["Ref", self.kb_result[domain][0]['Ref']]]
+                        if 'Ref' in self.kb_result[domain][0]:
+                            DA['Booking-Book'] = [["Ref", self.kb_result[domain][0]['Ref']]]
+                        else:
+                            DA['Booking-Book'] = [["Ref", "N/A"]]
                         # TODO handle booking between multi turn
 
 
@@ -496,14 +503,6 @@ def deduplicate(lst):
             i -= 1
         i += 1
     return lst
-
-
-def generate_ref_num(length):
-    """ Generate a ref num for booking. """
-    string = ""
-    while len(string) < length:
-        string += alphabet[random.randint(0, 999999) % 36]
-    return string
 
 
 def generate_phone_num(length):

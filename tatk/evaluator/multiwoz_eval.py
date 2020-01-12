@@ -5,7 +5,7 @@ import numpy as np
 from copy import deepcopy
 
 from tatk.evaluator.evaluator import Evaluator
-from tatk.util.multiwoz.dbquery import dbs
+from tatk.util.multiwoz.dbquery import Database
 
 requestable = \
     {'attraction': ['post', 'phone', 'addr', 'fee', 'area', 'type'],
@@ -40,6 +40,7 @@ class MultiWozEvaluator(Evaluator):
         self.goal = {}
         self.cur_domain = ''
         self.booked = {}
+        self.dbs = Database().dbs
 
     def _init_dict(self):
         dic = {}
@@ -99,11 +100,11 @@ class MultiWozEvaluator(Evaluator):
 
                 if da == 'booking-book-ref' and self.cur_domain in ['hotel', 'restaurant', 'train']:
                     if not self.booked[self.cur_domain] and re.match(r'^\d{8}$', value) and \
-                            len(dbs[self.cur_domain]) > int(value):
-                        self.booked[self.cur_domain] = dbs[self.cur_domain][int(value)]
+                            len(self.dbs[self.cur_domain]) > int(value):
+                        self.booked[self.cur_domain] = self.dbs[self.cur_domain][int(value)]
                 elif da == 'train-offerbooked-ref' or da == 'train-inform-ref':
-                    if not self.booked['train'] and re.match(r'^\d{8}$', value) and len(dbs['train']) > int(value):
-                        self.booked['train'] = dbs['train'][int(value)]
+                    if not self.booked['train'] and re.match(r'^\d{8}$', value) and len(self.dbs['train']) > int(value):
+                        self.booked['train'] = self.dbs['train'][int(value)]
                 elif da == 'taxi-inform-car':
                     if not self.booked['taxi']:
                         self.booked['taxi'] = 'booked'
@@ -220,7 +221,7 @@ class MultiWozEvaluator(Evaluator):
         elif key == "phone":
             return re.match(r'^\d{11}$', value)
         elif key == "price" or key == "entrance fee":
-            return 'pound' in value or value == "free"
+            return 'pound' in value or value == "free" or value == '?'
         elif key == "pricerange":
             return value in ["cheap", "expensive", "moderate", "free"]
         elif key == "postcode":

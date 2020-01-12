@@ -20,6 +20,7 @@ class UserPolicyVHUSAbstract(Policy):
         self.goal_input = torch.LongTensor(self.manager.get_goal_id(self.manager.usrgoal2seq(self.goal)))
         self.goal_len_input = torch.LongTensor([len(self.goal_input)]).squeeze()
         self.sys_da_id_stack = []  # to save sys da history
+        self.terminated = False
 
     def predict(self, state):
         """Predict an user act based on state and preorder system action.
@@ -42,8 +43,8 @@ class UserPolicyVHUSAbstract(Policy):
         sys_seq = torch.LongTensor(padding(self.sys_da_id_stack, max_sen_len))
         usr_a, terminated = self.user.select_action(self.goal_input, self.goal_len_input, sys_seq, sys_seq_len)
         usr_action = self.manager.usrseq2da(self.manager.id2sentence(usr_a), self.goal)
-
-        return usr_action, terminated
+        self.terminated = terminated
+        return usr_action
 
     def load(self, archive_file, model_file, filename):
         if not os.path.isfile(archive_file):
@@ -64,3 +65,7 @@ class UserPolicyVHUSAbstract(Policy):
 
     def get_goal(self):
         return self.goal
+
+    def is_terminated(self):
+        # Is there any action to say?
+        return self.terminated
