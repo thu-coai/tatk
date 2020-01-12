@@ -10,7 +10,13 @@ from pytorch_pretrained_bert.optimization import BertAdam
 
 from tatk.dst.sumbt.config.config import *
 from tatk.dst.sumbt.multiwoz.convert_to_glue_format import convert_to_glue_format
-from tatk.dst.sumbt.sumbt import SUMBTTracker, convert_examples_to_features, logger
+from tatk.dst.sumbt.sumbt import BeliefTracker, Processor, BertTokenizer, convert_examples_to_features, logger, InputExample
+from tatk.util.file_util import cached_path
+from tatk.util.multiwoz.state import default_state
+from tatk.dst.dst import DST
+from tatk.dst.sumbt.config.config import *
+
+import zipfile
 
 from tensorboardX import SummaryWriter
 
@@ -40,10 +46,44 @@ def warmup_linear(x, warmup=0.002):
     return 1.0 - x
 
 
-class MultiWozSUMBT(SUMBTTracker):
+class MultiWozSUMBT(DST):
     def __init__(self):
         super(MultiWozSUMBT, self).__init__()
         convert_to_glue_format()
+
+        self.belief_tracker = BeliefTracker()
+        self.batch = None  # generated with dataloader
+        self.current_turn = 0
+        self.idx2slot = {}
+        self.idx2value = {}  # slot value for each slot, use processor.get_labels()
+
+        if DEVICE == 'cuda':
+            if not torch.cuda.is_available():
+                raise ValueError('cuda not available')
+            n_gpu = torch.cuda.device_count()
+            if n_gpu < N_GPU:
+                raise ValueError('gpu not enough')
+
+        print("device: {} n_gpu: {}, distributed training: {}, 16-bits training: {}".format(DEVICE, n_gpu,
+                                                                                            bool(N_GPU > 1), FP16))
+
+        # Get Processor
+        self.processor = Processor()
+        self.label_list = self.processor.get_labels()
+        self.num_labels = [len(labels) for labels in self.label_list]  # number of slot-values in each slot-type
+        self.belief_tracker.init_session(self.num_labels)
+        if N_GPU > 1:
+                self.belief_tracker = torch.nn.DataParallel(self.belief_tracker)
+
+        # tokenizer
+        vocab_dir = os.path.join(BERT_DIR, 'vocab.txt')
+        if not os.path.exists(vocab_dir):
+            raise ValueError("Can't find %s " % vocab_dir)
+        self.tokenizer = BertTokenizer.from_pretrained(vocab_dir, do_lower_case=DO_LOWER_CASE)
+
+        self.num_train_steps = None
+        self.accumulation = False
+
         logger.info('dataset processed')
         if os.path.exists(OUTPUT_DIR) and os.listdir(OUTPUT_DIR):
             print("output dir {} not empty".format(OUTPUT_DIR))
@@ -53,12 +93,121 @@ class MultiWozSUMBT(SUMBTTracker):
         fileHandler = logging.FileHandler(os.path.join(OUTPUT_DIR, "log.txt"))
         logger.addHandler(fileHandler)
 
-
         random.seed(SEED)
         np.random.seed(SEED)
         torch.manual_seed(SEED)
         if N_GPU > 0:
             torch.cuda.manual_seed_all(SEED)
+
+        self.state = default_state()
+        # state = {'history': [[speaker, utt]], 'belief_state': {...}}
+
+    def load_weights(self):
+        # DEFAULT_DIRECTORY = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models")
+        # DEFAULT_ARCHIVE_FILE = os.path.join(DEFAULT_DIRECTORY, "sumbt_multiwoz.zip")
+        # archive_file = DEFAULT_ARCHIVE_FILE
+        # model_file = 'https://tatk-data.s3-ap-northeast-1.amazonaws.com/sumbt_multiwoz.zip'
+        # if not os.path.isfile(archive_file):
+        #     if not model_file:
+        #         raise Exception("No model for SC-LSTM is specified!")
+        #     archive_file = cached_path(model_file)
+        # model_dir = os.path.dirname(os.path.abspath(__file__))
+        # if not os.path.exists(os.path.join(model_dir, 'resource')):
+        #     archive = zipfile.ZipFile(archive_file, 'r')
+        #     archive.extractall(model_dir)
+
+        # model_ckpt = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pytorch_model.bin')
+        model_ckpt = os.path.join(OUTPUT_DIR, "pytorch_model.bin")
+        model = self.belief_tracker
+        # in the case that slot and values are different between the training and evaluation
+        ptr_model = torch.load(model_ckpt)
+        print('loading pretrained weights')
+
+        if N_GPU == 1:
+            state = model.state_dict()
+            state.update(ptr_model)
+            model.load_state_dict(state)
+        else:
+            # print("Evaluate using only one device!")
+            model.module.load_state_dict(ptr_model)
+
+        model.to(DEVICE)
+
+    def update(self, user_act=None):
+        self.current_turn = 0
+        # dialog_history: [{'sys': ..., 'usr': ...}, ...]
+        dialog_history = []
+        for i, (utter, utt) in enumerate(self.state['history']):
+            if i == 0:
+                dialog_history.append({'sys': '', 'usr': utt})
+            elif i % 2 == 0:
+                dialog_history.append({'sys': self.state['history'][i-1][1], 'usr': utt})
+
+        examples = []
+
+        for turn_idx, turn in enumerate(dialog_history):
+            guid = "%s-%s-%s" % ('track', 1, turn_idx)  # line[0]: dialogue index, line[1]: turn index
+            if self.accumulation:
+                if turn_idx == 0:
+                    assert turn['sys'] == ''
+                    text_a = turn['usr']
+                    text_b = ''
+                else:
+                    # The symbol '#' will be replaced with '[SEP]' after tokenization.
+                    text_a = turn['usr'] + " # " + text_a
+                    text_b = turn['sys'] + " # " + text_b
+            else:
+                text_a = turn['usr']  # line[2]: user utterance
+                text_b = turn['sys']  # line[3]: system response
+
+            # label = ['none' for idx in self.target_slot]
+            label = None
+
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+
+        all_input_ids, all_input_len, all_label_ids = convert_examples_to_features(
+            examples, self.label_list, MAX_SEQ_LENGTH, self.tokenizer, MAX_TURN_LENGTH)
+        all_input_ids, all_input_len = all_input_ids.to(DEVICE), all_input_len.to(
+            DEVICE)
+
+        pred_output = self.belief_tracker(all_input_ids, all_input_len, None, N_GPU)  # [num_slot, ds, num_turn, num_slot_value]
+        pred_output = [torch.argmax(pred_slot_res, 2) for pred_slot_res in pred_output]  # [num_slot, ds, num_turn]
+
+        self.pred_slot = []  # [[[(slot, value), slot_value2, ...], turn2, ...], dialog2, ...]
+        print(len(pred_output))
+        for slot_idx, slot_pred_res in enumerate(pred_output):
+            slot_str = self.processor.target_slot[slot_idx]
+            ds, num_turn = slot_pred_res.shape
+            if self.pred_slot == []:
+                for d in range(ds):
+                    self.pred_slot.append([])
+                for t in range(num_turn):
+                    for d in range(ds):
+                        self.pred_slot[d].append([])
+                for d in range(ds):
+                    for t in range(num_turn):
+                        self.pred_slot[d][t] = {}
+
+            for d in range(ds):
+                for t in range(num_turn):
+                    slot_value_idx = slot_pred_res[d, t]
+                    pred_slot_value = self.processor.ontology[slot_str][slot_value_idx]
+                    self.pred_slot[d][t][slot_str] = pred_slot_value
+
+        for key in self.pred_slot[0][-1]:
+            domain, slot_key = key.split('-')
+            slot_list = slot_key.split()
+            if domain not in self.state['belief_state']:
+                print('{} not in self.state'.format(domain))
+                continue
+
+            if len(slot_list) == 1:
+                self.state['belief_state'][domain]['semi'][slot_list[0]] = self.pred_slot[0][-1][key]
+            else:
+                self.state['belief_state'][domain]['book'][slot_list[1]] = self.pred_slot[0][-1][key]
+        # print(self.state)
+        return self.state
 
     def train(self, load_model=False, start_epoch=0, start_step=0):
         if load_model:
@@ -325,11 +474,15 @@ class MultiWozSUMBT(SUMBTTracker):
             if last_update + PATIENCE <= epoch:
                 break
 
-    def test(self):
+    def test(self, mode='dev'):
         # Evaluation
         self.load_weights()
 
-        eval_examples = self.processor.get_test_examples(TMP_DATA_DIR, accumulation=self.accumulation)
+        if mode == 'test':
+            eval_examples = self.processor.get_test_examples(TMP_DATA_DIR, accumulation=self.accumulation)
+        elif mode == 'dev':
+            eval_examples = self.processor.get_dev_examples(TMP_DATA_DIR, accumulation=self.accumulation)
+
         all_input_ids, all_input_len, all_label_ids = convert_examples_to_features(
             eval_examples, self.label_list, MAX_SEQ_LENGTH, self.tokenizer, MAX_TURN_LENGTH)
         all_input_ids, all_input_len, all_label_ids = all_input_ids.to(DEVICE), all_input_len.to(
@@ -471,9 +624,125 @@ def eval_all_accs(pred_slot, labels, accuracies):
     return accuracies
 
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--train', action='store_true')
+parser.add_argument('--dev', action='store_true')
+parser.add_argument('--test', action='store_true')
+
+
 if __name__ == "__main__":
 
+    # sumbt = MultiWozSUMBT()
+    # sumbt.train(load_model=False, start_epoch=0, start_step=0)
+    args = parser.parse_args()
     sumbt = MultiWozSUMBT()
-    sumbt.train(load_model=False, start_epoch=0, start_step=0)
-    # submt.test()
+    if args.train:
+        sumbt.train()
+    elif args.dev:
+        sumbt.load_weights()
+        sumbt.test('dev')
+    elif args.test:
+        sumbt.load_weights()
+        sumbt.test('test')
+    else:
+        sumbt.load_weights()
+        sumbt.state = {'belief_state': {
+                            "police": {
+                                "book": {
+                                    "booked": []
+                                },
+                                "semi": {}
+                            },
+                            "hotel": {
+                                "book": {
+                                    "booked": [],
+                                    "people": "",
+                                    "day": "",
+                                    "stay": ""
+                                },
+                                "semi": {
+                                    "name": "",
+                                    "area": "",
+                                    "parking": "",
+                                    "pricerange": "",
+                                    "stars": "",
+                                    "internet": "",
+                                    "type": ""
+                                }
+                            },
+                            "attraction": {
+                                "book": {
+                                    "booked": []
+                                },
+                                "semi": {
+                                    "type": "",
+                                    "name": "",
+                                    "area": ""
+                                }
+                            },
+                            "restaurant": {
+                                "book": {
+                                    "booked": [],
+                                    "people": "",
+                                    "day": "",
+                                    "time": ""
+                                },
+                                "semi": {
+                                    "food": "",
+                                    "pricerange": "",
+                                    "name": "",
+                                    "area": "",
+                                }
+                            },
+                            "hospital": {
+                                "book": {
+                                    "booked": []
+                                },
+                                "semi": {
+                                    "department": ""
+                                }
+                            },
+                            "taxi": {
+                                "book": {
+                                    "booked": []
+                                },
+                                "semi": {
+                                    "leaveAt": "",
+                                    "destination": "",
+                                    "departure": "",
+                                    "arriveBy": ""
+                                }
+                            },
+                            "train": {
+                                "book": {
+                                    "booked": [],
+                                    "people": ""
+                                },
+                                "semi": {
+                                    "leaveAt": "",
+                                    "destination": "",
+                                    "day": "",
+                                    "arriveBy": "",
+                                    "departure": ""
+                                }
+                            }
+                        },
+                       'history': [['a', 'I need to book a hotel in the east that has 4 stars.'],
+                                   ['b', 'I can help you with that . What is your price range?'],
+                                   ['a', 'That doesn\'t matter as long as it has free wifi and parking.'],
+                                   ['b', 'If you\'d like something cheap , I recommend the Allenbell . For something moderately priced , I would recommend the Warkworth House .'],
+                                   ['a', 'Could you book the Wartworth for one night , 1 person ?'],
+                                   ['b', 'What day will you be staying ?'],
+                                   ['a', 'Friday and Can you book it for me and get a reference number?'],
+                                   ['b', 'Booking was successful. Reference number is : BMUKPTG6. Can I help you with anything else today ? '],
+                                   ['a', 'I am looking to book a train that is leaving from Cambridge to Bishops Stortford on Friday.'],
+                                   ['b', 'There are a number of trains leaving throughout the day.  What time would you like to travel?'],
+                                   ['a', 'I want to get there by 19:45 at the latest.'],
+                                   ['b', 'Okay! The latest train you can take leaves at 17:29, and arrives by 18:07. Would you like for me to book that for you?'],
+                                   ['a', 'Yes please. I also need the travel time, departure time, and price.'],
+                                   ['b', 'Reference number is: UIFV8FAS . The price is 10.1 GBP and the trip will take about 38 minutes. May I be of any other assistance?'],
+                                   ['a', 'Yes. Sorry, but suddenly my plans changed. Can you change the Wartworth booking to Monday for 3 people and 4 nights?']]}
+        sumbt.update()
+
 

@@ -53,7 +53,7 @@ def convert_to_glue_format():
     for split_type, split_fp in zip(file_split, fp):
 
         zipfile_name = "{}.json.zip".format(split_type)
-        zip_fp = zipfile.ZipFile(zipfile_name)
+        zip_fp = zipfile.ZipFile(os.path.join(DATA_DIR, zipfile_name))
         data = json.loads(str(zip_fp.read(zip_fp.namelist()[0]), 'utf-8'))
 
         for file_id in data:
