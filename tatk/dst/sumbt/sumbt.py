@@ -17,6 +17,7 @@ from pytorch_pretrained_bert.tokenization import BertTokenizer
 from tatk.dst.dst import DST
 from tatk.dst.sumbt.config.config import *
 
+
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s -   %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
                     level=logging.INFO)
@@ -628,38 +629,7 @@ class Processor(DataProcessor):
 
 class SUMBTTracker(DST):
     def __init__(self):
-        self.belief_tracker = BeliefTracker()
-        self.batch = None  # generated with dataloader
-        self.current_turn = 0
-        self.idx2slot = {}
-        self.idx2value = {}  # slot value for each slot, use processor.get_labels()
-
-        if DEVICE == 'cuda':
-            if not torch.cuda.is_available():
-                raise ValueError('cuda not available')
-            n_gpu = torch.cuda.device_count()
-            if n_gpu < N_GPU:
-                raise ValueError('gpu not enough')
-
-        print("device: {} n_gpu: {}, distributed training: {}, 16-bits training: {}".format(DEVICE, n_gpu, bool(N_GPU > 1), FP16))
-
-
-        # Get Processor
-        self.processor = Processor()
-        self.label_list = self.processor.get_labels()
-        self.num_labels = [len(labels) for labels in self.label_list]  # number of slot-values in each slot-type
-        self.belief_tracker.init_session(self.num_labels)
-        if N_GPU > 1:
-            self.belief_tracker = torch.nn.DataParallel(self.belief_tracker)
-
-        # tokenizer
-        vocab_dir = os.path.join(BERT_DIR, 'vocab.txt')
-        if not os.path.exists(vocab_dir):
-            raise ValueError("Can't find %s " % vocab_dir)
-        self.tokenizer = BertTokenizer.from_pretrained(vocab_dir, do_lower_case=DO_LOWER_CASE)
-
-        self.num_train_steps = None
-        self.accumulation = False
+        pass
 
     def train(self):
         pass
@@ -723,23 +693,6 @@ class SUMBTTracker(DST):
                     slot_value_idx = slot_pred_res[d, t]
                     pred_slot_value = self.processor.ontology[slot_str][slot_value_idx]
                     self.pred_slot[d][t][slot_str] = pred_slot_value
-
-    def load_weights(self):
-        output_model_file = os.path.join(OUTPUT_DIR, "pytorch_model.bin")
-        model = self.belief_tracker
-        # in the case that slot and values are different between the training and evaluation
-        ptr_model = torch.load(output_model_file)
-        print('loading pretrained weights')
-
-        if N_GPU == 1:
-            state = model.state_dict()
-            state.update(ptr_model)
-            model.load_state_dict(state)
-        else:
-            # print("Evaluate using only one device!")
-            model.module.load_state_dict(ptr_model)
-
-        model.to(DEVICE)
 
     def update_batch(self, batch_action=None):
         ret = [d[self.current_turn] for d in self.pred_slot]
